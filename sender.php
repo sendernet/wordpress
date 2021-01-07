@@ -18,6 +18,7 @@
         require_once( "includes/Sender_Automated_Emails.php" );
     }
 
-    new Sender_Automated_Emails();
+    $sender = new Sender_Automated_Emails();
+    register_activation_hook( __FILE__, [&$sender, 'sender_activate']);
 
 ?>
