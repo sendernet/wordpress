@@ -1,8 +1,8 @@
 <?php
 
+class Sender_Automated_Emails
+{
 
-    class Sender_Automated_Emails
-    {
 
         private $senderBaseFile;
 
@@ -32,6 +32,7 @@
             $this->senderCreateTables();
             $this->senderSetupOptions();
             $this->senderCheckWooCommerce();
+            $this->senderEnableForms();
             return $this;
         }
 
@@ -216,5 +217,30 @@
             }
         }
 
+	private function senderEnableForms()
+	{
+		add_action( 'wp_head',  [&$this,'insertFormsScript'] );
+	}
 
-    }
+	public function insertFormsScript()
+	{
+		//Need enabled popups setting and account key for fetching json
+//		echo "
+//			<script>
+//			  (function (s, e, n, d, er) {
+//				s['Sender'] = er;
+//				s[er] = s[er] || function () {
+//				  (s[er].q = s[er].q || []).push(arguments)
+//				}, s[er].l = 1 * new Date();
+//				var a = e.createElement(n),
+//					m = e.getElementsByTagName(n)[0];
+//				a.async = 1;
+//				a.src = d;
+//				m.parentNode.insertBefore(a, m)
+//			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+//			  sender('birkanosis')
+//			</script>
+//			";
+	}
+
+}

@@ -17,7 +17,11 @@
     if( !class_exists( 'Sender_Automated_Emails' ) ) {
         require_once( "includes/Sender_Automated_Emails.php" );
     }
+    if( !class_exists('Sender_Templates_Loader') ) {
+        require_once( "templates/Sender_Templates_Loader.php" );
+    }
 
+    new Sender_Templates_Loader();
     $sender = new Sender_Automated_Emails(__FILE__);
 //    register_activation_hook( __FILE__, [&$sender, 'senderActivate']);
 
