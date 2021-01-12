@@ -143,7 +143,7 @@ class Sender_Automated_Emails
 	{
 
 		$additionalLinks = [
-			'<a href="' . admin_url('sender-settings.php') . '">Settings</a>',
+			'<a href="' . admin_url('admin.php?page=sender-settings') . '">Settings</a>',
 		];
 
 		return array_merge($links, $additionalLinks);
@@ -155,60 +155,18 @@ class Sender_Automated_Emails
 			return $this;
 		}
 
-		add_action('init', [&$this, 'senderCaptureEmail'], 10, 2);
-		add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
+        if( !class_exists('Sender_Carts') ) {
+            require_once("Sender_Carts.php" );
+        }
+
+        $senderCarts = new Sender_Carts($this);
+
+		add_action('init', [&$senderCarts, 'senderCaptureEmail'], 10, 2);
+		add_action('woocommerce_single_product_summary', [&$senderCarts, 'senderAddProductImportScript'], 10, 2);
+        add_action( 'woocommerce_checkout_order_processed', [&$senderCarts,  'senderConvertCart'], 10 , 1 );
+        add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
 	}
 
-	public function senderCaptureEmail()
-	{
-		//todo capture customer
-		if (!is_user_logged_in()) {
-			add_action('wp_ajax_nopriv_save_data', [&$this, 'senderSaveCapturedCostumer'], 10, 2);
-		}
-	}
-
-	public function senderSaveCapturedCostumer()
-	{
-
-	}
-
-	public function senderAddProductImportScript()
-	{
-		if (get_option('sender_allow_import')) {
-
-			global $product;
-
-			$id = $product->get_id();
-			$pName = $product->get_name();
-			$pImage = get_the_post_thumbnail_url($id);
-			$pDescription = str_replace("\"", '\\"', $product->get_description());
-			$pPrice = $product->get_regular_price();
-			$pCurrency = get_option('woocommerce_currency');
-			$pQty = $product->get_stock_quantity();
-			$pRating = $product->get_average_rating();
-			$pSalePrice = $pPrice;
-			$pDiscount = 0;
-
-			if ($product->is_on_sale() && !empty($product->get_sale_price())) {
-				$pSalePrice = $product->get_sale_price();
-				$pDiscount = round((string)100 - ($pSalePrice / $pPrice * 100));
-			}
-
-			echo '<script type="application/sender+json">
-                        {
-                          "name": "' . $pName . '",
-                          "image": "' . $pImage . '",
-                          "description": "' . $pDescription . '",
-                          "price": "' . (float)$pPrice . '",
-                          "discount": "-' . $pDiscount . '%",
-                          "special_price": "' . (float)$pSalePrice . '",
-                          "currency": "' . $pCurrency . '",
-                          "quantity": "' . $pQty . '",
-                          "rating": "' . $pRating . '"
-                        }
-                    </script>';
-		}
-	}
 
 	private function senderEnableForms()
 	{
