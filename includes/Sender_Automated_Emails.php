@@ -35,8 +35,6 @@ class Sender_Automated_Emails
             require_once("Sender_Forms_Widget.php" );
         }
 
-        new Sender_Forms_Widget($this);
-
 		$this->senderActivate()
 			 ->senderAddActions()
 			 ->senderAddFilters()
@@ -46,6 +44,7 @@ class Sender_Automated_Emails
 	private function senderAddActions()
 	{
 		add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
+        add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
 		return $this;
 	}
 
@@ -233,5 +232,10 @@ class Sender_Automated_Emails
 //			</script>
 //			";
 	}
+
+    public function senderRegisterFormsWidget() {
+        register_widget( 'Sender_Forms_Widget' );
+    }
+
 
 }

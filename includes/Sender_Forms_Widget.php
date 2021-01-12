@@ -4,17 +4,6 @@
         exit;
     }
 
-    // Add function to widgets_init that'll load our widget.
-    if(true) {
-        add_action( 'widgets_init', 'Sender_Automated_Emails_Widget' );
-    }
-
-// Register widget.
-    function Sender_Automated_Emails_Widget() {
-        register_widget( 'Sender_Forms_Widget' );
-    }
-
-
     class Sender_Forms_Widget extends  WP_Widget
     {
 
