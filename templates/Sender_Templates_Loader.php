@@ -3,10 +3,18 @@
 class Sender_Templates_Loader
 {
 	public $sender;
+	public $senderApi;
 
 	public function __construct($sender)
 	{
 		$this->sender = $sender;
+
+        if( !class_exists('Sender_Api') ) {
+            require_once( dirname(dirname(__FILE__)) . "/includes/Sender_Api.php" );
+        }
+
+        $this->senderApi = new Sender_Api();
+
 		add_action('admin_menu', [&$this, 'senderInitSidebar']);
 	}
 
@@ -29,8 +37,10 @@ class Sender_Templates_Loader
 		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );
 
 		if ($apiKey) {
-			$response = $this->sender->senderGetAccount()['body'];
+		    $this->senderApi->senderSetApiKey($apiKey);
+			$response = $this->senderApi->senderGetAccount()['body'];
 			$user = json_decode($response);
+			$forms = $this->senderApi->senderGetForms()['body'];
 		}
 		require_once('settings.php');
 	}

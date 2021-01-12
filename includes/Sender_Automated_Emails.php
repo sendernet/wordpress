@@ -2,9 +2,6 @@
 
 class Sender_Automated_Emails
 {
-	private $senderBaseUrl = 'https://api.sender.net/v2/';
-	private $senderAccountEndpoint = 'users';
-
 	private $availableSettings = [
 		'sender_api_key'            => false,
 		'sender_allow_guest_track'  => false,
@@ -200,19 +197,6 @@ class Sender_Automated_Emails
 	private function senderEnableForms()
 	{
 		add_action('wp_head', [&$this, 'insertFormsScript']);
-	}
-
-	public function senderGetAccount()
-	{
-		$arguments = [
-			'headers' => [
-				'Content-Type' => 'application/json',
-				'Accept' => 'application/json',
-				'Authorization' => 'Bearer ' . get_option('sender_api_key')
-			]
-		];
-
-		return wp_remote_request($this->senderBaseUrl . $this->senderAccountEndpoint, $arguments);
 	}
 
 	public function insertFormsScript()
