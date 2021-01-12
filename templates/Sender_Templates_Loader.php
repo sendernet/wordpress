@@ -26,12 +26,25 @@ class Sender_Templates_Loader
 
 	}
 
+	function senderHandleFormPost()
+	{
+		$changes = [];
+		foreach ($_POST as $name => $value) {
+
+			if (strpos($name, 'hidden_checkbox') !== false && !isset($_POST[ str_replace('_hidden_checkbox','', $name)])) {
+				$changes[str_replace('_hidden_checkbox','', $name)] = false;
+			} else {
+				$changes[$name] = $value;
+			}
+		}
+
+		$this->sender->updateSettings($changes);
+	}
+
 	function senderAddSidebar()
 	{
-
 		if($_POST) {
-			var_dump($_POST);
-			$this->sender->updateSettings($_POST);
+			$this->senderHandleFormPost();
 		}
 
 		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );

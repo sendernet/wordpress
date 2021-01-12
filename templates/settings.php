@@ -5,7 +5,7 @@
                 <h2 class="sender-header">Enter your api key</h2>
 
                 <div class="sender-subheader"> We need your API key to continue. <br>
-                     <a href="#" class="sender-link">Click here</a> if you are not sure where to find it.
+                    <a href="#" class="sender-link">Click here</a> if you are not sure where to find it.
 
                 </div>
 
@@ -18,11 +18,12 @@
 
             </form>
 
-		<?php } else {?>
+		<?php } else { ?>
             <div class="sender-settings-grid">
                 <div class="sender-account-info sender-box">
                     <div class="sender-logo">
-                        <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'assets/images/logo.png'; ?>" alt="Sender logo">
+                        <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.png'; ?>"
+                             alt="Sender logo">
                     </div>
                     <div class="sender-username">
                         <h2 class="sender-header"><?php echo $user->account->title ?></h2>
@@ -31,13 +32,15 @@
                     <div class="flex-grow-1"></div>
                     <div class="sender-logout">
                         <div class="sender-subheader">
-							<?php if($user->account->active_plan->type === 'PAYG') {
+							<?php if ($user->account->active_plan->type === 'PAYG') {
 								echo "Pay as you go plan";
-							} else if($user->account->active_plan->type === 'SUBSCRIPTION') {
-
-								echo "Monthly subscription";
 							} else {
-								echo "Free plan";
+								if ($user->account->active_plan->type === 'SUBSCRIPTION') {
+
+									echo "Monthly subscription";
+								} else {
+									echo "Free plan";
+								}
 							}
 							?>
                         </div>
@@ -51,31 +54,62 @@
                     </div>
                 </div>
                 <div class="sender-plugin-settings sender-box">
-                    <form method="post" action=''>
-                        <div class="sender-option">
-                            <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track" value="sender_allow_guest_track" name="sender_allow_guest_track" <?php if (get_option('sender_allow_guest_track')) {echo 'checked';} ?> >
-                            <label for="sender_allow_guest_track">Allow guests tracking</label>
+                    <form method="post" class="sender-account-info h-100" action=''>
+                        <div class="sender-options">
+                            <div class="sender-option">
+                                <input type="hidden" value="0" name="sender_allow_guest_track_hidden_checkbox">
+                                <label for="sender_allow_guest_track">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track"
+                                           value="sender_allow_guest_track"
+                                           name="sender_allow_guest_track" <?php if (get_option('sender_allow_guest_track')) {
+										echo 'checked';
+									} ?> >
+                                    <span>Allow guests tracking</span>
+                                </label>
+
+                            </div>
+                            <div class="sender-option">
+                                <input type="hidden" value="0" name="sender_allow_forms_hidden_checkbox">
+                                <label for="sender_allow_forms">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_forms"
+                                           name="sender_allow_forms" <?php if (get_option('sender_allow_forms')) {
+										echo 'checked';
+									} ?> >
+                                    <span>Show forms and pup-ups</span>
+                                </label>
+                            </div>
+                            <div class="sender-option">
+                                <input type="hidden" value="0" name="sender_allow_import_hidden_checkbox">
+                                <label for="sender_allow_import">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_import"
+                                           name="sender_allow_import" <?php if (get_option('sender_allow_import')) {
+										echo 'checked';
+									} ?> >
+                                    <span>Allow products import</span>
+                                </label>
+                            </div>
                         </div>
-                        <div class="sender-option">
-                            <input class="sender-checkbox" type="checkbox" id="sender_allow_forms" name="sender_allow_guest_track" <?php if (get_option('sender_allow_forms')) {echo 'checked';} ?> >
-                            <label for="sender_allow_forms">Show forms and pup-ups</label>
-                        </div>
-                        <div class="sender-option">
-                            <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track" name="sender_allow_import" <?php if (get_option('sender_allow_import')) {echo 'checked';} ?> >
-                            <label for="sender_allow_import">Allow products import</label>
-                        </div>
+                        <div class="flex-grow-1"></div>
                         <div class="sender-logout">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
                                    value="Save">
                         </div>
                     </form>
                 </div>
-                <div class="sender-forms-list sender-box"></div>
+                <div class="sender-forms-list">
+                    <div class="sender-big-header"> Forms
+                    </div>
+                    <div class=" sender-box"></div>
+                </div>
             </div>
-        <?php } ?>
+		<?php } ?>
     </div>
 </div>
 <style>
+
+    .h-100 {
+        height: 100%;
+    }
 
     .sender-logout {
         display: flex;
@@ -83,6 +117,7 @@
         align-items: center;
 
     }
+
     .sender-account-info {
         display: flex;
         flex-direction: column;
@@ -91,6 +126,7 @@
     .flex-grow-1 {
         flex-grow: 1;
     }
+
     .sender-settings-grid {
         margin: 40px;
         margin-left: 20px;
@@ -194,6 +230,14 @@
         line-height: 22px;
     }
 
+    .sender-big-header {
+        font-size: 32px;
+        line-height: 38px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #000;
+    }
+
     .sender-box {
         border-radius: 10px;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
@@ -205,4 +249,61 @@
     .sender-input {
 
     }
+
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+    }
+
+    /* Text color for the label */
+    input[type="checkbox"] + span {
+        cursor: pointer;
+        font: 16px sans-serif;
+        color: black;
+    }
+
+    /* Checkbox un-checked style */
+    input[type="checkbox"] + span:before {
+        content: '';
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 0.5em;
+        margin-top: 0.5em;
+        vertical-align: -2px;
+    }
+
+    /* Checked checkbox style (in this case the background is green #e7ffba, change this to change the color) */
+    input[type="checkbox"]:checked + span:before {
+        /* NOTE: Replace the url with a path to an SVG of a checkmark to get a checkmark icon */
+        background-image: url('<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>');
+        background-repeat: no-repeat;
+        background-position: center;
+        /* The size of the checkmark icon, you may/may not need this */
+        background-size: 11px;
+        border-radius: 5px;
+        background-color: #ff8d00;
+        color: white;
+        border: 1px solid transparent;
+    }
+
+    /* Adding a dotted border around the active tabbed-into checkbox */
+    input[type="checkbox"]:focus + span:before,
+    input[type="checkbox"] + span:hover:before {
+        /* Visible in the full-color space */
+        box-shadow: none;
+        outline: none;
+    }
+
+
+    /* Disabled checkbox styles */
+    input[type="checkbox"]:disabled + span {
+        cursor: default;
+        color: black;
+        opacity: 0.5;
+    }
+
 </style>
