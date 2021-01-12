@@ -4,7 +4,7 @@
         exit;
     }
 
-    class Sender_Api
+    class Sender_API
     {
         private $senderBaseRequestArguments;
         private $senderBaseUrl = 'https://api.sender.net/v2/';
@@ -38,8 +38,12 @@
             return $this->senderApiKey;
         }
 
-        public function senderBaseRequestArguments()
+        public function senderBaseRequestArguments($delete = false)
         {
+            if($delete){
+                return array_merge($this->senderBaseRequestArguments, ['method' => 'DELETE']);
+            }
+
             return $this->senderBaseRequestArguments;
         }
 
@@ -67,19 +71,23 @@
             return $this->senderBuildResponse($data);
         }
 
-        public function senderTrackCart()
+        public function senderTrackCart(array $cartParams)
         {
-
+            $params = array_merge($this->senderBaseRequestArguments(), ['params' => $cartParams]);
+            $response = wp_remote_post($this->senderBaseUrl . 'carts', $params);
+            return $this->senderBuildResponse($response);
         }
 
-        public function senderConvertCart()
+        public function senderConvertCart($wpCartId)
         {
-
+            $response = wp_remote_post($this->senderBaseUrl . 'carts/' . $wpCartId . '/convert', $this->senderBaseRequestArguments());
+            return $this->senderBuildResponse($response);
         }
 
-        public function senderDeleteCart()
+        public function senderDeleteCart($wpCartId)
         {
-
+            $response = wp_remote_request($this->senderBaseUrl . 'carts/' . $wpCartId, $this->senderBaseRequestArguments(true));
+            return $this->senderBuildResponse($response);
         }
 
         private function senderBuildResponse($response)

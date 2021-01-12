@@ -25,11 +25,17 @@ class Sender_Automated_Emails
 	{
 		$this->senderBaseFile = $senderBaseFile;
 
-        if( !class_exists('Sender_Api') ) {
-            require_once("Sender_Api.php" );
+        if( !class_exists('Sender_API') ) {
+            require_once("Sender_API.php" );
         }
 
-        $this->senderApi = new Sender_Api();
+        $this->senderApi = new Sender_API();
+
+        if( !class_exists('Sender_Forms_Widget') ) {
+            require_once("Sender_Forms_Widget.php" );
+        }
+
+        new Sender_Forms_Widget();
 
 		$this->senderActivate()
 			 ->senderAddActions()
