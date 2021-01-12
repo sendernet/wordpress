@@ -1,3 +1,5 @@
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <div class="sender-container">
     <div class="sender-flex-column">
 		<?php if (!$apiKey) { ?>
@@ -98,9 +100,26 @@
                 </div>
                 <div class="sender-forms-list">
                     <div class="sender-big-header"> Forms </div>
-                    <div class=" sender-box flex-column">
+                    <div class=" sender-box no-padding flex-column">
                         <?php foreach ($forms as $form): ?>
-                            <?= $form->id ?>
+                            <div class="sender-form-row">
+                                <div class="sender-form-thumbnail">
+                                    <img src="<?=$form->thumbnail_url?>" alt="thumbnail">
+                                </div>
+                                <div class="sender-form-text flex-column">
+                                    <div class="sender-header mb-10"><?= $form->title ?></div>
+                                    <div class="sender-subheader">Edited <?= $form->modified ?></div>
+                                </div>
+                                <div class="flex-grow-1"></div>
+                                <div class="sender-form-stats">
+                                    <div class="sender-header-small mb-10">Subscribers</div>
+                                    <div class="sender-subheader"><?= $form->subscribed ?></div>
+                                </div>
+                                <div class="sender-form-stats">
+                                    <div class="sender-header-small mb-10">Visitors</div>
+                                    <div class="sender-subheader"><?= $form->visited ?></div>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -114,11 +133,18 @@
         height: 100%;
     }
 
+    .sender-container {
+        font-family: 'Roboto', sans-serif !important;
+    }
     .sender-logout {
         display: flex;
         justify-content: flex-end;
         align-items: center;
 
+    }
+
+    .mb-10 {
+        margin-bottom: 10px !important;
     }
 
     .flex-column {
@@ -129,6 +155,32 @@
     .flex-grow-1 {
         flex-grow: 1;
     }
+
+    .no-padding {
+        padding: 0px !important;
+    }
+    .sender-form-stats {
+        margin-left: 10px;
+    }
+
+    .sender-form-thumbnail {
+        height: 100%;
+        margin-right: 20px;
+        width: 60px;
+        border: 1px solid #ccc;
+    }
+
+    .sender-form-thumbnail img {
+        height: 100%;
+    }
+
+    .sender-form-row {
+        display: flex;
+        height: 60px;
+        border-bottom: 1px solid #ccc;
+        padding: 20px;
+    }
+
 
     .sender-settings-grid {
         margin: 40px;
@@ -219,6 +271,12 @@
 
     .sender-link {
         color: #ff8d00;
+    }
+
+    .sender-header-small {
+        font-size: 16px;
+        color: #222;
+        line-height: 18px;
     }
 
     .sender-subheader {
