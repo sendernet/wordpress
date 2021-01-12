@@ -2,22 +2,40 @@
 
 class Sender_Templates_Loader
 {
+	public $sender;
 
-	public function __construct()
+	public function __construct($sender)
 	{
-		add_action('admin_menu', 'test_plugin_setup_menu');
+		$this->sender = $sender;
+		add_action('admin_menu', [&$this, 'senderInitSidebar']);
 
-		function test_plugin_setup_menu()
-		{
 
-			add_menu_page('Sender Automated Emails Marketing', 'Sender.net', 'manage_options', 'sender-settings', 'test_init');
-		}
 
-		function test_init()
-		{
-			$apiKey = false;
-			require_once('settings.php');
-		}
+
 	}
 
+	function senderInitSidebar()
+	{
+
+		add_action('admin_post_submit-sender-settings', 'senderSubmitForm');
+		add_menu_page('Sender Automated Emails Marketing', 'Sender.net', 'manage_options', 'sender-settings', [&$this, 'senderAddSidebar']);
+
+	}
+
+	function senderAddSidebar()
+	{
+
+		if($_POST) {
+			$this->sender->updateSettings($_POST);
+		}
+
+		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );
+		require_once('settings.php');
+	}
+
+	function senderSubmitForm()
+	{
+		var_dump($_POST);
+
+	}
 }

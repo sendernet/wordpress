@@ -2,7 +2,21 @@
 
 class Sender_Automated_Emails
 {
-
+		private $availableSettings = [
+			'sender_api_key' => false,
+			'sender_allow_guest_track' => false,
+			'sender_allow_import' => 1,
+			'sender_allow_forms' => false,
+			'sender_customers_list' => ['id' => false, 'title' => ' '],
+			'sender_registration_list' => ['id' => false, 'title' => ' '],
+			'sender_registration_track' => 1,
+			'sender_cart_period' => 'today',
+			'sender_has_woocommerce' => false,
+			'sender_high_acc' => true,
+			'sender_allow_push' => false,
+			'sender_forms_list' => false,
+			'sender_plugin_active' => false,
+		];
 
         private $senderBaseFile;
 
@@ -80,60 +94,22 @@ class Sender_Automated_Emails
             $wpdb->query( $usersSql );
         }
 
+        public function updateSettings($updates)
+		{
+			foreach ($this->availableSettings as $name => $defaultValue) {
+				if( isset( $updates[$name] ) ) {
+					update_option( $name, $updates[$name] );
+				}
+			}
+		}
+
         private function senderSetupOptions()
         {
-
-            if( !get_option( 'sender_api_key' ) ) {
-                add_option( 'sender_api_key', 'api_key' );
-            }
-
-            if( !get_option( 'sender_allow_guest_track' ) ) {
-                add_option( 'sender_allow_guest_track', false );
-            }
-
-            if( !get_option( 'sender_allow_import' ) ) {
-                add_option( 'sender_allow_import', 1 );
-            }
-
-            if( !get_option( 'sender_allow_forms' ) ) {
-                add_option( 'sender_allow_forms', false );
-            }
-
-            if( !get_option( 'sender_customers_list' ) ) {
-                add_option( 'sender_customers_list', ['id' => false, 'title' => ' '] );
-            }
-
-            if( !get_option( 'sender_registration_list' ) ) {
-                add_option( 'sender_registration_list', ['id' => false, 'title' => ' '] );
-            }
-
-            if( !get_option( 'sender_registration_track' ) ) {
-                add_option( 'sender_registration_track', 1 );
-            }
-
-            if( !get_option( 'sender_cart_period' ) ) {
-                add_option( 'sender_cart_period', 'today' );
-            }
-
-            if( !get_option( 'sender_has_woocommerce' ) ) {
-                add_option( 'sender_has_woocommerce', false );
-            }
-
-            if( !get_option( 'sender_high_acc' ) ) {
-                add_option( 'sender_high_acc', true );
-            }
-
-            if( !get_option( 'sender_allow_push' ) ) {
-                add_option( 'sender_allow_push', false );
-            }
-
-            if( !get_option( 'sender_forms_list' ) ) {
-                add_option( 'sender_forms_list', false );
-            }
-
-            if( !get_option( 'sender_plugin_active' ) ) {
-                add_option( 'sender_plugin_active', false );
-            }
+        	foreach ($this->availableSettings as $name => $defaultValue) {
+				if( !get_option( $name ) ) {
+					add_option( $name, $defaultValue );
+				}
+			}
         }
 
         public function senderCheckWooCommerce()

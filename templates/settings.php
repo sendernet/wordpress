@@ -1,7 +1,7 @@
 <div class="sender-container">
     <div class="sender-flex-column">
 		<?php if (!$apiKey) { ?>
-            <form method="post" action="options.php" class="sender-box required-api-key" novalidate="novalidate">
+            <form method="post" action='' class="sender-box required-api-key" novalidate="novalidate">
                 <h2 class="sender-header">Enter your api key</h2>
 
                 <div class="sender-subheader"> We need your API key to continue. <br>
@@ -18,7 +18,9 @@
 
             </form>
 
-		<?php } ?>
+		<?php } else {?>
+        <div><?= $apiKey ?></div>
+        <?php } ?>
     </div>
 </div>
 <style>
