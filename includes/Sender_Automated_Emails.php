@@ -19,10 +19,18 @@ class Sender_Automated_Emails
 	];
 
 	private $senderBaseFile;
+	public $senderApi;
 
 	public function __construct($senderBaseFile)
 	{
 		$this->senderBaseFile = $senderBaseFile;
+
+        if( !class_exists('Sender_Api') ) {
+            require_once("Sender_Api.php" );
+        }
+
+        $this->senderApi = new Sender_Api();
+
 		$this->senderActivate()
 			 ->senderAddActions()
 			 ->senderAddFilters()
