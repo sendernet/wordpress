@@ -31,6 +31,12 @@ class Sender_Automated_Emails
 
         $this->senderApi = new Sender_API();
 
+        if( !class_exists('Sender_Forms_Widget') ) {
+            require_once("Sender_Forms_Widget.php" );
+        }
+
+        new Sender_Forms_Widget();
+
 		$this->senderActivate()
 			 ->senderAddActions()
 			 ->senderAddFilters()
