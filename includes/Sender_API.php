@@ -55,7 +55,7 @@
 
         public function senderGetForms()
         {
-            $data = wp_remote_request($this->senderBaseUrl . 'forms', $this->senderBaseRequestArguments());
+            $data = wp_remote_request($this->senderBaseUrl . 'forms?type=embed&status=PUBLISHED', $this->senderBaseRequestArguments());
             return $this->senderBuildResponse($data);
         }
 

@@ -39,6 +39,9 @@ class Sender_Automated_Emails
 			 ->senderAddActions()
 			 ->senderAddFilters()
 			 ->senderSetupWooCommerce();
+
+		new Sender_Forms_Widget($this);
+
 	}
 
 	private function senderAddActions()
@@ -215,22 +218,22 @@ class Sender_Automated_Emails
 	public function insertFormsScript()
 	{
 		//Need enabled popups setting and account key for fetching json
-//		echo "
-//			<script>
-//			  (function (s, e, n, d, er) {
-//				s['Sender'] = er;
-//				s[er] = s[er] || function () {
-//				  (s[er].q = s[er].q || []).push(arguments)
-//				}, s[er].l = 1 * new Date();
-//				var a = e.createElement(n),
-//					m = e.getElementsByTagName(n)[0];
-//				a.async = 1;
-//				a.src = d;
-//				m.parentNode.insertBefore(a, m)
-//			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-//			  sender('birkanosis')
-//			</script>
-//			";
+		echo "
+			<script>
+			  (function (s, e, n, d, er) {
+				s['Sender'] = er;
+				s[er] = s[er] || function () {
+				  (s[er].q = s[er].q || []).push(arguments)
+				}, s[er].l = 1 * new Date();
+				var a = e.createElement(n),
+					m = e.getElementsByTagName(n)[0];
+				a.async = 1;
+				a.src = d;
+				m.parentNode.insertBefore(a, m)
+			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+			  sender('birkanosis')
+			</script>
+			";
 	}
 
     public function senderRegisterFormsWidget() {
