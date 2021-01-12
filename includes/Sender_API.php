@@ -71,10 +71,10 @@
             return $this->senderBuildResponse($data);
         }
 
-        public function senderTrackCart($wpCartId, array $cartParams)
+        public function senderTrackCart(array $cartParams)
         {
             $params = array_merge($this->senderBaseRequestArguments(), ['params' => $cartParams]);
-            $response = wp_remote_post($this->senderBaseUrl . 'carts/' . $wpCartId, $params);
+            $response = wp_remote_post($this->senderBaseUrl . 'carts', $params);
             return $this->senderBuildResponse($response);
         }
 
