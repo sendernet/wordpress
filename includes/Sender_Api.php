@@ -45,22 +45,26 @@
 
         public function senderGetAccount()
         {
-            return wp_remote_request($this->senderBaseUrl . 'users', $this->senderBaseRequestArguments());
+            $data = wp_remote_request($this->senderBaseUrl . 'users', $this->senderBaseRequestArguments());
+            return $this->senderBuildResponse($data);
         }
 
         public function senderGetForms()
         {
-            return wp_remote_request($this->senderBaseUrl . 'forms', $this->senderBaseRequestArguments());
+            $data = wp_remote_request($this->senderBaseUrl . 'forms', $this->senderBaseRequestArguments());
+            return $this->senderBuildResponse($data);
         }
 
         public function senderGetGroups()
         {
-            return wp_remote_request($this->senderBaseUrl . 'tags', $this->senderBaseRequestArguments());
+            $data = wp_remote_request($this->senderBaseUrl . 'tags', $this->senderBaseRequestArguments());
+            return $this->senderBuildResponse($data);
         }
 
         public function senderGetCart($cartHash)
         {
-
+            $data = wp_remote_request($this->senderBaseUrl . 'carts/' . $cartHash, $this->senderBaseRequestArguments());
+            return $this->senderBuildResponse($data);
         }
 
         public function senderTrackCart()
@@ -78,8 +82,9 @@
 
         }
 
-
-
-
+        private function senderBuildResponse($response)
+        {
+            return json_decode($response['body']);
+        }
 
     }

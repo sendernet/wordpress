@@ -42,10 +42,9 @@ class Sender_Templates_Loader
 
 		if ($apiKey) {
 		    $this->sender->senderApi->senderSetApiKey($apiKey);
-			$response = $this->sender->senderApi->senderGetAccount()['body'];
-			$user = json_decode($response);
-			$forms = json_decode($this->sender->senderApi->senderGetForms()['body'])->data;
-			$groups = $this->sender->senderApi->senderGetGroups()['body'];
+			$user = $this->sender->senderApi->senderGetAccount();
+			$forms = $this->sender->senderApi->senderGetForms()->data;
+			$groups = $this->sender->senderApi->senderGetGroups();
 		}
 		require_once('settings.php');
 	}
