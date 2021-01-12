@@ -140,7 +140,7 @@ class Sender_Automated_Emails
 	{
 
 		$additionalLinks = [
-			'<a href="' . admin_url('sender-settings.php') . '">Settings</a>',
+			'<a href="' . admin_url('admin.php?page=sender-settings') . '">Settings</a>',
 		];
 
 		return array_merge($links, $additionalLinks);
