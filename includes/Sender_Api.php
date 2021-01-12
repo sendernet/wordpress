@@ -1,5 +1,9 @@
 <?php
 
+    if (!defined('ABSPATH')) {
+        exit;
+    }
+
     class Sender_Api
     {
         private $senderBaseRequestArguments;
@@ -48,5 +52,34 @@
         {
             return wp_remote_request($this->senderBaseUrl . 'forms', $this->senderBaseRequestArguments());
         }
+
+        public function senderGetGroups()
+        {
+            return wp_remote_request($this->senderBaseUrl . 'tags', $this->senderBaseRequestArguments());
+        }
+
+        public function senderGetCart($cartHash)
+        {
+
+        }
+
+        public function senderTrackCart()
+        {
+
+        }
+
+        public function senderConvertCart()
+        {
+
+        }
+
+        public function senderDeleteCart()
+        {
+
+        }
+
+
+
+
 
     }
