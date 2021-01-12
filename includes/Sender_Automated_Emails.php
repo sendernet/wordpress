@@ -234,7 +234,7 @@ class Sender_Automated_Emails
 	}
 
     public function senderRegisterFormsWidget() {
-        register_widget( 'Sender_Forms_Widget' );
+        register_widget( new Sender_Forms_Widget($this));
     }
 
 

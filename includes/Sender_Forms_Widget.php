@@ -7,7 +7,7 @@
     class Sender_Forms_Widget extends  WP_Widget
     {
 
-        public function __construct()
+        public function __construct($sender)
         {
             /* Widget settings. */
             $widget_ops = ['classname' => 'sae_sender_form', 'description' => __('Add Sender.net form to your website.', 'framework')];
