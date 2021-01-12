@@ -161,7 +161,7 @@ class Sender_Automated_Emails
 		add_action('init', [&$senderCarts, 'senderCaptureEmail'], 10, 2);
 		add_action('woocommerce_single_product_summary', [&$senderCarts, 'senderAddProductImportScript'], 10, 2);
         add_action( 'woocommerce_checkout_order_processed', [&$senderCarts,  'senderConvertCart'], 10 , 1 );
-        add_action( 'woocommerce_after_checkout_billing_form',  [&$this, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
+        add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
 	}
 
 
