@@ -20,7 +20,7 @@
 
 		<?php } else { ?>
             <div class="sender-settings-grid">
-                <div class="sender-account-info sender-box">
+                <div class="flex-column sender-box">
                     <div class="sender-logo">
                         <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.png'; ?>"
                              alt="Sender logo">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <div class="sender-plugin-settings sender-box">
-                    <form method="post" class="sender-account-info h-100" action=''>
+                    <form method="post" class="flex-column h-100" action=''>
                         <div class="sender-options">
                             <div class="sender-option">
                                 <input type="hidden" value="0" name="sender_allow_guest_track_hidden_checkbox">
@@ -97,9 +97,12 @@
                     </form>
                 </div>
                 <div class="sender-forms-list">
-                    <div class="sender-big-header"> Forms
+                    <div class="sender-big-header"> Forms </div>
+                    <div class=" sender-box flex-column">
+                        <?php foreach ($forms as $form): ?>
+                            <?= $form->id ?>
+                        <?php endforeach; ?>
                     </div>
-                    <div class=" sender-box"></div>
                 </div>
             </div>
 		<?php } ?>
@@ -118,7 +121,7 @@
 
     }
 
-    .sender-account-info {
+    .flex-column {
         display: flex;
         flex-direction: column;
     }

@@ -44,7 +44,7 @@ class Sender_Templates_Loader
 		    $this->sender->senderApi->senderSetApiKey($apiKey);
 			$response = $this->sender->senderApi->senderGetAccount()['body'];
 			$user = json_decode($response);
-			$forms = $this->sender->senderApi->senderGetForms()['body'];
+			$forms = json_decode($this->sender->senderApi->senderGetForms()['body'])->data;
 			$groups = $this->sender->senderApi->senderGetGroups()['body'];
 		}
 		require_once('settings.php');
