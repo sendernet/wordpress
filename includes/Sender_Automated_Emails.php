@@ -35,7 +35,7 @@ class Sender_Automated_Emails
             require_once("Sender_Forms_Widget.php" );
         }
 
-        new Sender_Forms_Widget();
+        new Sender_Forms_Widget($this);
 
 		$this->senderActivate()
 			 ->senderAddActions()
