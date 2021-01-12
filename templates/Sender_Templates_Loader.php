@@ -8,10 +8,6 @@ class Sender_Templates_Loader
 	{
 		$this->sender = $sender;
 		add_action('admin_menu', [&$this, 'senderInitSidebar']);
-
-
-
-
 	}
 
 	function senderInitSidebar()
@@ -26,10 +22,16 @@ class Sender_Templates_Loader
 	{
 
 		if($_POST) {
+			var_dump($_POST);
 			$this->sender->updateSettings($_POST);
 		}
 
 		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );
+
+		if ($apiKey) {
+			$response = $this->sender->senderGetAccount()['body'];
+			$user = json_decode($response);
+		}
 		require_once('settings.php');
 	}
 

@@ -19,11 +19,92 @@
             </form>
 
 		<?php } else {?>
-        <div><?= $apiKey ?></div>
+            <div class="sender-settings-grid">
+                <div class="sender-account-info sender-box">
+                    <div class="sender-logo">
+                        <img src="<?php echo plugin_dir_url( dirname( __FILE__ ) ) . 'assets/images/logo.png'; ?>" alt="Sender logo">
+                    </div>
+                    <div class="sender-username">
+                        <h2 class="sender-header"><?php echo $user->account->title ?></h2>
+                    </div>
+
+                    <div class="flex-grow-1"></div>
+                    <div class="sender-logout">
+                        <div class="sender-subheader">
+							<?php if($user->account->active_plan->type === 'PAYG') {
+								echo "Pay as you go plan";
+							} else if($user->account->active_plan->type === 'SUBSCRIPTION') {
+
+								echo "Monthly subscription";
+							} else {
+								echo "Free plan";
+							}
+							?>
+                        </div>
+                        <div class="flex-grow-1"></div>
+                        <form method="post" action=''>
+                            <input name="sender_api_key" type="hidden" id="sender_api_key" value="api_key"
+                                   class="sender-input sender-text-input ">
+                            <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
+                                   value="Change user">
+                        </form>
+                    </div>
+                </div>
+                <div class="sender-plugin-settings sender-box">
+                    <form method="post" action=''>
+                        <div class="sender-option">
+                            <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track" value="sender_allow_guest_track" name="sender_allow_guest_track" <?php if (get_option('sender_allow_guest_track')) {echo 'checked';} ?> >
+                            <label for="sender_allow_guest_track">Allow guests tracking</label>
+                        </div>
+                        <div class="sender-option">
+                            <input class="sender-checkbox" type="checkbox" id="sender_allow_forms" name="sender_allow_guest_track" <?php if (get_option('sender_allow_forms')) {echo 'checked';} ?> >
+                            <label for="sender_allow_forms">Show forms and pup-ups</label>
+                        </div>
+                        <div class="sender-option">
+                            <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track" name="sender_allow_import" <?php if (get_option('sender_allow_import')) {echo 'checked';} ?> >
+                            <label for="sender_allow_import">Allow products import</label>
+                        </div>
+                        <div class="sender-logout">
+                            <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
+                                   value="Save">
+                        </div>
+                    </form>
+                </div>
+                <div class="sender-forms-list sender-box"></div>
+            </div>
         <?php } ?>
     </div>
 </div>
 <style>
+
+    .sender-logout {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+    }
+    .sender-account-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flex-grow-1 {
+        flex-grow: 1;
+    }
+    .sender-settings-grid {
+        margin: 40px;
+        margin-left: 20px;
+        display: grid;
+        grid-template-columns: 500px auto;
+        grid-template-rows: 250px auto;
+        grid-row-gap: 40px;
+        grid-column-gap: 40px;
+    }
+
+    .sender-forms-list {
+        grid-column: 1 / span 2;
+        grid-row: 2 / 2;
+    }
 
     .sender-flex-center-column {
         display: flex;
@@ -94,7 +175,7 @@
         background: white;
         display: flex;
         flex-direction: column;
-        padding: 35px;
+        padding: 35px !important;
     }
 
     .sender-link {
@@ -117,6 +198,8 @@
         border-radius: 10px;
         box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
         border: 1px solid #ddd;
+        background: white;
+        padding: 20px;
     }
 
     .sender-input {

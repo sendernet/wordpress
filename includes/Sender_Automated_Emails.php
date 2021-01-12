@@ -2,69 +2,72 @@
 
 class Sender_Automated_Emails
 {
-		private $availableSettings = [
-			'sender_api_key' => false,
-			'sender_allow_guest_track' => false,
-			'sender_allow_import' => 1,
-			'sender_allow_forms' => false,
-			'sender_customers_list' => ['id' => false, 'title' => ' '],
-			'sender_registration_list' => ['id' => false, 'title' => ' '],
-			'sender_registration_track' => 1,
-			'sender_cart_period' => 'today',
-			'sender_has_woocommerce' => false,
-			'sender_high_acc' => true,
-			'sender_allow_push' => false,
-			'sender_forms_list' => false,
-			'sender_plugin_active' => false,
-		];
+	private $senderBaseUrl = 'https://api.sender.net/v2/';
+	private $senderAccountEndpoint = 'users';
 
-        private $senderBaseFile;
+	private $availableSettings = [
+		'sender_api_key'            => false,
+		'sender_allow_guest_track'  => false,
+		'sender_allow_import'       => true,
+		'sender_allow_forms'        => false,
+		'sender_customers_list'     => ['id' => false, 'title' => ' '],
+		'sender_registration_list'  => ['id' => false, 'title' => ' '],
+		'sender_registration_track' => 1,
+		'sender_cart_period'        => 'today',
+		'sender_has_woocommerce'    => false,
+		'sender_high_acc'           => true,
+		'sender_allow_push'         => false,
+		'sender_forms_list'         => false,
+		'sender_plugin_active'      => false,
+	];
 
-        public function __construct($senderBaseFile)
-        {
-            $this->senderBaseFile = $senderBaseFile;
-            $this->senderActivate()
-                ->senderAddActions()
-                ->senderAddFilters()
-                ->senderSetupWooCommerce();
-        }
+	private $senderBaseFile;
 
-        private function senderAddActions()
-        {
-            add_action('admin_init', [&$this,'senderCheckWooCommerce']);
-            return $this;
-        }
+	public function __construct($senderBaseFile)
+	{
+		$this->senderBaseFile = $senderBaseFile;
+		$this->senderActivate()
+			 ->senderAddActions()
+			 ->senderAddFilters()
+			 ->senderSetupWooCommerce();
+	}
 
-        private function senderAddFilters()
-        {
-            add_filter( 'plugin_action_links_' . plugin_basename($this->senderBaseFile), [&$this, 'senderAddPluginLinks'] );
-            return $this;
-        }
+	private function senderAddActions()
+	{
+		add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
+		return $this;
+	}
 
-        public function senderActivate()
-        {
-            $this->senderCreateTables();
-            $this->senderSetupOptions();
-            $this->senderCheckWooCommerce();
-            $this->senderEnableForms();
-            return $this;
-        }
+	private function senderAddFilters()
+	{
+		add_filter('plugin_action_links_' . plugin_basename($this->senderBaseFile), [&$this, 'senderAddPluginLinks']);
+		return $this;
+	}
 
-        private function senderCreateTables()
-        {
-            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	public function senderActivate()
+	{
+		$this->senderCreateTables();
+		$this->senderSetupOptions();
+		$this->senderCheckWooCommerce();
+		$this->senderEnableForms();
+		return $this;
+	}
 
-            global $wpdb;
+	private function senderCreateTables()
+	{
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-            $wcap_collate = '';
+		global $wpdb;
 
-            if ($wpdb->has_cap('collation')) {
-                $wcap_collate = $wpdb->get_charset_collate();
-            }
+		$wcap_collate = '';
 
-            $sender_carts = $wpdb->prefix . 'sender_automated_emails_carts';
+		if ($wpdb->has_cap('collation')) {
+			$wcap_collate = $wpdb->get_charset_collate();
+		}
 
-            $cartsSql = "CREATE TABLE IF NOT EXISTS $sender_carts (
+		$sender_carts = $wpdb->prefix . 'sender_automated_emails_carts';
+
+		$cartsSql = "CREATE TABLE IF NOT EXISTS $sender_carts (
                              `id` int(11) NOT NULL AUTO_INCREMENT,
                              `user_id` int(11) NOT NULL,
                              `user_type` varchar(15),
@@ -77,11 +80,11 @@ class Sender_Automated_Emails
                              PRIMARY KEY (`id`)
                              ) $wcap_collate";
 
-            $wpdb->query( $cartsSql );
+		$wpdb->query($cartsSql);
 
-            $sender_users = $wpdb->prefix."sender_automated_emails_users" ;
+		$sender_users = $wpdb->prefix . "sender_automated_emails_users";
 
-            $usersSql = "CREATE TABLE IF NOT EXISTS $sender_users (
+		$usersSql = "CREATE TABLE IF NOT EXISTS $sender_users (
             `id` int(15) NOT NULL AUTO_INCREMENT,
             `first_name` text,
             `last_name` text,
@@ -91,111 +94,125 @@ class Sender_Automated_Emails
             PRIMARY KEY (`id`)
             ) $wcap_collate";
 
-            $wpdb->query( $usersSql );
-        }
+		$wpdb->query($usersSql);
+	}
 
-        public function updateSettings($updates)
-		{
-			foreach ($this->availableSettings as $name => $defaultValue) {
-				if( isset( $updates[$name] ) ) {
-					update_option( $name, $updates[$name] );
-				}
+	public function updateSettings($updates)
+	{
+		foreach ($this->availableSettings as $name => $defaultValue) {
+			if (isset($updates[$name])) {
+				update_option($name, $updates[$name]);
 			}
 		}
+	}
 
-        private function senderSetupOptions()
-        {
-        	foreach ($this->availableSettings as $name => $defaultValue) {
-				if( !get_option( $name ) ) {
-					add_option( $name, $defaultValue );
-				}
+	private function senderSetupOptions()
+	{
+		foreach ($this->availableSettings as $name => $defaultValue) {
+			if (!get_option($name)) {
+				add_option($name, $defaultValue);
 			}
-        }
+		}
+	}
 
-        public function senderCheckWooCommerce()
-        {
-            update_option('sender_has_woocommerce', $this->senderIsWooEnabled());
-        }
+	public function senderCheckWooCommerce()
+	{
+		update_option('sender_has_woocommerce', $this->senderIsWooEnabled());
+	}
 
-        private function senderIsWooEnabled()
-        {
-            include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-            return is_plugin_active('woocommerce/woocommerce.php') && class_exists('WooCommerce');
-        }
+	private function senderIsWooEnabled()
+	{
+		include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+		return is_plugin_active('woocommerce/woocommerce.php') && class_exists('WooCommerce');
+	}
 
-        public function senderAddPluginLinks($links) {
+	public function senderAddPluginLinks($links)
+	{
 
-            $additionalLinks = [
-                '<a href="' . admin_url( 'sender-settings.php' ) . '">Settings</a>',
-            ];
+		$additionalLinks = [
+			'<a href="' . admin_url('sender-settings.php') . '">Settings</a>',
+		];
 
-            return array_merge( $links, $additionalLinks );
-        }
+		return array_merge($links, $additionalLinks);
+	}
 
-        public function senderSetupWooCommerce()
-        {
-            if(!$this->senderIsWooEnabled()){
-                return $this;
-            }
+	public function senderSetupWooCommerce()
+	{
+		if (!$this->senderIsWooEnabled()) {
+			return $this;
+		}
 
-            add_action( 'init',  [&$this, 'senderCaptureEmail'], 10, 2 );
-            add_action( 'woocommerce_single_product_summary',  [&$this, 'senderAddProductImportScript'], 10, 2 );
-        }
+		add_action('init', [&$this, 'senderCaptureEmail'], 10, 2);
+		add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
+	}
 
-        public function senderCaptureEmail()
-        {
-            //todo capture customer
-            if (!is_user_logged_in()) {
-                add_action( 'wp_ajax_nopriv_save_data',  [&$this, 'senderSaveCapturedCostumer'], 10, 2 );
-            }
-        }
+	public function senderCaptureEmail()
+	{
+		//todo capture customer
+		if (!is_user_logged_in()) {
+			add_action('wp_ajax_nopriv_save_data', [&$this, 'senderSaveCapturedCostumer'], 10, 2);
+		}
+	}
 
-        public function senderSaveCapturedCostumer()
-        {
+	public function senderSaveCapturedCostumer()
+	{
 
-        }
+	}
 
-        public function senderAddProductImportScript()
-        {
-            if(get_option('sender_allow_import')) {
+	public function senderAddProductImportScript()
+	{
+		if (get_option('sender_allow_import')) {
 
-                global $product;
+			global $product;
 
-                $id = $product->get_id();
-                $pName = $product->get_name();
-                $pImage = get_the_post_thumbnail_url($id);
-                $pDescription = str_replace("\"", '\\"', $product->get_description());
-                $pPrice = $product->get_regular_price();
-                $pCurrency = get_option('woocommerce_currency');
-                $pQty = $product->get_stock_quantity();
-                $pRating = $product->get_average_rating();
-                $pSalePrice = $pPrice;
-                $pDiscount = 0;
+			$id = $product->get_id();
+			$pName = $product->get_name();
+			$pImage = get_the_post_thumbnail_url($id);
+			$pDescription = str_replace("\"", '\\"', $product->get_description());
+			$pPrice = $product->get_regular_price();
+			$pCurrency = get_option('woocommerce_currency');
+			$pQty = $product->get_stock_quantity();
+			$pRating = $product->get_average_rating();
+			$pSalePrice = $pPrice;
+			$pDiscount = 0;
 
-                if($product->is_on_sale() && !empty($product->get_sale_price())){
-                    $pSalePrice = $product->get_sale_price();
-                    $pDiscount = round((string) 100 - ($pSalePrice / $pPrice * 100));
-                }
+			if ($product->is_on_sale() && !empty($product->get_sale_price())) {
+				$pSalePrice = $product->get_sale_price();
+				$pDiscount = round((string)100 - ($pSalePrice / $pPrice * 100));
+			}
 
-                echo '<script type="application/sender+json">
+			echo '<script type="application/sender+json">
                         {
                           "name": "' . $pName . '",
                           "image": "' . $pImage . '",
                           "description": "' . $pDescription . '",
-                          "price": "' . (float) $pPrice .'",
-                          "discount": "-' .$pDiscount . '%",
-                          "special_price": "' . (float) $pSalePrice.'",
+                          "price": "' . (float)$pPrice . '",
+                          "discount": "-' . $pDiscount . '%",
+                          "special_price": "' . (float)$pSalePrice . '",
                           "currency": "' . $pCurrency . '",
                           "quantity": "' . $pQty . '",
                           "rating": "' . $pRating . '"
                         }
                     </script>';
-            }
-        }
+		}
+	}
 
 	private function senderEnableForms()
 	{
-		add_action( 'wp_head',  [&$this,'insertFormsScript'] );
+		add_action('wp_head', [&$this, 'insertFormsScript']);
+	}
+
+	public function senderGetAccount()
+	{
+		$arguments = [
+			'headers' => [
+				'Content-Type' => 'application/json',
+				'Accept' => 'application/json',
+				'Authorization' => 'Bearer ' . get_option('sender_api_key')
+			]
+		];
+
+		return wp_remote_request($this->senderBaseUrl . $this->senderAccountEndpoint, $arguments);
 	}
 
 	public function insertFormsScript()
