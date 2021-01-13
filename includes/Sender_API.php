@@ -73,7 +73,7 @@
 
         public function senderTrackCart(array $cartParams)
         {
-            $params = array_merge($this->senderBaseRequestArguments(), ['params' => $cartParams]);
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
             $response = wp_remote_post($this->senderBaseUrl . 'carts', $params);
             return $this->senderBuildResponse($response);
         }
@@ -87,6 +87,21 @@
         public function senderDeleteCart($wpCartId)
         {
             $response = wp_remote_request($this->senderBaseUrl . 'carts/' . $wpCartId, $this->senderBaseRequestArguments(true));
+            return $this->senderBuildResponse($response);
+        }
+
+        public function addToGroup($email, $firstname, $lastname, $groupId)
+        {
+            $subscriberParams = [
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'email' => $email,
+                'tag_ids' => [$groupId],
+                'update_existing' => true
+            ];
+
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($subscriberParams)]);
+            $response = wp_remote_post($this->senderBaseUrl . 'subscribers/create_update', $params);
             return $this->senderBuildResponse($response);
         }
 

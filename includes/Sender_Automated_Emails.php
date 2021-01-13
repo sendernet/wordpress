@@ -164,7 +164,6 @@ class Sender_Automated_Emails
         add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
 	}
 
-
 	private function senderEnableForms()
 	{
 		add_action('wp_head', [&$this, 'insertFormsScript']);
