@@ -40,6 +40,7 @@
 	.sender-widget-container {
 		display: flex;
 		flex-wrap: wrap;
+        align-items: center;
 	}
 	.sender-form-title {
 		padding: 10px;

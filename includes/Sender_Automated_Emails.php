@@ -7,15 +7,13 @@ class Sender_Automated_Emails
 		'sender_allow_guest_track'  => false,
 		'sender_allow_import'       => true,
 		'sender_allow_forms'        => false,
-		'sender_customers_list'     => ['id' => false, 'title' => ' '],
-		'sender_registration_list'  => ['id' => false, 'title' => ' '],
-		'sender_registration_track' => 1,
+		'sender_customers_list'     => 0,
+		'sender_registration_list'  => 0,
+		'sender_registration_track' => true,
 		'sender_cart_period'        => 'today',
 		'sender_has_woocommerce'    => false,
 		'sender_high_acc'           => true,
 		'sender_allow_push'         => false,
-		'sender_forms_list'         => false,
-		'sender_plugin_active'      => false,
 	];
 
 	private $senderBaseFile;
@@ -179,7 +177,9 @@ class Sender_Automated_Emails
 
 	public function insertFormsScript()
 	{
-		//Need enabled popups setting and account key for fetching json
+		if (!get_option('sender_allow_forms')) {
+			return;
+		}
 		echo "
 			<script>
 			  (function (s, e, n, d, er) {

@@ -20,7 +20,7 @@
 
             </form>
 
-		<?php } else { ?>
+		<?php } else {  ?>
             <div class="sender-settings-grid">
                 <div class="flex-column sender-box">
                     <div class="sender-logo">
@@ -50,14 +50,27 @@
                         <form method="post" action=''>
                             <input name="sender_api_key" type="hidden" id="sender_api_key" value="api_key"
                                    class="sender-input sender-text-input ">
-                            <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
+                            <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Change user">
                         </form>
                     </div>
                 </div>
                 <div class="sender-plugin-settings sender-box">
-                    <form method="post" class="flex-column h-100" action=''>
+                    <form method="post" class="flex-column h-100" action='' id="sender-form-settings">
                         <div class="sender-options">
+
+                            <div class="sender-option">
+                                <input type="hidden" value="0" name="sender_registration_track_hidden_checkbox">
+                                <label for="sender_registration_track">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_registration_track"
+                                           value="sender_registration_track"
+                                           name="sender_registration_track" <?php if (get_option('sender_registration_track')) {
+										echo 'checked';
+									} ?> >
+                                    <span>Track registered users</span>
+                                </label>
+                            </div>
+
                             <div class="sender-option">
                                 <input type="hidden" value="0" name="sender_allow_guest_track_hidden_checkbox">
                                 <label for="sender_allow_guest_track">
@@ -90,10 +103,38 @@
                                     <span>Allow products import</span>
                                 </label>
                             </div>
+                            <div class="sender-option">
+                                <label for="sender_customers_list">Customers list</label>
+                                <select form="sender-form-settings" name="sender_customers_list" id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
+                                    <option value="0">No list</option>
+                                    <?php foreach ($groups as $tag): ?>
+                                        <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="sender-option">
+                                <label for="sender_registration_list">Registration list</label>
+                                <select form="sender-form-settings" name="sender_registration_list" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
+                                    <option value="0">No list</option>
+                                    <?php foreach ($groups as $tag): ?>
+                                        <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="sender-option">
+                                <label for="sender_cart_period">Registration list</label>
+                                <select form="sender-form-settings" name="sender_cart_period" id="sender_cart_period" value="<?=get_option('sender_cart_period')?>">
+                                    <?php foreach ($periods as $id => $name): ?>
+                                        <option  <?= get_option('sender_cart_period') == $id ? 'selected' : '' ?>  value="<?=$id?>"><?=$name?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                         <div class="flex-grow-1"></div>
                         <div class="sender-logout">
-                            <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
+                            <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Save">
                         </div>
                     </form>
@@ -101,7 +142,7 @@
                 <div class="sender-forms-list">
                     <div class="sender-big-header"> Forms </div>
                     <div class=" sender-box no-padding flex-column">
-                        <?php foreach ($forms as $form): ?>
+                        <?php foreach ($shownForms as $form): ?>
                             <div class="sender-form-row">
                                 <div class="sender-form-thumbnail">
                                     <img src="<?=$form->thumbnail_url?>" alt="thumbnail">
@@ -131,6 +172,16 @@
 
     .h-100 {
         height: 100%;
+    }
+
+    .sender-options {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .sender-option {
+        width: 50%;
+        height: 40px;
     }
 
     .sender-container {
