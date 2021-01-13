@@ -156,15 +156,10 @@
                 $user = $this->senderGetUserById($userId);
 
                 if(isset($user[0]->email)){
-                    $wpUserObject = get_userdata($userId);
-                    if(isset($wpUserObject->user_email)){
-                        $this->sender->senderApi->addToGroup($wpUserObject->user_email,
-                            $wpUserObject->first_name ? $wpUserObject->first_name : '',
-                            $wpUserObject->last_name ? $wpUserObject->last_name : '',
-                            get_option('sender_registration_list'));
-                        $this->senderPrepareCartData($senderCart[0]->id, $user[0]->email);
-                    }
+                    $this->sender->senderApi->senderTrackRegisteredUsers($userId);
+                    $this->senderPrepareCartData($senderCart[0]->id, $user[0]->email);
                 }
+
                 $_SESSION['sender_automated_emails_cart_id'] = $senderCart[0]->id;
             } else {
 

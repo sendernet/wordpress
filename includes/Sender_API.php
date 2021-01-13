@@ -105,6 +105,19 @@
             return $this->senderBuildResponse($response);
         }
 
+        public function senderTrackRegisteredUsers($userId)
+        {
+            $user = get_userdata($userId);
+            $list = get_option('sender_registration_list');
+
+            if(isset($user->user_email) && $list){
+                $this->addToGroup($user->user_email,
+                    $user->first_name ? $user->first_name : '',
+                    $user->last_name ? $user->last_name : '',
+                    $list);
+            }
+        }
+
         private function senderBuildResponse($response)
         {
             return json_decode($response['body']);

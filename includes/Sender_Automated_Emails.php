@@ -48,6 +48,11 @@ class Sender_Automated_Emails
 	{
 		add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
+
+        if(get_option('sender_registration_track')){
+            add_action('user_register', [&$this->senderApi, 'senderTrackRegisteredUsers'], 10, 1);
+        }
+
 		return $this;
 	}
 
