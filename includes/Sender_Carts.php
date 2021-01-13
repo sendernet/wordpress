@@ -15,7 +15,6 @@
 
         public function senderCaptureEmail()
         {
-            //todo capture customer on init
             if (!is_user_logged_in()) {
                 add_action('wp_ajax_nopriv_sender_track_guest', [&$this, 'senderSaveCapturedCustomer'], 10, 2);
             }
