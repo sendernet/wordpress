@@ -110,11 +110,16 @@
             $user = get_userdata($userId);
             $list = get_option('sender_registration_list');
 
-            if(isset($user->user_email) && $list){
-                $this->addToGroup($user->user_email,
-                    $user->first_name ? $user->first_name : '',
-                    $user->last_name ? $user->last_name : '',
-                    $list);
+            if(isset($user->user_email)){
+
+                if($list && get_option('sender_registration_track')) {
+                    $this->addToGroup($user->user_email,
+                        $user->first_name ? $user->first_name : '',
+                        $user->last_name ? $user->last_name : '',
+                        $list);
+                }
+
+                setcookie( 'sender_registered_user', $user->user_email, 2147483647, COOKIE_DOMAIN );
             }
         }
 
