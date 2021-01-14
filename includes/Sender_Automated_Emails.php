@@ -38,13 +38,12 @@ class Sender_Automated_Emails
 			 ->senderAddFilters()
 			 ->senderSetupWooCommerce();
 
-		new Sender_Forms_Widget($this);
-
 	}
 
 	private function senderAddActions()
 	{
-		add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
+        add_action('wp_head', [&$this, 'insertFormsScript']);
+        add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
 
         if(get_option('sender_registration_track')){
@@ -62,55 +61,9 @@ class Sender_Automated_Emails
 
 	public function senderActivate()
 	{
-		$this->senderCreateTables();
 		$this->senderSetupOptions();
 		$this->senderCheckWooCommerce();
-		$this->senderEnableForms();
 		return $this;
-	}
-
-	private function senderCreateTables()
-	{
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-		global $wpdb;
-
-		$wcap_collate = '';
-
-		if ($wpdb->has_cap('collation')) {
-			$wcap_collate = $wpdb->get_charset_collate();
-		}
-
-		$sender_carts = $wpdb->prefix . 'sender_automated_emails_carts';
-
-		$cartsSql = "CREATE TABLE IF NOT EXISTS $sender_carts (
-                             `id` int(11) NOT NULL AUTO_INCREMENT,
-                             `user_id` int(11) NOT NULL,
-                             `user_type` varchar(15),
-                             `session` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-                             `cart_data` text COLLATE utf8_unicode_ci NOT NULL,
-                             `cart_recovered` int(11) NOT NULL,
-                             `cart_status` int(11) NOT NULL,
-                             `created` int(11) NOT NULL,
-                             `updated` int(11) NOT NULL,
-                             PRIMARY KEY (`id`)
-                             ) $wcap_collate";
-
-		$wpdb->query($cartsSql);
-
-		$sender_users = $wpdb->prefix . "sender_automated_emails_users";
-
-		$usersSql = "CREATE TABLE IF NOT EXISTS $sender_users (
-            `id` int(15) NOT NULL AUTO_INCREMENT,
-            `first_name` text,
-            `last_name` text,
-            `email` text,
-            `created` int(11) NOT NULL,
-            `updated` int(11) NOT NULL,
-            PRIMARY KEY (`id`)
-            ) $wcap_collate";
-
-		$wpdb->query($usersSql);
 	}
 
 	public function updateSettings($updates)
@@ -139,17 +92,7 @@ class Sender_Automated_Emails
 	private function senderIsWooEnabled()
 	{
 		include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-		return is_plugin_active('woocommerce/woocommerce.php') && class_exists('WooCommerce');
-	}
-
-	public function senderAddPluginLinks($links)
-	{
-
-		$additionalLinks = [
-			'<a href="' . admin_url('admin.php?page=sender-settings') . '">Settings</a>',
-		];
-
-		return array_merge($links, $additionalLinks);
+		return is_plugin_active('woocommerce/woocommerce.php');
 	}
 
 	public function senderSetupWooCommerce()
@@ -170,16 +113,8 @@ class Sender_Automated_Emails
         add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
 	}
 
-	private function senderEnableForms()
-	{
-		add_action('wp_head', [&$this, 'insertFormsScript']);
-	}
-
 	public function insertFormsScript()
 	{
-		if (!get_option('sender_allow_forms')) {
-			return;
-		}
 		echo "
 			<script>
 			  (function (s, e, n, d, er) {
@@ -202,5 +137,14 @@ class Sender_Automated_Emails
         register_widget( new Sender_Forms_Widget($this));
     }
 
+    public function senderAddPluginLinks($links)
+    {
+
+        $additionalLinks = [
+            '<a href="' . admin_url('admin.php?page=sender-settings') . '">Settings</a>',
+        ];
+
+        return array_merge($links, $additionalLinks);
+    }
 
 }
