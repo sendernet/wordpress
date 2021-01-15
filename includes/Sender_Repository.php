@@ -73,7 +73,6 @@ class Sender_Repository
 
         $query   = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_carts`
                         WHERE session = %s
-                        AND user_type = 'GUEST'
                         AND cart_recovered = %d
                         AND cart_status = '0' ";
 
@@ -168,15 +167,17 @@ class Sender_Repository
         $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, current_time('timestamp'), $visitorId, 0));
     }
 
-    public function senderUpdateCartBySession($cartData, $session, $timestamp)
+    public function senderUpdateCartBySession($cartData, $session, $timestamp = null)
     {
+    	if (!$timestamp) {
+    		$timestamp = current_time('timestamp');
+		}
         global $wpdb;
 
         $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
                                         SET cart_data = %s,
                                             updated = %d
                                         WHERE session = %s AND
-                                              user_type = 'GUEST' AND
                                               cart_recovered = %d";
 
         $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, $timestamp, $session, 0));
