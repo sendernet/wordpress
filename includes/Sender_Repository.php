@@ -219,4 +219,11 @@ class Sender_Repository
         return $this->senderGetUserByVisitorId($visitorId);
     }
 
+    public function senderDeleteCartBySession($session)
+    {
+        global $wpdb;
+        $query = "DELETE * FROM `".$wpdb->prefix."sender_automated_emails_carts` WHERE session = %s";
+        $wpdb->query($wpdb->prepare($query, $session));
+    }
+
 }
