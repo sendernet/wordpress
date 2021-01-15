@@ -115,12 +115,26 @@
 
         public function senderUpdateLoggedInUserCart()
         {
+            global $wpdb;
+            $woo = $this->senderGetWoo();
 
         }
 
         public function senderUpdateVisitorCart()
         {
 
+        }
+
+
+        public function senderGetWoo()
+        {
+            global $woocommerce;
+
+            if(function_exists('WC')){
+                return WC();
+            }
+
+            return $woocommerce;
         }
 
     }
