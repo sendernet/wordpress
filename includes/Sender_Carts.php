@@ -7,6 +7,9 @@
     class Sender_Carts
     {
         private $sender;
+        private $method;
+        private $params;
+
 
         public function __construct($sender)
         {
@@ -75,11 +78,14 @@
 			$cartData =  serialize($items);
 			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-			var_dump($items);
-			if (empty($items)) {
+			$cart = $this->sender->repository->senderGetCartBySession($session);
+
+			if (empty($items) && $cart) {
 				$this->sender->repository->senderDeleteCartBySession($session);
+				$this->senderAddSdk('deleteCart', json_encode(['external_id' => $cart->id]));
+				return;
 			}
-			if ($this->sender->repository->senderGetCartBySession($session)) {
+			if ($cart) {
 				$this->sender->repository->senderUpdateCartBySession($cartData, $session);
 			} else {
 				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id,$session);
@@ -88,6 +94,18 @@
 
         }
 
+        public function senderAddSdkFunction()
+		{
+			echo "<script> sender('$this->method', '$this->params')</script>";
+		}
+
+		public function senderAddSdk($method, $param)
+		{
+			$this->method = $method;
+			$this->params = $param;
+
+			add_action('wp_head', [&$this, 'senderAddSdkFunction'], 15);
+		}
 
 		public function senderGetVisitor()
 		{
