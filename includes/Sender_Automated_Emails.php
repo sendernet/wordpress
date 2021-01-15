@@ -109,11 +109,7 @@ class Sender_Automated_Emails
             require_once("Sender_Carts.php" );
         }
 
-        $senderCarts = new Sender_Carts($this);
-
-		add_action('woocommerce_single_product_summary', [&$senderCarts, 'senderAddProductImportScript'], 10, 2);
-        add_action( 'woocommerce_checkout_order_processed', [&$senderCarts,  'senderConvertCart'], 10 , 1 );
-        add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
+         new Sender_Carts($this);
 	}
 
 	public function insertFormsScript()
