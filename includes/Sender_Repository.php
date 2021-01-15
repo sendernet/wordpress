@@ -77,7 +77,9 @@ class Sender_Repository
                         AND cart_recovered = %d
                         AND cart_status = '0' ";
 
-        return $wpdb->get_results($wpdb->prepare( $query, $sessionKey, 0));
+        $result = $wpdb->get_results($wpdb->prepare( $query, $sessionKey, 0));
+
+        return !count($result) ? false : $result[0];
     }
 
     public function senderUpdateUserModified($userId, $timestamp)

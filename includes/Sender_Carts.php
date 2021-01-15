@@ -115,8 +115,15 @@
 
         public function senderUpdateLoggedInUserCart()
         {
-            global $wpdb;
             $woo = $this->senderGetWoo();
+
+            $session = $woo->session->get_session_cookie()[0];
+
+            $existingCart = $this->sender->repository->senderGetCartBySession($session);
+
+            if($existingCart){
+
+            }
 
         }
 
