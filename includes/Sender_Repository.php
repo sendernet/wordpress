@@ -196,7 +196,27 @@ class Sender_Repository
         return $wpdb->insert_id;
     }
 
+    public function senderGetUserByVisitorId($visitorId)
+    {
+        global $wpdb;
 
+        $sqlQuery = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_users` WHERE visitor_id = %s AND id != '0'";
 
+        $result = $wpdb->get_results( $wpdb->prepare( $sqlQuery, $visitorId ) );
+
+        if(count($result)){
+            return $result[0];
+        }
+
+        $sqlQuery = "INSERT INTO `".$wpdb->prefix."sender_automated_emails_users`
+                     ( visitor_id, created, updated )
+                     VALUES (%s, %d, %d )";
+
+        $currentTime = current_time('timestamp');
+
+        $wpdb->query($wpdb->prepare($sqlQuery, $visitorId, $currentTime, $currentTime));
+
+        return $this->senderGetUserByVisitorId($visitorId);
+    }
 
 }

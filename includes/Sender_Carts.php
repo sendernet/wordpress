@@ -121,7 +121,7 @@
 
             $existingCart = $this->sender->repository->senderGetCartBySession($session);
 
-            if($existingCart){
+            if(!$existingCart){
 
             }
 
