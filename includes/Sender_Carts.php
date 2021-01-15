@@ -19,7 +19,7 @@
             add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
             add_action( 'woocommerce_checkout_order_processed', [&$this,  'senderConvertCart'], 10 , 1 );
             add_action( 'woocommerce_after_checkout_billing_form',  [&$this, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
-            add_action('woocommerce_cart_updated', [&$this, 'callbackas']);
+            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
         }
 
         public function senderAddProductImportScript()
@@ -102,6 +102,25 @@
             $data['grand_total'] = $woocommerce->cart->total;
 
             return $data;
+        }
+
+        public function senderCartUpdated()
+        {
+            if(is_user_logged_in()){
+                return $this->senderUpdateLoggedInUserCart();
+            }
+
+            return $this->senderUpdateVisitorCart();
+        }
+
+        public function senderUpdateLoggedInUserCart()
+        {
+
+        }
+
+        public function senderUpdateVisitorCart()
+        {
+
         }
 
     }
