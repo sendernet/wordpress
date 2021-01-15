@@ -73,8 +73,7 @@
 
         public function senderCartUpdated()
         {
-			global $woocommerce;
-			$items = $woocommerce->cart->get_cart();
+			$items = $this->senderGetCart();
 
 			$cartData =  serialize($items);
 			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
