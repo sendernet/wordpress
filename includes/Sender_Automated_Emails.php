@@ -108,8 +108,11 @@ class Sender_Automated_Emails
         if( !class_exists('Sender_Carts') ) {
             require_once("Sender_Carts.php" );
         }
-
-         new Sender_Carts($this);
+        if( !class_exists('Sender_WooCommerce') ) {
+            require_once("Sender_WooCommerce.php" );
+        }
+		new Sender_Carts($this);
+         new Sender_WooCommerce($this);
 	}
 
 	public function insertFormsScript()

@@ -22,43 +22,6 @@
             add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
         }
 
-        public function senderAddProductImportScript()
-        {
-            if (get_option('sender_allow_import')) {
-
-                global $product;
-
-                $id = $product->get_id();
-                $pName = $product->get_name();
-                $pImage = get_the_post_thumbnail_url($id);
-                $pDescription = str_replace("\"", '\\"', $product->get_description());
-                $pPrice = $product->get_regular_price();
-                $pCurrency = get_option('woocommerce_currency');
-                $pQty = $product->get_stock_quantity();
-                $pRating = $product->get_average_rating();
-                $pSalePrice = $pPrice;
-                $pDiscount = 0;
-
-                if ($product->is_on_sale() && !empty($product->get_sale_price())) {
-                    $pSalePrice = $product->get_sale_price();
-                    $pDiscount = round((string)100 - ($pSalePrice / $pPrice * 100));
-                }
-
-                echo '<script type="application/sender+json">
-                        {
-                          "name": "' . $pName . '",
-                          "image": "' . $pImage . '",
-                          "description": "' . $pDescription . '",
-                          "price": "' . (float)$pPrice . '",
-                          "discount": "-' . $pDiscount . '%",
-                          "special_price": "' . (float)$pSalePrice . '",
-                          "currency": "' . $pCurrency . '",
-                          "quantity": "' . $pQty . '",
-                          "rating": "' . $pRating . '"
-                        }
-                    </script>';
-            }
-        }
 
         public function senderPrepareCartData($cartId, $email = '')
         {
@@ -106,32 +69,36 @@
 
         public function senderCartUpdated()
         {
-            if(is_user_logged_in()){
-                return $this->senderUpdateLoggedInUserCart();
-            }
+			global $woocommerce;
+			$items = $woocommerce->cart->get_cart();
 
-            return $this->senderUpdateVisitorCart();
-        }
+			$cartData =  serialize($items);
+			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-        public function senderUpdateLoggedInUserCart()
-        {
-            $woo = $this->senderGetWoo();
+			var_dump($items);
+			if (empty($items)) {
+				$this->sender->repository->senderDeleteCartBySession($session);
+			}
+			if ($this->sender->repository->senderGetCartBySession($session)) {
+				$this->sender->repository->senderUpdateCartBySession($cartData, $session);
+			} else {
+				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id,$session);
+			}
 
-            $session = $woo->session->get_session_cookie()[0];
-
-            $existingCart = $this->sender->repository->senderGetCartBySession($session);
-
-            if(!$existingCart){
-
-            }
 
         }
 
-        public function senderUpdateVisitorCart()
-        {
 
-        }
+		public function senderGetVisitor()
+		{
+			$visitor = $_COOKIE['sender_site_visitor'];
+			return $this->sender->repository->senderGetUserByVisitorId($visitor);
+		}
 
+        public function senderGetCart()
+		{
+			return $this->senderGetWoo()->cart->get_cart();
+		}
 
         public function senderGetWoo()
         {
