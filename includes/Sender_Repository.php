@@ -182,6 +182,20 @@ class Sender_Repository
         $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, $timestamp, $session, 0));
     }
 
+    public function senderCreateCart($cartData, $userId, $session)
+    {
+        global $wpdb;
+        $currentTime = current_time('timestamp');
+
+        $sqlQuery = "INSERT INTO `".$wpdb->prefix."sender_automated_emails_carts`
+                         ( user_id, cart_data, session, created, updated )
+                         VALUES ( %d, %s, %s, %s, %d, %d )";
+
+        $wpdb->query($wpdb->prepare($sqlQuery, $userId, $cartData, $session, $currentTime, $currentTime));
+
+        return $wpdb->insert_id;
+    }
+
 
 
 
