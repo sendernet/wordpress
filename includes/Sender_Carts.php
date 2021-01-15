@@ -75,7 +75,6 @@
 			$cartData =  serialize($items);
 			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-			var_dump($items);
 			if (empty($items)) {
 				$this->sender->repository->senderDeleteCartBySession($session);
 			}
@@ -84,8 +83,6 @@
 			} else {
 				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id,$session);
 			}
-
-
         }
 
 
