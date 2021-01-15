@@ -22,8 +22,8 @@
             add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
             add_action( 'woocommerce_checkout_order_processed', [&$this,  'senderConvertCart'], 10 , 1 );
             add_action( 'woocommerce_after_checkout_billing_form',  [&$this, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
-//            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
-            add_action( 'wp_ajax_labas', [&$this, 'senderCartUpdated']);
+            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+            add_action( 'wp_ajax_labas', [&$this, 'senderCartUpdated', 'nice']);
         }
 
 
@@ -86,31 +86,15 @@
 				echo json_encode(['method' => 'deleteCart', 'argument' => ['external_id' => $cart->id]]);
                 return;
 			}
-			if ($cart) {
+
+			if ($cart && !empty($items)) {
 				$this->sender->repository->senderUpdateCartBySession($cartData, $session);
-			} else {
+			} else if(!empty($items)){
 				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id,$session);
 			}
 
 
         }
-
-        public function senderAddSdkFunction()
-		{
-			echo "<script> sender('$this->method', '$this->params')</script>";
-		}
-
-		public function senderAddSdk($method, $param)
-		{
-			$this->method = $method;
-			$this->params = $param;
-
-			return [
-                $method,
-                $param
-            ];
-//			add_action('wp_head', [&$this, 'senderAddSdkFunction'], 15);
-		}
 
 		public function senderGetVisitor()
 		{
