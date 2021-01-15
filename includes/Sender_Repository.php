@@ -127,6 +127,17 @@ class Sender_Repository
         return $wpdb->get_results($wpdb->prepare( $query, $userId, 0) );
     }
 
+    public function senderGetUserById($userId){
+
+        global $wpdb;
+
+        $query = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_users` WHERE id = %d";
+
+        $result = $wpdb->get_results($wpdb->prepare( $query, $userId) );
+
+        return empty($result) ? false : $result[0] ;
+    }
+
     public function senderGetCartByVisitor($visitorId) {
 
         global $wpdb;
