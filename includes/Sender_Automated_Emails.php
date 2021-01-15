@@ -18,6 +18,7 @@ class Sender_Automated_Emails
 
 	private $senderBaseFile;
 	public $senderApi;
+	public $repository;
 
 	public function __construct($senderBaseFile)
 	{
@@ -28,6 +29,12 @@ class Sender_Automated_Emails
         }
 
         $this->senderApi = new Sender_API();
+
+        if( !class_exists('Sender_Repository') ) {
+            require_once("Sender_Repository.php" );
+        }
+
+        $this->repository = new Sender_Repository();
 
         if( !class_exists('Sender_Forms_Widget') ) {
             require_once("Sender_Forms_Widget.php" );
@@ -104,7 +111,6 @@ class Sender_Automated_Emails
 
         $senderCarts = new Sender_Carts($this);
 
-		add_action('init', [&$senderCarts, 'senderCaptureEmail'], 10, 2);
 		add_action('woocommerce_single_product_summary', [&$senderCarts, 'senderAddProductImportScript'], 10, 2);
         add_action( 'woocommerce_checkout_order_processed', [&$senderCarts,  'senderConvertCart'], 10 , 1 );
         add_action( 'woocommerce_after_checkout_billing_form',  [&$senderCarts, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
@@ -124,8 +130,8 @@ class Sender_Automated_Emails
 				a.async = 1;
 				a.src = d;
 				m.parentNode.insertBefore(a, m)
-			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-			  sender('birkanosis')
+			  })(window, document, 'script', '/wp-content/plugins/sender/assets/sdk.js', 'sender');
+			  sender('birkanosis');
 			</script>
 			";
 	}

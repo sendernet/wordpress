@@ -22,7 +22,9 @@
     }
 
     $sender = new Sender_Automated_Emails(__FILE__);
-    new Sender_Templates_Loader($sender);
-//    register_activation_hook( __FILE__, [&$sender, 'senderActivate']);
+
+    register_activation_hook( __FILE__, [&$sender->repository, 'senderCreateTables']);
+
+new Sender_Templates_Loader($sender);
 
 ?>

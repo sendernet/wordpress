@@ -13,12 +13,6 @@
             $this->sender = $sender;
         }
 
-        public function senderCaptureEmail()
-        {
-            if (!is_user_logged_in()) {
-                add_action('wp_ajax_nopriv_sender_track_guest', [&$this, 'senderSaveCapturedCustomer'], 10, 2);
-            }
-        }
 
         public function senderAddProductImportScript()
         {
@@ -58,134 +52,6 @@
             }
         }
 
-        public function senderConvertCart($order)
-        {
-            global $wpdb;
-            //todo convert cart everywhere
-            var_dump('nupirko kazka');
-        }
-
-        public function senderCatchGuestEmailAfterCheckout()
-        {
-            if (! is_user_logged_in()) {
-                ?>
-                <script type="text/javascript">
-                    jQuery( 'input#billing_email' ).on( 'blur', function() {
-
-                        var data = {
-                            first_name	: jQuery('#billing_first_name').val(),
-                            last_name	: jQuery('#billing_last_name').val(),
-                            email		: jQuery('#billing_email').val(),
-                            action: 'sender_track_guest'
-                        };
-
-                        var adminUrl = "<?php echo get_admin_url();?>admin-ajax.php";
-
-                        jQuery.post( adminUrl, data);
-                    });
-                </script>
-                <?php
-            }
-        }
-
-        public function senderSaveCapturedCustomer()
-        {
-            global $woocommerce;
-
-            $now = current_time( 'timestamp' );
-
-            if(function_exists('WC')){
-                $woo = WC();
-            } else {
-                $woo = $woocommerce;
-            }
-
-            if(session_id() === '') {
-                session_start();
-            }
-
-            if ( isset($_POST['first_name']) && !empty($_POST['first_name']) ){
-                $_SESSION['first_name'] = sanitize_text_field($_POST['first_name']);
-            }
-
-            if ( isset($_POST['last_name']) && !empty($_POST['last_name']) ) {
-                $_SESSION['last_name'] = sanitize_text_field($_POST['last_name']);
-            }
-
-            if ( isset($_POST['email']) && !empty($_POST['email']) ) {
-                $_SESSION['email'] = sanitize_email($_POST['email']);
-            }
-
-            $firstName = $_SESSION['first_name'] ? sanitize_text_field($_SESSION['first_name']) : '';
-            $lastName = $_SESSION['last_name'] ? sanitize_text_field($_SESSION['last_name']) : '';
-            $email = $_SESSION['email'] ? sanitize_email($_SESSION['email']) : '';
-
-            $guest = $this->senderGetCustomerByEmail($email);
-            $sessionCookie = $woo->session->get_session_cookie()[0];
-            $guestCart = $this->senderGetCartBySession($sessionCookie);
-
-            if($guest){
-                $userId = $guest[0]->id;
-                $this->senderUpdateUserModified($userId, $now);
-                if($guestCart){
-                    $this->senderUpdateCartModified($userId, $guestCart[0]->id, $now);
-                }
-            } elseif ($guestCart)
-            {
-                $userId = $guestCart[0]->user_id;
-
-                $userId == 0
-                    ? $userId = $this->senderCreateGuestUser($firstName, $lastName, $email, $now)
-                    : $this->senderUpdateUserEmail($userId, $email, $now);
-
-                $this->senderUpdateCartModified($userId, $guestCart[0]->id, $now);
-            } else {
-                $userId = $this->senderCreateNewGuestUser($firstName, $lastName,$email,$now);
-            }
-
-            $senderCart = $this->senderGetCartByUser($userId);
-            $_SESSION['user_id'] = $userId;
-
-            $this->sender->senderApi->addToGroup($email, $firstName, $lastName, get_option('sender_customers_list'));
-
-            $cartInfo = [ 'cart' => $woo->session->cart];
-
-            if(count($senderCart) > 0){
-                $this->senderUpdateCartData($userId, json_encode($cartInfo));
-                $user = $this->senderGetUserById($userId);
-
-                if(isset($user[0]->email)){
-                    $this->sender->senderApi->senderTrackRegisteredUsers($userId);
-                    $this->senderPrepareCartData($senderCart[0]->id, $user[0]->email);
-                }
-
-                $_SESSION['sender_automated_emails_cart_id'] = $senderCart[0]->id;
-            } else {
-
-                if($sessionCookie != ''){
-
-                    $cartBySession = $this->senderGetCartBySession($sessionCookie);
-
-                    if(!count($cartBySession)){
-
-                        if(!empty($cartInfo['cart'])){
-                            $_SESSION['sender_automated_emails_cart_id'] = $this->senderSaveCart(0, 'GUEST', json_encode($cartInfo), $sessionCookie);
-                        }
-
-                    } else {
-
-                        if(!empty($cartInfo['cart'])){
-                            $this->senderUpdateCartByIdAndSession($cartBySession[0]->id, json_encode($cartInfo), $sessionCookie, $now);
-                            $guestCart = $this->senderGetCartBySession($sessionCookie);
-                            $email = $this->senderGetUserById($guestCart[0]->user_id)[0]->email;
-                            $this->senderPrepareCartData($cartBySession[0]->id, $email);
-                            $_SESSION['sender_automated_emails_cart_id'] = $cartBySession[0]->id;
-                        }
-
-                    }
-                }
-            }
-        }
 
         public function senderGetCustomerByEmail($email)
         {
@@ -237,29 +103,6 @@
             $wpdb->query( $wpdb->prepare($sqlQuery, $userId, $timestamp, $cartId));
         }
 
-        public function senderCreateGuestUser($firstName, $lastName, $email, $timestamp)
-        {
-            global $wpdb;
-
-            $sqlQuery = "INSERT INTO `".$wpdb->prefix."sender_automated_emails_users`
-                             ( first_name, last_name, email, created, updated )
-                             VALUES ( %s, %s, %s, %d, %d )";
-
-            $wpdb->query($wpdb->prepare($sqlQuery, $firstName, $lastName, $email, $timestamp, $timestamp));
-
-            return $wpdb->insert_id;
-        }
-
-        public function senderUpdateUserEmail($userId, $email, $timestamp)
-        {
-            global $wpdb;
-            $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_users`
-                                SET email =   %s,
-                                    updated = %d
-                                WHERE id = %d ";
-
-            $wpdb->query( $wpdb->prepare($sqlQuery, $email, $timestamp, $userId));
-        }
 
         public function senderCreateNewGuestUser($firstName, $lastName, $email, $now)
         {
@@ -315,13 +158,7 @@
             $wpdb->query( $wpdb->prepare($sqlQuery, $cartInfo, $timestamp, $cartId, $sessionCookie, 0));
         }
 
-        public function senderGetUserById($userId)
-        {
-            global $wpdb;
-            $sqlQuery = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_users` WHERE id = %d AND id != '0'";
 
-            return $wpdb->get_results( $wpdb->prepare( $sqlQuery, $userId ) );
-        }
 
         public function senderPrepareCartData($cartId, $email = '')
         {
@@ -364,26 +201,7 @@
 
             $data['grand_total'] = $woocommerce->cart->total;
 
-            if(count($data['products']) >= 1) {
-                $this->sender->senderApi->senderTrackCart($data);
-            } else {
-                $this->sender->senderApi->senderDeleteCart($cartId);
-            }
-        }
-
-        public function senderSaveCart($userId, $userType, $cartData, $session)
-        {
-            global $wpdb;
-
-            $currentTime = current_time('timestamp');
-
-            $sqlQuery = "INSERT INTO `".$wpdb->prefix."sender_automated_emails_carts`
-                         ( user_id, user_type, cart_data, session, created, updated )
-                         VALUES ( %d, %s, %s, %s, %d, %d )";
-
-            $wpdb->query($wpdb->prepare($sqlQuery, $userId, $userType, $cartData, $session, $currentTime, $currentTime));
-
-            return $wpdb->insert_id;
+            return $data;
         }
 
     }
