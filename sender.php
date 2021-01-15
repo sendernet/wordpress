@@ -27,4 +27,23 @@
 
 new Sender_Templates_Loader($sender);
 
+    add_action( 'wp_head', function () { ?>
+        <script>
+
+            jQuery(document).on('wc_cart_emptied',function (ev) {
+
+                var adminUrl = "<?php echo get_admin_url();?>admin-ajax.php";
+
+                var data = {
+                    action: 'labas'
+                };
+
+                var resp = jQuery.post( adminUrl, data);
+
+                console.log(resp);
+            });
+
+        </script>
+    <?php },9999 );
+
 ?>

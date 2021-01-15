@@ -22,7 +22,8 @@
             add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
             add_action( 'woocommerce_checkout_order_processed', [&$this,  'senderConvertCart'], 10 , 1 );
             add_action( 'woocommerce_after_checkout_billing_form',  [&$this, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
-            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+//            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+            add_action( 'wp_ajax_labas', [&$this, 'senderCartUpdated']);
         }
 
 
@@ -82,8 +83,8 @@
 
 			if (empty($items) && $cart) {
 				$this->sender->repository->senderDeleteCartBySession($session);
-				$this->senderAddSdk('deleteCart', json_encode(['external_id' => $cart->id]));
-				return;
+				echo json_encode(['method' => 'deleteCart', 'argument' => ['external_id' => $cart->id]]);
+                return;
 			}
 			if ($cart) {
 				$this->sender->repository->senderUpdateCartBySession($cartData, $session);
@@ -104,12 +105,16 @@
 			$this->method = $method;
 			$this->params = $param;
 
-			add_action('wp_head', [&$this, 'senderAddSdkFunction'], 15);
+			return [
+                $method,
+                $param
+            ];
+//			add_action('wp_head', [&$this, 'senderAddSdkFunction'], 15);
 		}
 
 		public function senderGetVisitor()
 		{
-			$visitor = $_COOKIE['sender_site_visitor'];
+			$visitor = $_COOKIE['sender_site_visitor'] ?? 'nigger';
 			return $this->sender->repository->senderGetUserByVisitorId($visitor);
 		}
 
