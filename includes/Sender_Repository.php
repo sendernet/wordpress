@@ -52,4 +52,135 @@ class Sender_Repository
 		$wpdb->query($usersSql);
 	}
 
+    public function senderGetCustomerByEmail($email)
+    {
+        global $wpdb;
+
+        $sqlQuery = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_users` WHERE email = %s AND id != '0'";
+
+        $result = $wpdb->get_results( $wpdb->prepare( $sqlQuery, $email ) );
+
+        return $result;
+    }
+
+    public function senderGetCartBySession($sessionKey)
+    {
+        if(!$sessionKey) {
+            return [];
+        }
+
+        global $wpdb;
+
+        $query   = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_carts`
+                        WHERE session = %s
+                        AND user_type = 'GUEST'
+                        AND cart_recovered = %d
+                        AND cart_status = '0' ";
+
+        return $wpdb->get_results($wpdb->prepare( $query, $sessionKey, 0));
+    }
+
+    public function senderUpdateUserModified($userId, $timestamp)
+    {
+        global $wpdb;
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_users`
+                            SET updated = %d
+                            WHERE id = %d ";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $timestamp, $userId));
+    }
+
+    public function senderUpdateCartUser($cartId, $userId, $timestamp)
+    {
+        global $wpdb;
+
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
+                            SET user_id = %d,
+                                updated = %d
+                            WHERE id = %d ";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $userId, $timestamp, $cartId));
+    }
+
+    public function senderCreateNewGuestUser($visitorId, $timestamp)
+    {
+        global $wpdb;
+        $sqlQuery = "INSERT INTO `".$wpdb->prefix."sender_automated_emails_users`
+                             ( visitor_id, created, updated )
+                             VALUES (%s, %d, %d )";
+
+        $wpdb->query($wpdb->prepare($sqlQuery, $visitorId, $timestamp, $timestamp));
+
+        return $wpdb->insert_id;
+    }
+
+    public function senderGetCartByUser($userId) {
+
+        global $wpdb;
+
+        $query   = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_carts`
+                        WHERE user_id = %d
+                        AND cart_recovered = %d
+                        AND cart_status = '0'";
+
+        return $wpdb->get_results($wpdb->prepare( $query, $userId, 0) );
+    }
+
+    public function senderGetCartByVisitor($visitorId) {
+
+        global $wpdb;
+
+        $query   = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_carts`
+                        WHERE visitor_id = %d
+                        AND cart_recovered = %d
+                        AND cart_status = '0'";
+
+        return $wpdb->get_results($wpdb->prepare( $query, $visitorId, 0) );
+    }
+
+    public function senderUpdateUserCartData($userId, $cartData)
+    {
+        global $wpdb;
+
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
+                             SET cart_data = %s,
+                                 updated = %d
+                             WHERE user_id = %d 
+                             AND cart_recovered = %d
+                             AND cart_status = '0' ";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, current_time('timestamp'), $userId, 0));
+    }
+
+    public function senderVisitorUserCartData($visitorId, $cartData)
+    {
+        global $wpdb;
+
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
+                             SET cart_data = %s,
+                                 updated = %d
+                             WHERE visitor_id = %d 
+                             AND cart_recovered = %d
+                             AND cart_status = '0' ";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, current_time('timestamp'), $visitorId, 0));
+    }
+
+    public function senderUpdateCartBySession($cartData, $session, $timestamp)
+    {
+        global $wpdb;
+
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
+                                        SET cart_data = %s,
+                                            updated = %d
+                                        WHERE session = %s AND
+                                              user_type = 'GUEST' AND
+                                              cart_recovered = %d";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, $timestamp, $session, 0));
+    }
+
+
+
+
 }
