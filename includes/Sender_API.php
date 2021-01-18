@@ -8,6 +8,7 @@ class Sender_API
 {
 	private $senderBaseRequestArguments;
 	private $senderBaseUrl = 'https://api.sender.net/v2/';
+	private $senderStatsBaseUrl = 'https://stats.sender.net/';
 	protected $senderApiKey;
 
 	public function __construct()
@@ -67,7 +68,7 @@ class Sender_API
 
 	public function senderGetCart($cartHash)
 	{
-		$data = wp_remote_request($this->senderBaseUrl . 'carts/' . $cartHash, $this->senderBaseRequestArguments());
+		$data = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $cartHash, $this->senderBaseRequestArguments());
 		return $this->senderBuildResponse($data);
 	}
 
@@ -88,14 +89,31 @@ class Sender_API
 
 	public function senderDeleteCart($wpCartId)
 	{
-		$response = wp_remote_request($this->senderBaseUrl . 'carts/' . $wpCartId, $this->senderBaseRequestArguments(true));
+		$user = $this->senderGetAccount();
+		$data = ['resource_key' => $user->account->resource_key];
+		$params = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($data)]);
+
+		$response = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $wpCartId, $params);
 		return $this->senderBuildResponse($response);
 	}
 
     public function senderTrackCart(array $cartParams)
     {
         $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
-        $response = wp_remote_post($this->senderBaseUrl . 'carts', $params);
+        $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
+		$this->senderBuildResponse($response);
+        return $this->senderBuildResponse($response);
+    }
+
+    public function senderUpdateCart(array $cartParams)
+    {
+    	$data = $cartParams;
+    	$user = $this->senderGetAccount();
+		$data['resource_key'] = $user->account->resource_key;
+
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data), 'method' => 'PATCH']);
+		$response = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $cartParams['external_id'], $params);
+
         return $this->senderBuildResponse($response);
     }
 
