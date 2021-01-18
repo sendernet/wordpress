@@ -15,6 +15,7 @@
         {
             $this->sender = $sender;
             $this->senderAddCartsActions();
+            $this->senderAddCartsFilters();
         }
 
         private function senderAddCartsActions()
@@ -24,6 +25,10 @@
             add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
         }
 
+        private function senderAddCartsFilters()
+        {
+            add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
+        }
 
         public function senderConvertCart($orderId)
 		{
@@ -141,6 +146,31 @@
             }
 
             return $woocommerce;
+        }
+
+        public function senderRecoverCart()
+        {
+            $hash = $_GET['hash'];
+
+            if(!$hash){
+                return;
+            }
+
+            //base64 revert hash and get cart
+            //json decode cart
+            //
+//            $Cart = new WC_Cart();
+//
+//            foreach ($decodedCart['cart'] as $product) {
+//                $Cart->add_to_cart(
+//                    (int) $product['product_id'],
+//                    (int) $product['quantity'],
+//                    (int) $product['variation_id'],
+//                    $product['variation']
+//                );
+//            }
+//
+//            $CartSession = new WC_Cart_Session($Cart);
         }
 
     }
