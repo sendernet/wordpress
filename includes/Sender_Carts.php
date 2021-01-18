@@ -21,10 +21,22 @@
         {
             add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
             add_action( 'woocommerce_checkout_order_processed', [&$this,  'senderConvertCart'], 10 , 1 );
-            add_action( 'woocommerce_after_checkout_billing_form',  [&$this, 'senderCatchGuestEmailAfterCheckout'], 10, 2 );
             add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
         }
 
+
+        public function senderConvertCart($orderId)
+		{
+			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
+
+
+			$cart = $this->sender->repository->senderGetCartBySession($session);
+
+
+			register_shutdown_function([&$this->sender->senderApi, "senderConvertCart"], ['cartId' => $cart->id,  'orderId' => $orderId]);
+
+			$this->sender->repository->senderConvertCartBySession($session);
+		}
 
         public function senderPrepareCartData($cart)
         {
@@ -86,7 +98,9 @@
 
 			if (empty($items) && $cart) {
 				$this->sender->repository->senderDeleteCartBySession($session);
-				var_dump($this->sender->senderApi->senderDeleteCart($cart->id));
+				if ($cart->cart_status == "2") {
+					return;
+				}
 				register_shutdown_function([&$this->sender->senderApi, "senderDeleteCart"], $cart->id);
 				return;
 			}

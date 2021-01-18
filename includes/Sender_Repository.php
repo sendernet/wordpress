@@ -194,6 +194,23 @@ class Sender_Repository
         $wpdb->query( $wpdb->prepare($sqlQuery, $cartData, $timestamp, $session, 0));
     }
 
+    public function senderConvertCartBySession($session, $timestamp = null)
+    {
+    	if (!$timestamp) {
+    		$timestamp = current_time('timestamp');
+		}
+        global $wpdb;
+
+        $sqlQuery = "UPDATE `".$wpdb->prefix."sender_automated_emails_carts`
+                                        SET cart_status = 2,
+                                            updated = %d
+                                        WHERE session = %s";
+
+        $wpdb->query( $wpdb->prepare($sqlQuery, $timestamp, $session));
+    }
+
+
+
     public function senderCreateCart($cartData, $userId, $session)
     {
         global $wpdb;

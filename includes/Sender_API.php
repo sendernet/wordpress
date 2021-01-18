@@ -72,19 +72,30 @@ class Sender_API
 		return $this->senderBuildResponse($data);
 	}
 
-	public function senderConvertCart($wpCartId)
+	public function senderConvertCart($params)
 	{
 		$list = get_option('sender_customers_list');
 
+		$email = wc_get_order($params['orderId'])->get_billing_email();
+
 		$data = [
-			'external_id' => $wpCartId,
+			'external_id' => $params['cartId'],
+			'email' => $email
 		];
+
+		$user = $this->senderGetAccount();
+
+		$data['resource_key'] = $user->account->resource_key;
+		$url = $this->senderStatsBaseUrl . 'carts/' . $params['cartId'] . '/convert';
+
 		if ($list) {
 			$data['list_id'] = $list;
 		}
-		echo '
-			<script> sender("convertCart", ' . json_encode($data) . '</script>
-		';
+
+		$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+
+		$response = wp_remote_post($url, $params);
+		return $this->senderBuildResponse($response);
 	}
 
 	public function senderDeleteCart($wpCartId)
