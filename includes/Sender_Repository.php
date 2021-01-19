@@ -45,6 +45,7 @@ class Sender_Repository
             `email` text,
             `created` int(11) NOT NULL,
             `updated` int(11) NOT NULL,
+            `wp_user_id` int(11),
             `visitor_id` varchar(32),
             PRIMARY KEY (`id`)
             ) $wcap_collate";
@@ -62,6 +63,17 @@ class Sender_Repository
 
         return $result;
     }
+
+	public function senderGetCustomerByWpId($id)
+	{
+		global $wpdb;
+
+		$sqlQuery = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_users` WHERE wp_user_id = %s";
+
+		$result = $wpdb->get_results( $wpdb->prepare( $sqlQuery, $id ) );
+
+		return $result;
+	}
 
     public function senderGetCartBySession($sessionKey)
     {

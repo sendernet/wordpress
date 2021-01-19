@@ -1,187 +1,216 @@
 <?php
 
-    if ( ! defined( 'ABSPATH' ) ) {
-        exit;
-    }
+if (!defined('ABSPATH')) {
+	exit;
+}
 
-    class Sender_Carts
-    {
-        private $sender;
-        private $method;
-        private $params;
+class Sender_Carts
+{
+	private $sender;
+	private $method;
+	private $params;
 
+	public function __construct($sender)
+	{
+		$this->sender = $sender;
+		$this->senderAddCartsActions();
+		$this->senderAddCartsFilters();
+	}
 
-        public function __construct($sender)
-        {
-            $this->sender = $sender;
-            $this->senderAddCartsActions();
-            $this->senderAddCartsFilters();
-        }
+	private function senderAddCartsActions()
+	{
+		add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
+		add_action('woocommerce_checkout_order_processed', [&$this, 'senderConvertCart'], 10, 1);
+		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+	}
 
-        private function senderAddCartsActions()
-        {
-            add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
-            add_action( 'woocommerce_checkout_order_processed', [&$this,  'senderConvertCart'], 10 , 1 );
-            add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
-        }
+	private function senderAddCartsFilters()
+	{
+		add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
+	}
 
-        private function senderAddCartsFilters()
-        {
-            add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
-        }
+	public function senderConvertCart($orderId)
+	{
+		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-        public function senderConvertCart($orderId)
-		{
-			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
+		$cart = $this->sender->repository->senderGetCartBySession($session);
 
+		register_shutdown_function([&$this->sender->senderApi, "senderConvertCart"], ['cartId' => $cart->id, 'orderId' => $orderId]);
 
-			$cart = $this->sender->repository->senderGetCartBySession($session);
+		$this->sender->repository->senderConvertCartBySession($session);
+	}
 
+	public function senderPrepareCartData($cart)
+	{
+		global $woocommerce;
 
-			register_shutdown_function([&$this->sender->senderApi, "senderConvertCart"], ['cartId' => $cart->id,  'orderId' => $orderId]);
+		$items = $woocommerce->cart->get_cart();
+		$total = $woocommerce->cart->total;
+		$user = $this->sender->repository->senderGetUserById($cart->user_id);
 
-			$this->sender->repository->senderConvertCartBySession($session);
+		$data = [
+			"visitor_id"  => $user->visitor_id,
+			"external_id" => $cart->id,
+			"url"         => wc_get_cart_url() . '&hash=' . $cart->id,
+			"currency"    => 'EUR',
+			"grand_total" => $total,
+			"products"    => [],
+		];
+
+		foreach ($items as $item => $values) {
+
+			$_product = wc_get_product($values['data']->get_id());
+			$regularPrice = (int)get_post_meta($values['product_id'], '_regular_price', true);
+			$salePrice = (int)get_post_meta($values['product_id'], '_sale_price', true);
+
+			if ($regularPrice <= 0) {
+				$regularPrice = 1;
+			}
+
+			$discount = round(100 - ($salePrice / $regularPrice * 100));
+
+			$prod = [
+				'sku'           => $values['data']->get_sku(),
+				'name'          => (string)$_product->get_title(),
+				'price'         => (string)$regularPrice,
+				'price_display' => (string)$_product->get_price() . get_woocommerce_currency_symbol(),
+				'discount'      => (string)$discount,
+				'qty'           => $values['quantity'],
+				'image'         => get_the_post_thumbnail_url($values['data']->get_id()),
+			];
+
+			$data['products'][] = $prod;
 		}
 
-        public function senderPrepareCartData($cart)
-        {
-            global $woocommerce;
+		$data['grand_total'] = $woocommerce->cart->total;
 
-            $items = $woocommerce->cart->get_cart();
-            $total = $woocommerce->cart->total;
-			$user =  $this->sender->repository->senderGetUserById($cart->user_id);
+		return $data;
+	}
 
-            $data = array(
-                "visitor_id" => $user->visitor_id,
-                "external_id" => $cart->id,
-                "url" => 'null',
-                "currency" => 'EUR',
-                "grand_total" =>  $total,
-                "products" => array()
-            );
+	public function trackUser()
+	{
+		if (!is_user_logged_in()) {
+			return;
+		}
+		$wpUser = wp_get_current_user();
+		$wpId = $wpUser->ID;
 
-            foreach($items as $item => $values) {
+		$visitorId = sanitize_text_field($_COOKIE['sender_site_visitor']);
+		$user = (new Sender_User())->findBy('wp_user_id', $wpId);
 
-                $_product     = wc_get_product( $values['data']->get_id() );
-                $regularPrice = (int) get_post_meta($values['product_id'] , '_regular_price', true);
-                $salePrice    = (int) get_post_meta($values['product_id'] , '_sale_price', true);
+		if (!$user) {
+			$user = (new Sender_User())->findBy('visitor_id', $visitorId);
+		}
+		if (!$user) {
+			$user = new Sender_User();
+		}
 
-                if ($regularPrice <= 0) $regularPrice = 1;
+		$user->visitor_id = $visitorId;
+		$user->wp_user_id = $wpId;
+		$user->email = $wpUser->user_email;
+		if ($user->isDirty()) {
+			register_shutdown_function([&$this->sender->senderApi, "senderTrackRegisteredUsers"], $wpId);
+		}
+		$user->save();
 
-                $discount = round(100 - ($salePrice / $regularPrice * 100));
+	}
 
-                $prod = [
-                    'sku' => $values['data']->get_sku(),
-                    'name' =>(string)  $_product->get_title(),
-                    'price' => (string) $regularPrice,
-                    'price_display' => (string) $_product->get_price().get_woocommerce_currency_symbol(),
-                    'discount' => (string) $discount,
-                    'qty' => $values['quantity'],
-                    'image' =>  get_the_post_thumbnail_url($values['data']->get_id())
-                ];
+	public function senderCartUpdated()
+	{
+		$this->trackUser();
+		$items = $this->senderGetCart();
 
-                $data['products'][] = $prod;
-            }
+		$cartData = serialize($items);
+		if (!$this->senderGetWoo()->session->get_session_cookie()) {
+			return;
+		}
 
-            $data['grand_total'] = $woocommerce->cart->total;
+		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-            return $data;
-        }
+		$cart = $this->sender->repository->senderGetCartBySession($session);
 
-        public function senderCartUpdated()
-        {
-			$items = $this->senderGetCart();
-
-			$cartData =  serialize($items);
-			if ( !$this->senderGetWoo()->session->get_session_cookie() ) {
+		if (empty($items) && $cart) {
+			$this->sender->repository->senderDeleteCartBySession($session);
+			if ($cart->cart_status == "2") {
 				return;
 			}
+			register_shutdown_function([&$this->sender->senderApi, "senderDeleteCart"], $cart->id);
+			return;
+		}
 
-			$session = $this->senderGetWoo()->session->get_session_cookie()[0];
+		if ($cart && !empty($items)) {
+			$this->sender->repository->senderUpdateCartBySession($cartData, $session);
+			$cartData = $this->senderPrepareCartData($cart);
+			register_shutdown_function([&$this->sender->senderApi, "senderUpdateCart"], ...[$cartData, $session]);
+			return;
 
-			$cart = $this->sender->repository->senderGetCartBySession($session);
-
-			if (empty($items) && $cart) {
-				$this->sender->repository->senderDeleteCartBySession($session);
-				if ($cart->cart_status == "2") {
-					return;
-				}
-				register_shutdown_function([&$this->sender->senderApi, "senderDeleteCart"], $cart->id);
-				return;
-			}
-
-			if ($cart && !empty($items)) {
-				$this->sender->repository->senderUpdateCartBySession($cartData, $session);
-				$cartData = $this->senderPrepareCartData($cart);
-				register_shutdown_function([&$this->sender->senderApi, "senderUpdateCart"], ...[$cartData, $session]);
-				return;
-
-			} else if(!empty($items)){
-				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id,$session);
+		} else {
+			if (!empty($items)) {
+				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id, $session);
 				$cart = $this->sender->repository->senderGetCartBySession($session);
 				$cartData = $this->senderPrepareCartData($cart);
 				register_shutdown_function([&$this->sender->senderApi, "senderTrackCart"], $cartData);
 			}
-
-
-        }
-
-		public function senderGetVisitor()
-		{
-			$visitor = $_COOKIE['sender_site_visitor'];
-			return $this->sender->repository->senderGetUserByVisitorId($visitor);
 		}
 
-        public function senderGetCart()
-		{
-			return $this->senderGetWoo()->cart->get_cart();
+	}
+
+	public function senderGetVisitor()
+	{
+		$visitor = $_COOKIE['sender_site_visitor'];
+		return $this->sender->repository->senderGetUserByVisitorId($visitor);
+	}
+
+	public function senderGetCart()
+	{
+		return $this->senderGetWoo()->cart->get_cart();
+	}
+
+	public function senderGetWoo()
+	{
+		global $woocommerce;
+
+		if (function_exists('WC')) {
+			return WC();
 		}
 
-        public function senderGetWoo()
-        {
-            global $woocommerce;
+		return $woocommerce;
+	}
 
-            if(function_exists('WC')){
-                return WC();
-            }
+	public function senderRecoverCart($template)
+	{
 
-            return $woocommerce;
-        }
+		if (!isset($_GET['hash'])) {
+			return $template;
+		}
 
-        public function senderRecoverCart($template)
-        {
+		$cartId = sanitize_text_field($_GET['hash']);
 
-            if(!isset($_GET['hash'])){
-                return $template;
-            }
+		$cart = $this->sender->repository->senderGetCartById($cartId);
 
-            $cartId = base64_decode(sanitize_text_field($_GET['hash']));
+		if (!$cart) {
+			return $template;
+		}
 
-            $cart = $this->sender->repository->senderGetCartById($cartId);
+		$cartData = unserialize($cart->cart_data);
 
-            if(!$cart){
-                return $template;
-            }
+		if (empty($cartData)) {
+			return $template;
+		}
 
-            $cartData = unserialize($cart->cart_data);
+		$Cart = new WC_Cart();
 
-            if (empty($cartData)) {
-                return $template;
-            }
+		foreach ($cartData as $product) {
+			$Cart->add_to_cart(
+				(int)$product['product_id'],
+				(int)$product['quantity'],
+				(int)$product['variation_id'],
+				$product['variation']
+			);
+		}
+		new WC_Cart_Session($Cart);
 
-            $Cart = new WC_Cart();
+		return $template;
+	}
 
-            foreach ($cartData as $product) {
-                $Cart->add_to_cart(
-                    (int) $product['product_id'],
-                    (int) $product['quantity'],
-                    (int) $product['variation_id'],
-                    $product['variation']
-                );
-            }
-            new WC_Cart_Session($Cart);
-
-            return $template;
-        }
-
-    }
+}

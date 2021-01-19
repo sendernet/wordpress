@@ -22,6 +22,7 @@ class Sender_Automated_Emails
 
 	public function __construct($senderBaseFile)
 	{
+
 		$this->senderBaseFile = $senderBaseFile;
 
         if( !class_exists('Sender_API') ) {
@@ -40,6 +41,10 @@ class Sender_Automated_Emails
             require_once("Sender_Forms_Widget.php" );
         }
 
+		if (!class_exists('Sender_User')) {
+			require_once 'Model/Sender_User.php';
+		}
+
 		$this->senderActivate()
 			 ->senderAddActions()
 			 ->senderAddFilters()
@@ -53,6 +58,7 @@ class Sender_Automated_Emails
         add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
         add_action('user_register', [&$this->senderApi, 'senderTrackRegisteredUsers'], 10, 1);
+        add_action('wp_login', [&$this->senderApi, 'senderTrackRegisteredUsers']);
 
 		return $this;
 	}
@@ -117,6 +123,7 @@ class Sender_Automated_Emails
 
 	public function insertFormsScript()
 	{
+
 		echo "
 			<script>
 			  (function (s, e, n, d, er) {

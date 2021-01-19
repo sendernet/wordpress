@@ -110,7 +110,9 @@ class Sender_API
 
     public function senderTrackCart(array $cartParams)
     {
+    	$body = $cartParams;
         $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
+
         $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
 		$this->senderBuildResponse($response);
         return $this->senderBuildResponse($response);
@@ -154,13 +156,16 @@ class Sender_API
 				'email' => $user->user_email,
 				'firstname' => $user->first_name,
 				'lastname' => $user->last_name,
+				'visitor_id' => $_COOKIE['sender_site_visitor']
 			];
 			if ($list) {
-				$data['list_id'] = $list;
+				$data['list_id'] = (int) $list;
 			}
-			echo '
-				<script> sender("attachEmail", ' . json_encode($data) . '</script>
-			';
+
+			$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+			$response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
+
+			return $this->senderBuildResponse($response);
 
 		}
 	}
