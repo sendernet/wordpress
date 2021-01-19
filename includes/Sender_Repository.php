@@ -4,7 +4,7 @@ class Sender_Repository
 {
 	public function __construct()
 	{
-
+        $this->senderCreateTables();
 	}
 
 	public function senderCreateTables()
@@ -51,6 +51,22 @@ class Sender_Repository
             ) $wcap_collate";
 
 		$wpdb->query($usersSql);
+
+		//check before altering, for old tables
+
+        $map = [
+            'visitor_id' => 'varchar(32)',
+            'wp_user_id' => 'int(11)'
+        ];
+
+        foreach ($map as $column => $type)
+        {
+            $columnExists = $wpdb->get_results("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$sender_users' AND column_name = '$column'" );
+            if(empty($columnExists)){
+                $wpdb->query("ALTER TABLE $sender_users ADD $column $type");
+            }
+        }
+
 	}
 
     public function senderGetCustomerByEmail($email)
