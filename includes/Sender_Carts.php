@@ -148,29 +148,40 @@
             return $woocommerce;
         }
 
-        public function senderRecoverCart()
+        public function senderRecoverCart($template)
         {
-            $hash = $_GET['hash'];
 
-            if(!$hash){
-                return;
+            if(!isset($_GET['hash'])){
+                return $template;
             }
 
-            //base64 revert hash and get cart
-            //json decode cart
-            //
-//            $Cart = new WC_Cart();
-//
-//            foreach ($decodedCart['cart'] as $product) {
-//                $Cart->add_to_cart(
-//                    (int) $product['product_id'],
-//                    (int) $product['quantity'],
-//                    (int) $product['variation_id'],
-//                    $product['variation']
-//                );
-//            }
-//
-//            $CartSession = new WC_Cart_Session($Cart);
+            $cartId = base64_decode(sanitize_text_field($_GET['hash']));
+
+            $cart = $this->sender->repository->senderGetCartById($cartId);
+
+            if(!$cart){
+                return $template;
+            }
+
+            $cartData = unserialize($cart->cart_data);
+
+            if (empty($cartData)) {
+                return $template;
+            }
+
+            $Cart = new WC_Cart();
+
+            foreach ($cartData as $product) {
+                $Cart->add_to_cart(
+                    (int) $product['product_id'],
+                    (int) $product['quantity'],
+                    (int) $product['variation_id'],
+                    $product['variation']
+                );
+            }
+            new WC_Cart_Session($Cart);
+
+            return $template;
         }
 
     }

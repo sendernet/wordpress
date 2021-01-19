@@ -209,8 +209,6 @@ class Sender_Repository
         $wpdb->query( $wpdb->prepare($sqlQuery, $timestamp, $session));
     }
 
-
-
     public function senderCreateCart($cartData, $userId, $session)
     {
         global $wpdb;
@@ -253,6 +251,19 @@ class Sender_Repository
         global $wpdb;
         $query = "DELETE FROM `".$wpdb->prefix."sender_automated_emails_carts` WHERE session = %d";
         $wpdb->query($wpdb->prepare($query, $session));
+    }
+
+    public function senderGetCartById($cartId)
+    {
+        global $wpdb;
+
+        $query   = "SELECT * FROM `".$wpdb->prefix."sender_automated_emails_carts`
+                        WHERE id = %d
+                        AND cart_recovered = %d";
+
+        $result =  $wpdb->get_results($wpdb->prepare( $query, $cartId, 0) );
+
+        return !empty($result) ? $result[0] : false;
     }
 
 }
