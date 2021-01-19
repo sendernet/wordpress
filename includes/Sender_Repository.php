@@ -4,7 +4,7 @@ class Sender_Repository
 {
 	public function __construct()
 	{
-        $this->senderCreateTables();
+
 	}
 
 	public function senderCreateTables()
