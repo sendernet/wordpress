@@ -80,12 +80,10 @@ class Sender_API
 
 		$data = [
 			'external_id' => $params['cartId'],
-			'email' => $email
+			'email' => $email,
+            'resource_key' => $this->senderGetResourceKey()
 		];
 
-		$user = $this->senderGetAccount();
-
-		$data['resource_key'] = $user->account->resource_key;
 		$url = $this->senderStatsBaseUrl . 'carts/' . $params['cartId'] . '/convert';
 
 		if ($list) {
@@ -100,8 +98,7 @@ class Sender_API
 
 	public function senderDeleteCart($wpCartId)
 	{
-		$user = $this->senderGetAccount();
-		$data = ['resource_key' => $user->account->resource_key];
+		$data = ['resource_key' => $this->senderGetResourceKey()];
 		$params = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($data)]);
 
 		$response = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $wpCartId, $params);
@@ -110,21 +107,18 @@ class Sender_API
 
     public function senderTrackCart(array $cartParams)
     {
-    	$body = $cartParams;
         $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
 
         $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
-		$this->senderBuildResponse($response);
+
         return $this->senderBuildResponse($response);
     }
 
     public function senderUpdateCart(array $cartParams)
     {
-    	$data = $cartParams;
-    	$user = $this->senderGetAccount();
-		$data['resource_key'] = $user->account->resource_key;
+        $cartParams['resource_key'] = $this->senderGetResourceKey();
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams), 'method' => 'PATCH']);
 
-        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data), 'method' => 'PATCH']);
 		$response = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $cartParams['external_id'], $params);
 
         return $this->senderBuildResponse($response);
@@ -144,6 +138,7 @@ class Sender_API
 				'lastname' => $user->last_name,
 				'visitor_id' => $_COOKIE['sender_site_visitor']
 			];
+
 			if ($list) {
 				$data['list_id'] = (int) $list;
 			}
