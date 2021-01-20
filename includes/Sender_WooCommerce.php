@@ -28,8 +28,9 @@
                 $pDescription = str_replace("\"", '\\"', $product->get_description());
                 $pPrice = $product->get_regular_price();
                 $pCurrency = get_option('woocommerce_currency');
-                $pQty = $product->get_stock_quantity();
+                $pQty = $product->get_stock_quantity() ? $product->get_stock_quantity() : 1;
                 $pRating = $product->get_average_rating();
+                $pOnSale = $product->is_on_sale();
                 $pSalePrice = $pPrice;
                 $pDiscount = 0;
 
@@ -48,6 +49,7 @@
                           "special_price": "' . (float)$pSalePrice . '",
                           "currency": "' . $pCurrency . '",
                           "quantity": "' . $pQty . '",
+                          "is_on_sale": "'.$pOnSale.'",
                           "rating": "' . $pRating . '"
                         }
                     </script>';

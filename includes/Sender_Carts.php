@@ -19,7 +19,6 @@ class Sender_Carts
 
 	private function senderAddCartsActions()
 	{
-		add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
 		add_action('woocommerce_checkout_order_processed', [&$this, 'senderConvertCart'], 10, 1);
 		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
 	}
