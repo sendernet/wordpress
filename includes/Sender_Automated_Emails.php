@@ -29,36 +29,42 @@ class Sender_Automated_Emails
 
         $this->senderApi = new Sender_API();
 
-        if( !class_exists('Sender_Repository') ) {
-            require_once("Sender_Repository.php" );
-        }
-
-        $this->repository = new Sender_Repository();
-
         if( !class_exists('Sender_Forms_Widget') ) {
             require_once("Sender_Forms_Widget.php" );
         }
 
-		if (!class_exists('Sender_User')) {
-			require_once 'Model/Sender_User.php';
-		}
-		if (!class_exists('Sender_Cart')) {
-			require_once 'Model/Sender_Cart.php';
-		}
+       if($this->senderIsWooEnabled()){
+           if (!class_exists('Sender_User')) {
+               require_once 'Model/Sender_User.php';
+           }
+           if (!class_exists('Sender_Cart')) {
+               require_once 'Model/Sender_Cart.php';
+           }
 
-		$this->senderActivate()
+           if( !class_exists('Sender_Repository') ) {
+               require_once("Sender_Repository.php" );
+           }
+
+           $this->repository = new Sender_Repository();
+
+           register_activation_hook( $senderBaseFile, [&$this->repository, 'senderCreateTables']);
+       }
+
+		$this->senderSetupOptions()
 			 ->senderAddActions()
 			 ->senderAddFilters()
 			 ->senderSetupWooCommerce();
-
 	}
 
 	private function senderAddActions()
 	{
         add_action('wp_head', [&$this, 'insertSdkScript']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
-        add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
-        add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
+
+        if(get_option('sender_allow_tracking') && $this->senderIsWooEnabled()){
+            add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
+            add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
+        }
 
 		return $this;
 	}
@@ -66,12 +72,6 @@ class Sender_Automated_Emails
 	private function senderAddFilters()
 	{
 		add_filter('plugin_action_links_' . plugin_basename($this->senderBaseFile), [&$this, 'senderAddPluginLinks']);
-		return $this;
-	}
-
-	public function senderActivate()
-	{
-		$this->senderSetupOptions();
 		return $this;
 	}
 
@@ -91,6 +91,7 @@ class Sender_Automated_Emails
 				add_option($name, $defaultValue);
 			}
 		}
+		return $this;
 	}
 
 	private function senderIsWooEnabled()
@@ -99,27 +100,29 @@ class Sender_Automated_Emails
 		return is_plugin_active('woocommerce/woocommerce.php');
 	}
 
-	public function senderSetupWooCommerce()
-	{
-		if (!$this->senderIsWooEnabled()) {
-			return $this;
-		}
+    public function senderSetupWooCommerce()
+    {
+        if (!$this->senderIsWooEnabled()) {
+            return $this;
+        }
 
-        if(get_option('sender_allow_tracking')){
+        if (get_option('sender_allow_tracking')) {
 
-            if( !class_exists('Sender_Carts') ) {
-                require_once("Sender_Carts.php" );
+            if (!class_exists('Sender_Carts')) {
+                require_once("Sender_Carts.php");
             }
 
             new Sender_Carts($this);
         }
 
-        if( !class_exists('Sender_WooCommerce') ) {
-            require_once("Sender_WooCommerce.php" );
+        if (!class_exists('Sender_WooCommerce')) {
+            require_once("Sender_WooCommerce.php");
         }
 
-         new Sender_WooCommerce($this);
-	}
+        new Sender_WooCommerce($this);
+
+        return $this;
+    }
 
 	public function insertSdkScript()
 	{
