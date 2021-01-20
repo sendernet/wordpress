@@ -175,4 +175,8 @@ class Sender_API
 		return json_decode($response['body']);
 	}
 
+	public function senderApiShutdownCallback($callback, $params)
+    {
+        register_shutdown_function([$this, $callback], $params);
+    }
 }

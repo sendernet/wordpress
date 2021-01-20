@@ -35,7 +35,7 @@ class Sender_Carts
 
 		$cart = $this->sender->repository->senderGetCartBySession($session);
 
-		register_shutdown_function([&$this->sender->senderApi, "senderConvertCart"], ['cartId' => $cart->id, 'orderId' => $orderId]);
+		$this->sender->senderApi->senderApiShutdownCallback("senderConvertCart", ['cartId' => $cart->id, 'orderId' => $orderId]);
 
 		$this->sender->repository->senderConvertCartBySession($session);
 	}
@@ -109,8 +109,8 @@ class Sender_Carts
 		$user->wp_user_id = $wpId;
 		$user->email = $wpUser->user_email;
 		if ($user->isDirty()) {
-			register_shutdown_function([&$this->sender->senderApi, "senderTrackRegisteredUsers"], $wpId);
-		}
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
+        }
 		$user->save();
 
 	}
@@ -134,14 +134,15 @@ class Sender_Carts
 			if ($cart->cart_status == "2") {
 				return;
 			}
-			register_shutdown_function([&$this->sender->senderApi, "senderDeleteCart"], $cart->id);
-			return;
+            $this->sender->senderApi->senderApiShutdownCallback("senderDeleteCart", $cart->id);
+
+            return;
 		}
 
 		if ($cart && !empty($items)) {
 			$this->sender->repository->senderUpdateCartBySession($cartData, $session);
 			$cartData = $this->senderPrepareCartData($cart);
-			register_shutdown_function([&$this->sender->senderApi, "senderUpdateCart"], ...[$cartData, $session]);
+            $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", [$cartData, $session]);
 			return;
 
 		} else {
@@ -149,8 +150,8 @@ class Sender_Carts
 				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id, $session);
 				$cart = $this->sender->repository->senderGetCartBySession($session);
 				$cartData = $this->senderPrepareCartData($cart);
-				register_shutdown_function([&$this->sender->senderApi, "senderTrackCart"], $cartData);
-			}
+                $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
+            }
 		}
 
 	}
