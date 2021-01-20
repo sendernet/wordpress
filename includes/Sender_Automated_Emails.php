@@ -29,10 +29,6 @@ class Sender_Automated_Emails
 
         $this->senderApi = new Sender_API();
 
-        if( !class_exists('Sender_Forms_Widget') ) {
-            require_once("Sender_Forms_Widget.php" );
-        }
-
        if($this->senderIsWooEnabled()){
            if (!class_exists('Sender_User')) {
                require_once 'Model/Sender_User.php';
@@ -147,6 +143,11 @@ class Sender_Automated_Emails
 	}
 
     public function senderRegisterFormsWidget() {
+
+        if( !class_exists('Sender_Forms_Widget') ) {
+            require_once("Sender_Forms_Widget.php" );
+        }
+
         register_widget( new Sender_Forms_Widget($this));
     }
 
