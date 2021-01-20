@@ -23,8 +23,17 @@
                 global $product;
 
                 $id = $product->get_id();
-                $pName = $product->get_name();
+
                 $pImage = get_the_post_thumbnail_url($id);
+
+                if(!$pImage){
+                    $gallery = $product->get_gallery_image_ids();
+                    if(!empty($gallery)){
+                        $pImage = wp_get_attachment_url($gallery[0]);
+                    }
+                }
+
+                $pName = $product->get_name();
                 $pDescription = str_replace("\"", '\\"', $product->get_description());
                 $pPrice = $product->get_regular_price();
                 $pCurrency = get_option('woocommerce_currency');
