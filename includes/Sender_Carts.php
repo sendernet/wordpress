@@ -195,9 +195,12 @@ class Sender_Carts
 
 		$cart = (new Sender_Cart())->find($cartId);
 
-		if (!$cart) {
+		if (!$cart || $cart->cart_recovered ) {
 			return $template;
 		}
+
+		$cart->cart_recovered = '1';
+		$cart->save();
 
 		$cartData = unserialize($cart->cart_data);
 

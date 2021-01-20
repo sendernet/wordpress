@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+	exit;
+}
 
 if (!class_exists('Sender_Model')) {
 	require_once 'Sender_Model.php';
