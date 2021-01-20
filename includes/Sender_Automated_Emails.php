@@ -9,11 +9,9 @@ class Sender_Automated_Emails
 	private $availableSettings = [
 		'sender_api_key'            => false,
         'sender_resource_key'       => false,
-        'sender_allow_carts_track'  => false,
-		'sender_allow_import'       => true,
+        'sender_allow_tracking'     => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
-		'sender_registration_track' => true,
 	];
 
 	private $senderBaseFile;
@@ -107,7 +105,7 @@ class Sender_Automated_Emails
 			return $this;
 		}
 
-        if(get_option('sender_allow_carts_track')){
+        if(get_option('sender_allow_tracking')){
 
             if( !class_exists('Sender_Carts') ) {
                 require_once("Sender_Carts.php" );

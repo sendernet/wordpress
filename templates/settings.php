@@ -58,39 +58,15 @@
                 <div class="sender-plugin-settings sender-box">
                     <form method="post" class="flex-column h-100" action='' id="sender-form-settings">
                         <div class="sender-options">
-
                             <div class="sender-option">
-                                <input type="hidden" value="0" name="sender_registration_track_hidden_checkbox">
-                                <label for="sender_registration_track">
-                                    <input class="sender-checkbox" type="checkbox" id="sender_registration_track"
-                                           value="sender_registration_track"
-                                           name="sender_registration_track" <?php if (get_option('sender_registration_track')) {
+                                <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
+                                <label for="sender_allow_tracking">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_tracking"
+                                           value="sender_allow_tracking"
+                                           name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
 										echo 'checked';
 									} ?> >
-                                    <span>Track registered users</span>
-                                </label>
-                            </div>
-
-                            <div class="sender-option">
-                                <input type="hidden" value="0" name="sender_allow_carts_track_hidden_checkbox">
-                                <label for="sender_allow_carts_track">
-                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_carts_track"
-                                           value="sender_allow_carts_track"
-                                           name="sender_allow_carts_track" <?php if (get_option('sender_allow_carts_track')) {
-										echo 'checked';
-									} ?> >
-                                    <span>Allow carts tracking</span>
-                                </label>
-
-                            </div>
-                            <div class="sender-option">
-                                <input type="hidden" value="0" name="sender_allow_import_hidden_checkbox">
-                                <label for="sender_allow_import">
-                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_import"
-                                           name="sender_allow_import" <?php if (get_option('sender_allow_import')) {
-										echo 'checked';
-									} ?> >
-                                    <span>Allow products import</span>
+                                    <span>Allow tracking</span>
                                 </label>
                             </div>
                             <div class="sender-option">

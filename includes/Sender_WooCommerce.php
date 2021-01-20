@@ -16,9 +16,6 @@
 
         public function senderAddProductImportScript()
         {
-            if (!get_option('sender_allow_import')) {
-                return;
-            }
 
                 global $product;
 
