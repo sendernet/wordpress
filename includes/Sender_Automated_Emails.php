@@ -90,7 +90,7 @@ class Sender_Automated_Emails
 		return $this;
 	}
 
-	private function senderIsWooEnabled()
+	public function senderIsWooEnabled()
 	{
 		include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 		return is_plugin_active('woocommerce/woocommerce.php');

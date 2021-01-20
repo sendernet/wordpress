@@ -43,6 +43,7 @@ class Sender_Templates_Loader
 		}
 
 		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );
+		$wooEnabled = $this->sender->senderIsWooEnabled();
 
 		if ($apiKey) {
 		    $this->sender->senderApi->senderSetApiKey($apiKey);
@@ -64,7 +65,6 @@ class Sender_Templates_Loader
 
 		require_once('settings.php');
 	}
-
 
 	function senderGetAllForms() {
 		global $wp_registered_sidebars;

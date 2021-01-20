@@ -55,6 +55,7 @@
                         </form>
                     </div>
                 </div>
+                <?php if ($wooEnabled) { ?>
                 <div class="sender-plugin-settings sender-box">
                     <form method="post" class="flex-column h-100" action='' id="sender-form-settings">
                         <div class="sender-options">
@@ -96,6 +97,7 @@
                         </div>
                     </form>
                 </div>
+                <?php } ?>
                 <div class="sender-forms-list">
                     <div class="sender-big-header"> Forms </div>
                     <div class=" sender-box no-padding flex-column">
