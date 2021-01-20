@@ -48,6 +48,9 @@ class Sender_Automated_Emails
 		if (!class_exists('Sender_User')) {
 			require_once 'Model/Sender_User.php';
 		}
+		if (!class_exists('Sender_Cart')) {
+			require_once 'Model/Sender_Cart.php';
+		}
 
 		$this->senderActivate()
 			 ->senderAddActions()

@@ -32,11 +32,12 @@ class Sender_Carts
 	{
 		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-		$cart = $this->sender->repository->senderGetCartBySession($session);
+		$cart = (new Sender_Cart())->findBy('session', $session);
 
 		$this->sender->senderApi->senderApiShutdownCallback("senderConvertCart", ['cartId' => $cart->id, 'orderId' => $orderId]);
 
-		$this->sender->repository->senderConvertCartBySession($session);
+		$cart->cart_status = '2';
+		$cart->save();
 	}
 
 	public function senderPrepareCartData($cart)
@@ -45,7 +46,7 @@ class Sender_Carts
 
 		$items = $woocommerce->cart->get_cart();
 		$total = $woocommerce->cart->total;
-		$user = $this->sender->repository->senderGetUserById($cart->user_id);
+		$user = (new Sender_User())->find($cart->user_id);
 
 		$data = [
 			"visitor_id"  => $user->visitor_id,
@@ -120,16 +121,17 @@ class Sender_Carts
 		$items = $this->senderGetCart();
 
 		$cartData = serialize($items);
+
 		if (!$this->senderGetWoo()->session->get_session_cookie()) {
 			return;
 		}
 
 		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-		$cart = $this->sender->repository->senderGetCartBySession($session);
+		$cart = (new Sender_Cart())->findBy('session', $session);
 
 		if (empty($items) && $cart) {
-			$this->sender->repository->senderDeleteCartBySession($session);
+			$cart->delete();
 			if ($cart->cart_status == "2") {
 				return;
 			}
@@ -139,26 +141,31 @@ class Sender_Carts
 		}
 
 		if ($cart && !empty($items)) {
-			$this->sender->repository->senderUpdateCartBySession($cartData, $session);
+			$cart->cart_data = $cartData;
+			$cart->save();
 			$cartData = $this->senderPrepareCartData($cart);
             $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", [$cartData, $session]);
 			return;
 
-		} else {
-			if (!empty($items)) {
-				$this->sender->repository->senderCreateCart($cartData, $this->senderGetVisitor()->id, $session);
-				$cart = $this->sender->repository->senderGetCartBySession($session);
-				$cartData = $this->senderPrepareCartData($cart);
-                $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
-            }
 		}
+		if (!empty($items)) {
+			$newCart = new Sender_Cart();
+			$newCart->cart_data = $cartData;
+			$newCart->user_id = $this->senderGetVisitor()->id;
+			$newCart->session = $session;
+			$newCart->save();
+
+			$cartData = $this->senderPrepareCartData($newCart);
+			$this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
+		}
+
 
 	}
 
 	public function senderGetVisitor()
 	{
 		$visitor = $_COOKIE['sender_site_visitor'];
-		return $this->sender->repository->senderGetUserByVisitorId($visitor);
+		return (new Sender_User())->findBy('visitor_id', $visitor);
 	}
 
 	public function senderGetCart()
@@ -186,7 +193,7 @@ class Sender_Carts
 
 		$cartId = sanitize_text_field($_GET['hash']);
 
-		$cart = $this->sender->repository->senderGetCartById($cartId);
+		$cart = (new Sender_Cart())->find($cartId);
 
 		if (!$cart) {
 			return $template;

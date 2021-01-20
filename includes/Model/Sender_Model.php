@@ -37,24 +37,13 @@ class Sender_Model
 		return $this;
 	}
 
-	protected function setAttribute($attribute, $value)
+	public function delete()
 	{
-		if ($this->{$attribute} === $value) {
-			return $this;
-		}
-		$this->dirtyAttributes[] = $attribute;
-		$this->{$attribute} = $value;
+		global $wpdb;
+		$sqlQuery = "SELECT * FROM `{$this->getTableName()}` WHERE id = %s";
+		$wpdb->query($wpdb->prepare($sqlQuery, $this->id));
 
-		return $this;
-	}
-
-	public function save()
-	{
-		if(!$this->id) {
-			return $this->createNew();
-		}
-
-		return $this->update();
+		return true;
 	}
 
 	public function createNew()
@@ -78,9 +67,40 @@ class Sender_Model
 		$sqlQuery .= " updated ) ";
 		$changes[] = current_time('timestamp');
 
+		$sqlQuery .= " VALUES ( ";
+
+		foreach ($changes as $key => $change) {
+			$sqlQuery .= " %s ";
+			if ($key +1 !== count($changes)) {
+				$sqlQuery .= ", ";
+			}
+		}
+		$sqlQuery .= ") ";
+
 		$wpdb->query( $wpdb->prepare($sqlQuery, ...$changes));
 		$this->dirtyAttributes = [];
 		return $this;
+	}
+
+	protected function setAttribute($attribute, $value)
+	{
+		if ($this->{$attribute} === $value) {
+			return $this;
+		}
+		$this->dirtyAttributes[] = $attribute;
+		$this->{$attribute} = $value;
+
+		return $this;
+	}
+
+
+	public function save()
+	{
+		if(!$this->id) {
+			return $this->createNew();
+		}
+
+		return $this->update();
 	}
 
 	public function update()
@@ -124,14 +144,21 @@ class Sender_Model
 
 	public function __set($name, $value)
 	{
-
 		if (property_exists($this, $name)) {
 			$this->setAttribute($name, $value);
 
 			return $this;
 		}
-		$this->{$name} = $value;
 
 		return $this;
+	}
+
+	public function __get($name)
+	{
+		if (property_exists($this, $name)) {
+
+			return $this->{$name};
+		}
+
 	}
 }
