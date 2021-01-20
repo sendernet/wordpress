@@ -18,7 +18,9 @@
 
         public function senderAddProductImportScript()
         {
-            if (get_option('sender_allow_import')) {
+            if (!get_option('sender_allow_import')) {
+                return;
+            }
 
                 global $product;
 
@@ -62,6 +64,5 @@
                           "rating": "' . $pRating . '"
                         }
                     </script>';
-            }
         }
     }
