@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Sender_Automated_Emails
 {
 	private $availableSettings = [
