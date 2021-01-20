@@ -14,8 +14,6 @@
 			add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
         }
 
-
-
         public function senderAddProductImportScript()
         {
             if (!get_option('sender_allow_import')) {

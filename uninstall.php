@@ -8,9 +8,8 @@
     $availableSettings = [
         'sender_api_key',
         'sender_resource_key',
-        'sender_allow_guest_track',
+        'sender_allow_carts_track',
         'sender_allow_import',
-        'sender_allow_forms',
         'sender_customers_list',
         'sender_registration_list',
         'sender_registration_track',

@@ -72,26 +72,16 @@
                             </div>
 
                             <div class="sender-option">
-                                <input type="hidden" value="0" name="sender_allow_guest_track_hidden_checkbox">
-                                <label for="sender_allow_guest_track">
-                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_guest_track"
-                                           value="sender_allow_guest_track"
-                                           name="sender_allow_guest_track" <?php if (get_option('sender_allow_guest_track')) {
+                                <input type="hidden" value="0" name="sender_allow_carts_track_hidden_checkbox">
+                                <label for="sender_allow_carts_track">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_carts_track"
+                                           value="sender_allow_carts_track"
+                                           name="sender_allow_carts_track" <?php if (get_option('sender_allow_carts_track')) {
 										echo 'checked';
 									} ?> >
-                                    <span>Allow guests tracking</span>
+                                    <span>Allow carts tracking</span>
                                 </label>
 
-                            </div>
-                            <div class="sender-option">
-                                <input type="hidden" value="0" name="sender_allow_forms_hidden_checkbox">
-                                <label for="sender_allow_forms">
-                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_forms"
-                                           name="sender_allow_forms" <?php if (get_option('sender_allow_forms')) {
-										echo 'checked';
-									} ?> >
-                                    <span>Show forms and pup-ups</span>
-                                </label>
                             </div>
                             <div class="sender-option">
                                 <input type="hidden" value="0" name="sender_allow_import_hidden_checkbox">

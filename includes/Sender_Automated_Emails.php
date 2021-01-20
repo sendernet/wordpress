@@ -9,9 +9,8 @@ class Sender_Automated_Emails
 	private $availableSettings = [
 		'sender_api_key'            => false,
         'sender_resource_key'       => false,
-        'sender_allow_guest_track'  => false,
+        'sender_allow_carts_track'  => false,
 		'sender_allow_import'       => true,
-		'sender_allow_forms'        => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
 		'sender_registration_track' => true,
@@ -58,7 +57,7 @@ class Sender_Automated_Emails
 
 	private function senderAddActions()
 	{
-        add_action('wp_head', [&$this, 'insertFormsScript']);
+        add_action('wp_head', [&$this, 'insertSdkScript']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
         add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
         add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
@@ -108,17 +107,23 @@ class Sender_Automated_Emails
 			return $this;
 		}
 
-        if( !class_exists('Sender_Carts') ) {
-            require_once("Sender_Carts.php" );
+        if(get_option('sender_allow_carts_track')){
+
+            if( !class_exists('Sender_Carts') ) {
+                require_once("Sender_Carts.php" );
+            }
+
+            new Sender_Carts($this);
         }
+
         if( !class_exists('Sender_WooCommerce') ) {
             require_once("Sender_WooCommerce.php" );
         }
-		new Sender_Carts($this);
+
          new Sender_WooCommerce($this);
 	}
 
-	public function insertFormsScript()
+	public function insertSdkScript()
 	{
 	    $key = $this->senderApi->senderGetResourceKey();
 

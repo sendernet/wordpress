@@ -7,8 +7,6 @@ if (!defined('ABSPATH')) {
 class Sender_Carts
 {
 	private $sender;
-	private $method;
-	private $params;
 
 	public function __construct($sender)
 	{
@@ -158,7 +156,6 @@ class Sender_Carts
 			$cartData = $this->senderPrepareCartData($newCart);
 			$this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
 		}
-
 
 	}
 

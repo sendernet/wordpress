@@ -6,7 +6,6 @@ if (!defined('ABSPATH')) {
 
 class Sender_Repository
 {
-
 	public function senderCreateTables()
 	{
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -68,5 +67,4 @@ class Sender_Repository
         }
 
 	}
-
 }
