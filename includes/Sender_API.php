@@ -130,20 +130,6 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
-//        public function addToGroup($email, $firstname, $lastname, $groupId)
-//        {
-//            $subscriberParams = [
-//                'firstname' => $firstname,
-//                'lastname' => $lastname,
-//                'email' => $email,
-//                'tag_ids' => [$groupId],
-//                'update_existing' => true
-//            ];
-//
-//            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($subscriberParams)]);
-//            $response = wp_remote_post($this->senderBaseUrl . 'subscribers/create_update', $params);
-//            return $this->senderBuildResponse($response);
-//        }
 
 	public function senderTrackRegisteredUsers($userId)
 	{

@@ -6,10 +6,6 @@ if (!defined('ABSPATH')) {
 
 class Sender_Repository
 {
-	public function __construct()
-	{
-
-	}
 
 	public function senderCreateTables()
 	{
