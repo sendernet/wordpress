@@ -61,11 +61,6 @@ class Sender_Templates_Loader
 			}
 
 		}
-		$periods = [
-			'today' => 'Today',
-			'tomorrow' => 'Tomorrow',
-			'month' => 'Month'
-		];
 
 		require_once('settings.php');
 	}

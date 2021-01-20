@@ -122,15 +122,6 @@
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
-                            <div class="sender-option">
-                                <label for="sender_cart_period">Registration list</label>
-                                <select form="sender-form-settings" name="sender_cart_period" id="sender_cart_period" value="<?=get_option('sender_cart_period')?>">
-                                    <?php foreach ($periods as $id => $name): ?>
-                                        <option  <?= get_option('sender_cart_period') == $id ? 'selected' : '' ?>  value="<?=$id?>"><?=$name?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
                         </div>
                         <div class="flex-grow-1"></div>
                         <div class="sender-logout">

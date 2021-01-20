@@ -8,16 +8,13 @@ class Sender_Automated_Emails
 {
 	private $availableSettings = [
 		'sender_api_key'            => false,
-		'sender_allow_guest_track'  => false,
+        'sender_resource_key'       => false,
+        'sender_allow_guest_track'  => false,
 		'sender_allow_import'       => true,
 		'sender_allow_forms'        => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
 		'sender_registration_track' => true,
-		'sender_cart_period'        => 'today',
-		'sender_has_woocommerce'    => false,
-		'sender_high_acc'           => true,
-		'sender_allow_push'         => false,
 	];
 
 	private $senderBaseFile;
@@ -62,7 +59,6 @@ class Sender_Automated_Emails
 	private function senderAddActions()
 	{
         add_action('wp_head', [&$this, 'insertFormsScript']);
-        add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
         add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
         add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
@@ -79,7 +75,6 @@ class Sender_Automated_Emails
 	public function senderActivate()
 	{
 		$this->senderSetupOptions();
-		$this->senderCheckWooCommerce();
 		return $this;
 	}
 
@@ -99,11 +94,6 @@ class Sender_Automated_Emails
 				add_option($name, $defaultValue);
 			}
 		}
-	}
-
-	public function senderCheckWooCommerce()
-	{
-		update_option('sender_has_woocommerce', $this->senderIsWooEnabled());
 	}
 
 	private function senderIsWooEnabled()
@@ -130,7 +120,8 @@ class Sender_Automated_Emails
 
 	public function insertFormsScript()
 	{
-        $user = $this->senderApi->senderGetAccount();
+	    $key = $this->senderApi->senderGetResourceKey();
+
 		echo "
 			<script>
 			  (function (s, e, n, d, er) {
@@ -144,7 +135,7 @@ class Sender_Automated_Emails
 				a.src = d;
 				m.parentNode.insertBefore(a, m)
 			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
-			  sender('{$user->account->resource_key}');
+			  sender('{$key}');
 			</script>
 			";
 	}

@@ -7,16 +7,13 @@
 
     $availableSettings = [
         'sender_api_key',
+        'sender_resource_key',
         'sender_allow_guest_track',
         'sender_allow_import',
         'sender_allow_forms',
         'sender_customers_list',
         'sender_registration_list',
         'sender_registration_track',
-        'sender_cart_period',
-        'sender_has_woocommerce',
-        'sender_high_acc',
-        'sender_allow_push',
     ];
 
     global $wpdb;

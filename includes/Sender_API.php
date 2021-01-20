@@ -184,4 +184,17 @@ class Sender_API
     {
         register_shutdown_function([$this, $callback], $params);
     }
+
+    public function senderGetResourceKey()
+    {
+        $key = get_option('sender_resource_key');
+
+        if(!$key){
+            $user = $this->senderApi->senderGetAccount();
+            $key = $user->account->resource_key;
+            update_option('sender_resource_key', $key);
+        }
+
+        return $key;
+    }
 }
