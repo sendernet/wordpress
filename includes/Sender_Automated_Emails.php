@@ -140,6 +140,14 @@ class Sender_Automated_Emails
 			  sender('{$key}');
 			</script>
 			";
+
+		if (get_option('sender_allow_tracking') && $this->senderIsWooEnabled()) {
+			echo "
+			<script>
+			  sender('trackVisitors')
+			</script>
+			";
+		}
 	}
 
     public function senderRegisterFormsWidget() {

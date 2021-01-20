@@ -87,9 +87,10 @@ class Sender_Carts
 
 	public function trackUser()
 	{
-		if (!is_user_logged_in()) {
+		if (!is_user_logged_in() || !isset($_COOKIE['sender_site_visitor'])) {
 			return;
 		}
+
 		$wpUser = wp_get_current_user();
 		$wpId = $wpUser->ID;
 
