@@ -57,8 +57,8 @@ class Sender_Automated_Emails
         add_action('wp_head', [&$this, 'insertFormsScript']);
         add_action('admin_init', [&$this, 'senderCheckWooCommerce']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
-        add_action('user_register', [&$this->senderApi, 'senderTrackRegisteredUsers'], 10, 1);
-        add_action('wp_login', [&$this->senderApi, 'senderTrackRegisteredUsers']);
+        add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
+        add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
 
 		return $this;
 	}

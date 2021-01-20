@@ -170,6 +170,11 @@ class Sender_API
 		}
 	}
 
+	public function senderTrackRegisterUserCallback($userId)
+    {
+        $this->senderApiShutdownCallback('senderTrackRegisteredUsers', $userId);
+    }
+
 	private function senderBuildResponse($response)
 	{
 		return json_decode($response['body']);
