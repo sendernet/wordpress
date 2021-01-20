@@ -57,7 +57,8 @@
                 </div>
                 <?php if ($wooEnabled) { ?>
                 <div class="sender-plugin-settings sender-box">
-                    <form method="post" class="flex-column h-100" action='' id="sender-form-settings">
+                    <div class="sender-header">WooCommerce settings</div>
+                    <form style="position: relative" method="post" class="flex-column h-100" action='' id="sender-form-settings">
                         <div class="sender-options">
                             <div class="sender-option">
                                 <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
@@ -72,17 +73,20 @@
                             </div>
                             <div class="sender-option">
                                 <label for="sender_customers_list">Customers list</label>
-                                <select form="sender-form-settings" name="sender_customers_list" id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
+                                <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
+                                    echo 'disabled';
+                                } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
                                     <option value="0">No list</option>
                                     <?php foreach ($groups as $tag): ?>
                                         <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
                             <div class="sender-option">
-                                <label for="sender_registration_list">Registration list</label>
-                                <select form="sender-form-settings" name="sender_registration_list" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
+                                <label for="sender_registration_list">Users who registered list</label>
+                                <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
+                                    echo 'disabled';
+                                } ?> name="sender_registration_list" class="sender-woo-lists" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
                                     <option value="0">No list</option>
                                     <?php foreach ($groups as $tag): ?>
                                         <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
@@ -91,14 +95,16 @@
                             </div>
                         </div>
                         <div class="flex-grow-1"></div>
-                        <div class="sender-logout">
+                        <div class="sender-logout" style="position: absolute; bottom: 20px; right: 0">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Save">
                         </div>
                     </form>
                 </div>
                 <?php } ?>
-                <div class="sender-forms-list">
+
+                <?php if(!empty($shownForms)) {?>
+                    <div class="sender-forms-list">
                     <div class="sender-big-header"> Forms </div>
                     <div class=" sender-box no-padding flex-column">
                         <?php foreach ($shownForms as $form): ?>
@@ -123,6 +129,7 @@
                         <?php endforeach; ?>
                     </div>
                 </div>
+                <? }?>
             </div>
 		<?php } ?>
     </div>
@@ -135,7 +142,7 @@
 
     .sender-options {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
     }
 
     .sender-option {
@@ -378,3 +385,12 @@
     }
 
 </style>
+
+<script>
+
+    jQuery('#sender_allow_tracking').on('change', function (ev){
+        jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
+    });
+
+
+</script>
