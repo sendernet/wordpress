@@ -190,7 +190,7 @@ class Sender_API
         $key = get_option('sender_resource_key');
 
         if(!$key){
-            $user = $this->senderApi->senderGetAccount();
+            $user = $this->senderGetAccount();
             $key = $user->account->resource_key;
             update_option('sender_resource_key', $key);
         }
