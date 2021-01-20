@@ -123,7 +123,7 @@ class Sender_Automated_Emails
 
 	public function insertFormsScript()
 	{
-
+        $user = $this->senderApi->senderGetAccount();
 		echo "
 			<script>
 			  (function (s, e, n, d, er) {
@@ -136,8 +136,8 @@ class Sender_Automated_Emails
 				a.async = 1;
 				a.src = d;
 				m.parentNode.insertBefore(a, m)
-			  })(window, document, 'script', '/wp-content/plugins/sender/assets/sdk.js', 'sender');
-			  sender('birkanosis');
+			  })(window, document, 'script', 'https://cdn.sender.net/accounts_resources/universal.js', 'sender');
+			  sender('{$user->account->resource_key}');
 			</script>
 			";
 	}
