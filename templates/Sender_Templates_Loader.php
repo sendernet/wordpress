@@ -28,11 +28,6 @@ class Sender_Templates_Loader
 
 	function senderHandleFormPost()
 	{
-
-	    if(array_key_exists('sender_api_key', $_POST)){
-	        $this->validateApiKey($_POST['sender_api_key']);
-        }
-
 		$changes = [];
 		foreach ($_POST as $name => $value) {
 
@@ -44,6 +39,11 @@ class Sender_Templates_Loader
 		}
 
 		$this->sender->updateSettings($changes);
+
+        if(array_key_exists('sender_api_key', $_POST)){
+            $this->validateApiKey($_POST['sender_api_key']);
+        }
+
 	}
 
 	function senderAddSidebar()
