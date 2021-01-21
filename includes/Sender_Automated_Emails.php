@@ -40,8 +40,8 @@ class Sender_Automated_Emails
             register_activation_hook( $senderBaseFile, [new Sender_Repository(), 'senderCreateTables']);
         }
 
+        $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
-		$this->senderEnqueueStyles();
 
 		if (!$this->senderApiKey()) {
 			return;
