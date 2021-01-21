@@ -17,7 +17,6 @@ class Sender_Automated_Emails
 
 	private $senderBaseFile;
 	public $senderApi;
-	public $repository;
 
 	private function senderApiKey()
 	{
@@ -37,6 +36,14 @@ class Sender_Automated_Emails
 		$this->senderSetupOptions()
             ->senderAddFilters();
 
+		if($this->senderIsWooEnabled())
+        {
+            if( !class_exists('Sender_Repository') ) {
+                require_once("Sender_Repository.php" );
+            }
+
+            register_activation_hook( $senderBaseFile, [new Sender_Repository(), 'senderCreateTables']);
+        }
 
 		if (!$this->senderApiKey()) {
 			return;
@@ -49,14 +56,6 @@ class Sender_Automated_Emails
            if (!class_exists('Sender_Cart')) {
                require_once 'Model/Sender_Cart.php';
            }
-
-           if( !class_exists('Sender_Repository') ) {
-               require_once("Sender_Repository.php" );
-           }
-
-           $this->repository = new Sender_Repository();
-
-           register_activation_hook( $senderBaseFile, [&$this->repository, 'senderCreateTables']);
        }
 
 		$this->senderAddActions()
