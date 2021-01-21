@@ -50,41 +50,6 @@
 
 </div>
 
-
-
-<style>
-	.sender-widget-container {
-		display: flex;
-		flex-wrap: wrap;
-        align-items: center;
-	}
-	.sender-form-title {
-		padding: 10px;
-        font-weight: bolder;
-	}
-	.sender-form-is-selected {
-		border: 1px solid #ff8d00 !important;
-	}
-
-	.sender-form-select {
-        cursor: pointer;
-		width: 125px;
-		margin: 3px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-        height: 190px;
-	}
-    .sender-form-thumbnail img {
-		width: 100%;
-	}
-    .sender-form-thumbnail {
-		width: 100%;
-	}
-    .display-none {
-        display:none;
-    }
-</style>
-
 <script>
     divs = document.getElementsByClassName('sender-form-select')
 

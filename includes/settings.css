@@ -1,4 +1,360 @@
+/* sidebar icon */
 #adminmenu #toplevel_page_sender-settings .wp-menu-image img {
     padding: 9px 0 0 0;
     width: 16px;
+}
+
+/* Settings page */
+.sender-is-danger {
+     color: #b41d1d !important;
+     border: solid 1px #b41d1d;
+     background-color: #ffe9e9;
+     border-radius: 5px;
+
+ }
+.sender-margin-top-10 {
+    margin-top: 10px;
+}
+.sender-padding-10 {
+    padding: 10px;
+}
+.h-100 {
+    height: 100%;
+}
+
+.sender-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.sender-option {
+    width: 50%;
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.sender-container {
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 14px;
+    color: #000;
+    line-height: 18px;
+}
+
+.sender-select-label {
+    display: inline-block;
+    width: 160px;
+}
+
+.sender-logout {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+}
+
+.mb-10 {
+    margin-bottom: 10px !important;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.no-padding {
+    padding: 0px !important;
+}
+.sender-form-stats {
+    margin-left: 10px;
+}
+
+.sender-form-thumbnail {
+    height: 100%;
+    margin-right: 20px;
+    width: 60px;
+    border: 1px solid #ccc;
+}
+
+.sender-form-thumbnail img {
+    height: 100%;
+}
+
+.sender-form-row {
+    display: flex;
+    height: 60px;
+    border-bottom: 1px solid #ccc;
+    padding: 20px;
+}
+
+
+.sender-settings-grid {
+    margin: 40px;
+    margin-left: 20px;
+    display: grid;
+    grid-template-columns: 500px auto;
+    grid-template-rows: 250px auto;
+    grid-row-gap: 40px;
+    grid-column-gap: 40px;
+}
+
+.sender-forms-list {
+    grid-column: 1 / span 2;
+    grid-row: 2 / 2;
+}
+
+.sender-flex-center-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.sender-cta-button {
+    background-color: #ff8d00;
+    border-color: transparent;
+    cursor: pointer;
+    justify-content: center;
+    padding: 12px 20px;
+    text-align: center;
+    white-space: nowrap;
+    height: unset !important;
+    font-weight: 700;
+    border-radius: 5px !important;
+    box-shadow: none !important;
+
+    color: #fff;
+    font-size: 14px;
+}
+
+.sender-cta-button:hover {
+    background-color: #ffae00 !important;
+}
+
+.sender-cta-button:active {
+    background-color: #e67f00 !important;
+}
+
+.sender-cta-button:focus {
+    background-color: #e67f00 !important;
+}
+
+.sender-input {
+    margin: 10px 0;
+}
+
+.sender-text-input {
+    box-shadow: none;
+    padding: 7px 12px;
+    border-color: #ccc;
+    border-radius: 5px;
+    color: #000;
+    font-size: 14px;
+    line-height: 28px;
+    color: #000;
+    height: 40px;
+    max-width: 100%;
+}
+
+.sender-text-input::placeholder {
+    color: #999;
+}
+
+.sender-text-input:focus {
+    border-color: #aaa !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.required-api-key {
+    max-width: 80%;
+    margin: 200px auto;
+    width: 543px;
+    height: 300px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    padding: 35px !important;
+}
+
+.sender-link {
+    color: #ff8d00;
+}
+
+.sender-header-small {
+    font-size: 16px;
+    color: #222;
+    line-height: 18px;
+}
+
+.sender-subheader {
+    font-size: 14px;
+    color: #555;
+    line-height: 22px;
+}
+
+.sender-header {
+    font-size: 16px;
+    color: #000;
+    line-height: 24px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.sender-big-header {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+.sender-box {
+    border-radius: 10px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
+    border: 1px solid #ddd;
+    background: white;
+    padding: 20px;
+}
+
+.sender-woo-lists {
+    width: 292px;
+    height: 40px;
+    margin: 5px 0 0;
+    padding: 13px 11px 12px 12px;
+    border-radius: 5px !important;
+    border: 1px solid #cccccc !important;
+    background-color: #ffffff;
+    color: #000000 !important;
+}
+.sender-select-wrap {
+    position: relative;
+}
+.sender-select-wrap::after {
+    height: 0 !important;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #000;
+    top: 50%;
+    right: 12px;
+    content: " ";
+    display: block;
+    pointer-events: none;
+    position: absolute;
+}
+
+.sender-select-wrap:focus-within::after {
+    transform: rotate(180deg);
+}
+
+.sender-woo-lists:hover:not([disabled]) {
+    color: #000000 !important;
+    border-radius: 5px !important;
+    border: 1px solid #aaaaaa !important;
+}
+.sender-woo-lists {
+    background: none !important;
+}
+@-moz-document url-prefix(){
+    .sender-woo-lists{border: 1px solid #CCC; border-radius: 4px; box-sizing: border-box; position: relative; overflow: hidden;}
+    .sender-woo-lists select { width: 110%; background-position: right 30px center !important; border: none !important;}
+}
+/* For IE10 */
+select.sender-woo-lists::-ms-expand {
+    display: none !important;
+}
+select.sender-woo-lists:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+}
+
+/* Text color for the label */
+input[type="checkbox"] + span {
+    cursor: pointer;
+    color: black;
+}
+
+/* Checkbox un-checked style */
+input[type="checkbox"] + span:before {
+    content: '';
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+    vertical-align: -2px;
+}
+
+/* Adding a dotted border around the active tabbed-into checkbox */
+input[type="checkbox"]:focus + span:before,
+input[type="checkbox"] + span:hover:before {
+    /* Visible in the full-color space */
+    box-shadow: none;
+    outline: none;
+}
+/* Checked checkbox style (in this case the background is green #e7ffba, change this to change the color) */
+input[type="checkbox"]:checked + span:before {
+    /* NOTE: Replace the url with a path to an SVG of a checkmark to get a checkmark icon */
+    background-image: url('/wp-content/plugins/sender/assets/images/white_check.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    /* The size of the checkmark icon, you may/may not need this */
+    background-size: 11px;
+    border-radius: 5px;
+    background-color: #ff8d00;
+    color: white;
+    border: 1px solid transparent;
+}
+
+/* Disabled checkbox styles */
+input[type="checkbox"]:disabled + span {
+    cursor: default;
+    color: black;
+    opacity: 0.5;
+}
+
+/* widgets */
+
+.sender-widget-container {
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+ }
+.sender-form-title {
+    padding: 10px;
+    font-weight: bolder;
+}
+.sender-form-is-selected {
+    border: 1px solid #ff8d00 !important;
+}
+
+.sender-form-select {
+    cursor: pointer;
+    width: 125px;
+    margin: 3px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 190px;
+}
+.sender-form-thumbnail img {
+    width: 100%;
+}
+.sender-form-thumbnail {
+    width: 100%;
+}
+.display-none {
+    display:none;
 }
