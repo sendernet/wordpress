@@ -9,7 +9,6 @@ class Sender_API
 	private $senderBaseUrl = 'https://api.sender.net/v2/';
 	private $senderStatsBaseUrl = 'https://stats.sender.net/';
 
-
 	public function senderGetBaseArguments()
 	{
 		return [
@@ -75,6 +74,7 @@ class Sender_API
 		$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
 
 		$response = wp_remote_post($url, $params);
+
 		return $this->senderBuildResponse($response);
 	}
 
@@ -82,8 +82,8 @@ class Sender_API
 	{
 		$data = ['resource_key' => $this->senderGetResourceKey()];
 		$params = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($data)]);
-
 		$response = wp_remote_request($this->senderStatsBaseUrl . 'carts/' . $wpCartId, $params);
+
 		return $this->senderBuildResponse($response);
 	}
 
@@ -105,7 +105,6 @@ class Sender_API
 
         return $this->senderBuildResponse($response);
     }
-
 
 	public function senderTrackRegisteredUsers($userId)
 	{
@@ -138,12 +137,7 @@ class Sender_API
         $this->senderApiShutdownCallback('senderTrackRegisteredUsers', $userId);
     }
 
-	private function senderBuildResponse($response)
-	{
-		return json_decode($response['body']);
-	}
-
-	public function senderApiShutdownCallback($callback, $params)
+    public function senderApiShutdownCallback($callback, $params)
     {
         register_shutdown_function([$this, $callback], $params);
     }
@@ -160,4 +154,10 @@ class Sender_API
 
         return $key;
     }
+
+	private function senderBuildResponse($response)
+	{
+		return json_decode($response['body']);
+	}
+
 }

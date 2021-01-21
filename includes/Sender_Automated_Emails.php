@@ -34,7 +34,8 @@ class Sender_Automated_Emails
 
 		$this->senderApi = new Sender_API();
 
-		$this->senderSetupOptions();
+		$this->senderSetupOptions()
+            ->senderAddFilters();
 
 
 		if (!$this->senderApiKey()) {
@@ -59,7 +60,6 @@ class Sender_Automated_Emails
        }
 
 		$this->senderAddActions()
-			 ->senderAddFilters()
 			 ->senderSetupWooCommerce();
 	}
 

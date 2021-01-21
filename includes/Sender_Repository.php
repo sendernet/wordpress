@@ -51,8 +51,6 @@ class Sender_Repository
 
 		$wpdb->query($usersSql);
 
-		//check before altering, for old tables
-
         $map = [
             'visitor_id' => 'varchar(32)',
             'wp_user_id' => 'int(11)'
