@@ -4,6 +4,9 @@
     <div class="sender-flex-column">
 		<?php if (!$apiKey) { ?>
             <form method="post" action='' class="sender-box required-api-key" novalidate="novalidate">
+                <div class="sender-login-image">
+                    <img src="/wp-content/plugins/sender/assets/images/logo.png">
+                </div>
                 <h2 class="sender-header">Enter your api key</h2>
 
                 <div class="sender-subheader"> We need your API key to continue. <br>
