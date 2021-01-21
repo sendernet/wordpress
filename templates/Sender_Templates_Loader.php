@@ -44,14 +44,12 @@ class Sender_Templates_Loader
 
 		$this->sender->checkApiKey();
 
-		$apiKey = get_option( 'sender_api_key' ) === 'api_key' ? false : get_option( 'sender_api_key' );
+		$apiKey = get_option( 'sender_api_key' );
 		$wooEnabled = $this->sender->senderIsWooEnabled();
 
 		if ($apiKey) {
 			$user = $this->sender->senderApi->senderGetAccount();
-
 			$groups = $this->sender->senderApi->senderGetGroups()->data;
-
 		}
 
 		require_once('settings.php');

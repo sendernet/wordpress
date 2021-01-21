@@ -22,29 +22,29 @@
             parent::__construct('sender_automated_emails_widget', __('Sender.net Form', 'framework'), $widget_ops, $control_ops);
         }
 
-		public function update( $newInstance, $oldInstance ) {
-			$instance = array();
+		public function update( $newInstance, $oldInstance )
+        {
+			$instance = [];
 
 			$instance['form'] = ( ! empty( $newInstance['form'] ) ) ? strip_tags( $newInstance['form'] ) : '';
 			return $instance;
 		}
 
 
-		public function widget( $args, $instance ) {
+		public function widget( $args, $instance )
+        {
         	if (!isset($instance['form'])) {
         		return;
 			}
+
         	$code = $instance['form'];
 			echo "<div class='sender-form-field' data-sender-form-id='$code'></div>";
 		}
 
 
-		function form( $instance ) {
-
+		function form( $instance )
+        {
 			$forms = $this->sender->senderApi->senderGetForms()->data;
-
 			require(dirname(dirname(__FILE__)) . '/templates/widget_options.php');
-
-
 		}
 	}

@@ -11,19 +11,24 @@ class Sender_Carts
 	public function __construct($sender)
 	{
 		$this->sender = $sender;
-		$this->senderAddCartsActions();
-		$this->senderAddCartsFilters();
+
+		$this->senderAddCartsActions()
+            ->senderAddCartsFilters();
 	}
 
 	private function senderAddCartsActions()
 	{
 		add_action('woocommerce_checkout_order_processed', [&$this, 'senderConvertCart'], 10, 1);
 		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+
+		return $this;
 	}
 
 	private function senderAddCartsFilters()
 	{
 		add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
+
+		return $this;
 	}
 
 	public function senderConvertCart($orderId)
@@ -100,6 +105,7 @@ class Sender_Carts
 		if (!$user) {
 			$user = (new Sender_User())->findBy('visitor_id', $visitorId);
 		}
+
 		if (!$user) {
 			$user = new Sender_User();
 		}
@@ -107,11 +113,12 @@ class Sender_Carts
 		$user->visitor_id = $visitorId;
 		$user->wp_user_id = $wpId;
 		$user->email = $wpUser->user_email;
+
 		if ($user->isDirty()) {
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
         }
-		$user->save();
 
+		$user->save();
 	}
 
 	public function senderCartUpdated()
@@ -145,8 +152,8 @@ class Sender_Carts
 			$cartData = $this->senderPrepareCartData($cart);
             $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", [$cartData, $session]);
 			return;
-
 		}
+
 		if (!empty($items)) {
 			$newCart = new Sender_Cart();
 			$newCart->cart_data = $cartData;
@@ -206,17 +213,18 @@ class Sender_Carts
 			return $template;
 		}
 
-		$Cart = new WC_Cart();
+		$wooCart = new WC_Cart();
 
 		foreach ($cartData as $product) {
-			$Cart->add_to_cart(
+            $wooCart->add_to_cart(
 				(int)$product['product_id'],
 				(int)$product['quantity'],
 				(int)$product['variation_id'],
 				$product['variation']
 			);
 		}
-		new WC_Cart_Session($Cart);
+
+		new WC_Cart_Session($wooCart);
 
 		return $template;
 	}
