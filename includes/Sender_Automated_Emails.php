@@ -40,6 +40,8 @@ class Sender_Automated_Emails
             register_activation_hook( $senderBaseFile, [new Sender_Repository(), 'senderCreateTables']);
         }
 
+		$this->senderCreateSettingsTemplates();
+
 		if (!$this->senderApiKey()) {
 			return;
 		}
@@ -200,6 +202,15 @@ class Sender_Automated_Emails
     private function senderApiKey()
     {
         return get_option( 'sender_api_key' );
+    }
+
+    private function senderCreateSettingsTemplates()
+    {
+        if( !class_exists('Sender_Templates_Loader') ) {
+            require_once( dirname($this->senderBaseFile) . "/templates/Sender_Templates_Loader.php" );
+        }
+
+        new Sender_Templates_Loader($this);
     }
 
 }

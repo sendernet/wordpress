@@ -18,10 +18,4 @@
         require_once( "includes/Sender_Automated_Emails.php" );
     }
 
-    if( !class_exists('Sender_Templates_Loader') ) {
-        require_once( "templates/Sender_Templates_Loader.php" );
-    }
-
-    $sender = new Sender_Automated_Emails(__FILE__);
-
-    new Sender_Templates_Loader($sender);
+    new Sender_Automated_Emails(__FILE__);
