@@ -6,7 +6,13 @@
 	<?php
 	foreach($forms as $form) {
 		?>
-		<option <?php echo 'value="'.esc_attr($form->settings->embed_hash).'" '; if ( $form->settings->embed_hash == $instance['form'] ) echo 'selected = "selected"' ; ?>><?php echo esc_html($form->title); ?></option>
+        <?
+        $selected = false;
+        if(isset($instance['form'])){
+            $selected = $form->settings->embed_hash == $instance['form'];
+        }
+        ?>
+		<option <?php echo 'value="'.esc_attr($form->settings->embed_hash).'" '; if ($selected) echo 'selected = "selected"' ; ?>><?php echo esc_html($form->title); ?></option>
 		<?php
 	}
 	?>
@@ -16,8 +22,13 @@
 	<?php
 	foreach($forms as $form) {
 		?>
-
-		<div class="sender-form-select <?= $form->settings->embed_hash == $instance['form'] ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" '; if ( $form->settings->embed_hash == $instance['form'] ) ?>">
+            <?
+                $selected = false;
+                if(isset($instance['form'])){
+                    $selected = $form->settings->embed_hash == $instance['form'];
+                }
+            ?>
+		<div class="sender-form-select <?= $selected ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" ';?>">
 			<div class="sender-form-title">
 				<?php echo esc_html($form->title); ?>
 
@@ -50,6 +61,7 @@
 	}
 
 	.sender-form-select {
+        cursor: pointer;
 		width: 125px;
 		margin: 5px;
 		border: 1px solid #ccc;
