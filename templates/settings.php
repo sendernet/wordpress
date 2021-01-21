@@ -7,22 +7,25 @@
                 <div class="sender-login-image">
                     <img src="/wp-content/plugins/sender/assets/images/logo.png">
                 </div>
-                <h2 class="sender-header">Enter your api key</h2>
+                <h2 class="sender-header">Enter your API key</h2>
 
-                <div class="sender-subheader"> We need your API key to continue. <br>
-                    <a href="#" class="sender-link">Click here</a> if you are not sure where to find it.
+                <div>
+                    <a href="#" class="sender-link">Click here</a> if you are not sure where to find it
 
                 </div>
+                <div class="sender-flex-center-column">
+                <div class="flex-grow-1"></div>
+
                 <?php if(get_option('sender_account_message')) { ?>
-                    <div class="sender-is-danger sender-margin-top-10 sender-padding-10">
-                        <?php echo get_option('sender_account_message') ?>
+                    <div class="sender-is-danger sender-padding-10" >
+						<?php echo get_option('sender_account_message') ?>
                     </div>
 				<?php } ?>
 
-                <div class="sender-flex-center-column">
-                    <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your api key here"
+
+                    <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input ">
-                    <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
+                    <input type="submit" name="submit" id="submit" class="sender-cta-button"
                            value="Begin">
                 </div>
             </form>
