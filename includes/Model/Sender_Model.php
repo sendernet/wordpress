@@ -40,7 +40,7 @@ class Sender_Model
 	public function delete()
 	{
 		global $wpdb;
-		$sqlQuery = "SELECT * FROM `{$this->getTableName()}` WHERE id = %s";
+		$sqlQuery = "DELETE FROM `{$this->getTableName()}` WHERE id = %s";
 		$wpdb->query($wpdb->prepare($sqlQuery, $this->id));
 
 		return true;
