@@ -18,11 +18,6 @@ class Sender_Automated_Emails
 	private $senderBaseFile;
 	public $senderApi;
 
-	private function senderApiKey()
-	{
-		return get_option( 'sender_api_key' );
-	}
-
 	public function __construct($senderBaseFile)
 	{
 		$this->senderBaseFile = $senderBaseFile;
@@ -200,6 +195,11 @@ class Sender_Automated_Emails
         ];
 
         return array_merge($links, $additionalLinks);
+    }
+
+    private function senderApiKey()
+    {
+        return get_option( 'sender_api_key' );
     }
 
 }
