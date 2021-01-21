@@ -47,7 +47,7 @@ class Sender_Carts
 	{
 
 		$items = $this->senderGetCart();
-		$total = $this->senderGetWoo()->cart->get_total();
+		$total = $this->senderGetWoo()->cart->total;
 		$user = (new Sender_User())->find($cart->user_id);
 
 		$data = [
@@ -159,7 +159,9 @@ class Sender_Carts
 			$newCart->save();
 
 			$cartData = $this->senderPrepareCartData($newCart);
-			$this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
+            var_dump($cartData);
+
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
 		}
 
 	}
