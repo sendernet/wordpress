@@ -6,8 +6,6 @@
 	<option disabled selected>Select your form</option>
 	<?php
 	foreach($forms as $form) {
-		?>
-        <?
         $selected = false;
         if(isset($instance['form'])){
             $selected = $form->settings->embed_hash == $instance['form'];
