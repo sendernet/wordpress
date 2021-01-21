@@ -167,7 +167,14 @@ class Sender_Carts
 	public function senderGetVisitor()
 	{
 		$visitor = $_COOKIE['sender_site_visitor'];
-		return (new Sender_User())->findBy('visitor_id', $visitor);
+		$user = (new Sender_User())->findBy('visitor_id', $visitor);
+
+		if (!$user) {
+			$user = new Sender_User();
+			$user->visitor_id = $visitor;
+			$user->save();
+		}
+		return $user;
 	}
 
 	public function senderGetCart()
