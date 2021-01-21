@@ -45,10 +45,9 @@ class Sender_Carts
 
 	public function senderPrepareCartData($cart)
 	{
-		global $woocommerce;
 
-		$items = $woocommerce->cart->get_cart();
-		$total = $woocommerce->cart->total;
+		$items = $this->senderGetCart();
+		$total = $this->senderGetWoo()->cart->get_total();
 		$user = (new Sender_User())->find($cart->user_id);
 
 		$data = [
@@ -84,8 +83,6 @@ class Sender_Carts
 
 			$data['products'][] = $prod;
 		}
-
-		$data['grand_total'] = $woocommerce->cart->total;
 
 		return $data;
 	}

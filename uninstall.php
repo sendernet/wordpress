@@ -28,9 +28,7 @@
 
     foreach ($availableSettings as $setting)
     {
-    	if (get_option($setting)) {
-			delete_option($setting);
-		}
+        delete_option($setting);
     }
 
 ?>
