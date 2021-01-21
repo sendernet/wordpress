@@ -221,7 +221,7 @@ class Sender_Automated_Emails
 
     public function senderInitStyles()
     {
-        wp_enqueue_style('sender-styles', plugin_dir_url( $this->senderBaseFile). 'includes/settings.css');
+        wp_enqueue_style('sender-styles', plugin_dir_url( $this->senderBaseFile). 'styles/settings.css');
     }
 
 }
