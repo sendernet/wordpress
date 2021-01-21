@@ -10,6 +10,11 @@
                     <a href="#" class="sender-link">Click here</a> if you are not sure where to find it.
 
                 </div>
+                <?php if(get_option('sender_account_message')) { ?>
+                    <div class="sender-subheader sender-is-danger sender-margin-top-10 sender-padding-10">
+                        <?php echo get_option('sender_account_message') ?>
+                    </div>
+				<?php } ?>
 
                 <div class="sender-flex-center-column">
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your api key here"
@@ -17,7 +22,6 @@
                     <input type="submit" name="submit" id="submit" class="sender-cta-button sender-input"
                            value="Begin">
                 </div>
-
             </form>
 
 		<?php } else {  ?>
@@ -48,7 +52,7 @@
                         </div>
                         <div class="flex-grow-1"></div>
                         <form method="post" action=''>
-                            <input name="sender_api_key" type="hidden" id="sender_api_key" value="api_key"
+                            <input name="sender_api_key" type="hidden" id="sender_api_key" value=""
                                    class="sender-input sender-text-input ">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Change user">
@@ -102,40 +106,24 @@
                     </form>
                 </div>
                 <?php } ?>
-
-                <?php if(!empty($shownForms)) {?>
-                    <div class="sender-forms-list">
-                    <div class="sender-big-header"> Forms </div>
-                    <div class=" sender-box no-padding flex-column">
-                        <?php foreach ($shownForms as $form): ?>
-                            <div class="sender-form-row">
-                                <div class="sender-form-thumbnail">
-                                    <img src="<?=$form->thumbnail_url?>" alt="thumbnail">
-                                </div>
-                                <div class="sender-form-text flex-column">
-                                    <div class="sender-header mb-10"><?= $form->title ?></div>
-                                    <div class="sender-subheader">Edited <?= $form->modified ?></div>
-                                </div>
-                                <div class="flex-grow-1"></div>
-                                <div class="sender-form-stats">
-                                    <div class="sender-header-small mb-10">Subscribers</div>
-                                    <div class="sender-subheader"><?= $form->subscribed ?></div>
-                                </div>
-                                <div class="sender-form-stats">
-                                    <div class="sender-header-small mb-10">Visitors</div>
-                                    <div class="sender-subheader"><?= $form->visited ?></div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <? }?>
             </div>
 		<?php } ?>
     </div>
 </div>
 <style>
+    .sender-is-danger {
+        color: #b41d1d !important;
+        border: solid 1px #b41d1d;
+        background-color: #ffe9e9;
+        border-radius: 5px;
 
+    }
+    .sender-margin-top-10 {
+        margin-top: 10px;
+    }
+    .sender-padding-10 {
+        padding: 10px;
+    }
     .h-100 {
         height: 100%;
     }

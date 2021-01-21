@@ -6,46 +6,28 @@ if (!defined('ABSPATH')) {
 
 class Sender_API
 {
-	private $senderBaseRequestArguments;
 	private $senderBaseUrl = 'https://api.sender.net/v2/';
 	private $senderStatsBaseUrl = 'https://stats.sender.net/';
-	protected $senderApiKey;
 
-	public function __construct()
-	{
-		$this->senderSetApiKey()
-			 ->senderSetBaseArguments();
-	}
 
-	public function senderSetBaseArguments()
+	public function senderGetBaseArguments()
 	{
-		$this->senderBaseRequestArguments = [
+		return [
 			'headers' => [
 				'Content-Type'  => 'application/json',
 				'Accept'        => 'application/json',
-				'Authorization' => 'Bearer ' . $this->senderGetApiKey(),
+				'Authorization' => 'Bearer ' . get_option('sender_api_key'),
 			],
 		];
-	}
-
-	public function senderSetApiKey($apiKey = null)
-	{
-		$this->senderApiKey = $apiKey ? $apiKey : get_option('sender_api_key');
-		return $this;
-	}
-
-	public function senderGetApiKey()
-	{
-		return $this->senderApiKey;
 	}
 
 	public function senderBaseRequestArguments($delete = false)
 	{
 		if ($delete) {
-			return array_merge($this->senderBaseRequestArguments, ['method' => 'DELETE']);
+			return array_merge($this->senderGetBaseArguments(), ['method' => 'DELETE']);
 		}
 
-		return $this->senderBaseRequestArguments;
+		return $this->senderGetBaseArguments();
 	}
 
 	public function senderGetAccount()

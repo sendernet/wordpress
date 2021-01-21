@@ -10,6 +10,7 @@ class Sender_Automated_Emails
 		'sender_api_key'            => false,
         'sender_resource_key'       => false,
         'sender_allow_tracking'     => false,
+        'sender_account_message'    => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
 	];
@@ -18,16 +19,27 @@ class Sender_Automated_Emails
 	public $senderApi;
 	public $repository;
 
+	private function senderApiKey()
+	{
+		return get_option( 'sender_api_key' );
+	}
+
 	public function __construct($senderBaseFile)
 	{
-
 		$this->senderBaseFile = $senderBaseFile;
 
-        if( !class_exists('Sender_API') ) {
-            require_once("Sender_API.php" );
-        }
+		if( !class_exists('Sender_API') ) {
+			require_once("Sender_API.php" );
+		}
 
-        $this->senderApi = new Sender_API();
+		$this->senderApi = new Sender_API();
+
+		$this->senderSetupOptions();
+
+
+		if (!$this->senderApiKey()) {
+			return;
+		}
 
        if($this->senderIsWooEnabled()){
            if (!class_exists('Sender_User')) {
@@ -46,15 +58,14 @@ class Sender_Automated_Emails
            register_activation_hook( $senderBaseFile, [&$this->repository, 'senderCreateTables']);
        }
 
-		$this->senderSetupOptions()
-			 ->senderAddActions()
+		$this->senderAddActions()
 			 ->senderAddFilters()
 			 ->senderSetupWooCommerce();
 	}
 
 	private function senderAddActions()
 	{
-        add_action('wp_head', [&$this, 'insertSdkScript']);
+		add_action('wp_head', [&$this, 'insertSdkScript']);
         add_action( 'widgets_init', [&$this,'senderRegisterFormsWidget']);
 
         if(get_option('sender_allow_tracking') && $this->senderIsWooEnabled()){
@@ -88,6 +99,29 @@ class Sender_Automated_Emails
 			}
 		}
 		return $this;
+	}
+
+	public function checkApiKey()
+	{
+		if (!$this->senderApiKey()) {
+			update_option('sender_account_message', false);
+			update_option('sender_resource_key', false);
+			return false;
+		}
+
+		$user = $this->senderApi->senderGetAccount();
+
+		if(isset($user->message)) {
+			update_option('sender_api_key', false);
+			update_option('sender_account_message', $user->message);
+			update_option('sender_resource_key', false);
+			return false;
+		}
+
+		update_option('sender_resource_key', $user->account->resource_key);
+		update_option('sender_account_message', false);
+
+		return true;
 	}
 
 	public function senderIsWooEnabled()
