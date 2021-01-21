@@ -17,7 +17,7 @@ class Sender_API
 			 ->senderSetBaseArguments();
 	}
 
-	private function senderSetBaseArguments()
+	public function senderSetBaseArguments()
 	{
 		$this->senderBaseRequestArguments = [
 			'headers' => [
@@ -30,7 +30,7 @@ class Sender_API
 
 	public function senderSetApiKey($apiKey = null)
 	{
-		$this->senderApiKey = $apiKey ?? get_option('sender_api_key');
+		$this->senderApiKey = $apiKey ? $apiKey : get_option('sender_api_key');
 		return $this;
 	}
 

@@ -17,12 +17,22 @@ class Sender_Templates_Loader
 
 	function senderInitSidebar()
 	{
-		add_action('admin_post_submit-sender-settings', 'senderSubmitForm');
 		add_menu_page('Sender Automated Emails Marketing', 'Sender.net', 'manage_options', 'sender-settings', [&$this, 'senderAddSidebar']);
 	}
 
+	function validateApiKey($apiKey)
+    {
+        $this->sender->senderApi->senderSetApiKey($apiKey);
+        $this->sender->senderApi->checkApiKey();
+    }
+
 	function senderHandleFormPost()
 	{
+
+	    if(array_key_exists('sender_api_key', $_POST)){
+	        $this->validateApiKey($_POST['sender_api_key']);
+        }
+
 		$changes = [];
 		foreach ($_POST as $name => $value) {
 

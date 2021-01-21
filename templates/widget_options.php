@@ -23,7 +23,7 @@
 
 			</div>
 			<div class="sender-form-thumbnail">
-				<img src="<?=$form->thumbnail_url?>" alt="thumbnail">
+				<img src="<?=$form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>" alt="thumbnail">
 			</div>
 		</div>
 
@@ -54,6 +54,7 @@
 		margin: 5px;
 		border: 1px solid #ccc;
 		border-radius: 5px;
+        height: 200px;
 	}
     .sender-form-thumbnail img {
 		width: 100%;
