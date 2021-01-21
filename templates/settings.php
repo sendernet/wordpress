@@ -1,5 +1,5 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <div class="sender-container">
     <div class="sender-flex-column">
 		<?php if (!$apiKey) { ?>
@@ -11,7 +11,7 @@
 
                 </div>
                 <?php if(get_option('sender_account_message')) { ?>
-                    <div class="sender-subheader sender-is-danger sender-margin-top-10 sender-padding-10">
+                    <div class="sender-is-danger sender-margin-top-10 sender-padding-10">
                         <?php echo get_option('sender_account_message') ?>
                     </div>
 				<?php } ?>
@@ -37,7 +37,7 @@
 
                     <div class="flex-grow-1"></div>
                     <div class="sender-logout">
-                        <div class="sender-subheader">
+                        <div >
 							<?php if ($user->account->active_plan->type === 'PAYG') {
 								echo "Pay as you go plan";
 							} else {
@@ -60,9 +60,9 @@
                     </div>
                 </div>
                 <?php if ($wooEnabled) { ?>
-                <div class="sender-plugin-settings sender-box">
+                <div  style="position: relative" class="sender-plugin-settings sender-box">
                     <div class="sender-header">WooCommerce settings</div>
-                    <form style="position: relative" method="post" class="flex-column h-100" action='' id="sender-form-settings">
+                    <form method="post" class="flex-column h-100" action='' id="sender-form-settings">
                         <div class="sender-options">
                             <div class="sender-option">
                                 <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
@@ -76,30 +76,34 @@
                                 </label>
                             </div>
                             <div class="sender-option">
-                                <label for="sender_customers_list">Customers list</label>
-                                <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
-                                    echo 'disabled';
-                                } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
-                                    <option value="0">No list</option>
-                                    <?php foreach ($groups as $tag): ?>
-                                        <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label class="sender-select-label" for="sender_customers_list">Customers list</label>
+                                <span class="sender-select-wrap">
+                                    <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
+                                        echo 'disabled';
+                                    } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
+                                        <option value="0">No list</option>
+                                        <?php foreach ($groups as $tag): ?>
+                                            <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </span>
                             </div>
                             <div class="sender-option">
-                                <label for="sender_registration_list">Users who registered list</label>
-                                <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
-                                    echo 'disabled';
-                                } ?> name="sender_registration_list" class="sender-woo-lists" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
-                                    <option value="0">No list</option>
-                                    <?php foreach ($groups as $tag): ?>
-                                        <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label class="sender-select-label" for="sender_registration_list">Users who registered list</label>
+                                <span class="sender-select-wrap">
+                                    <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
+                                        echo 'disabled';
+                                        } ?> name="sender_registration_list" class="sender-woo-lists" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
+                                            <option value="0">No list</option>
+                                        <?php foreach ($groups as $tag): ?>
+                                            <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </span>
                             </div>
                         </div>
                         <div class="flex-grow-1"></div>
-                        <div class="sender-logout" style="position: absolute; bottom: 20px; right: 0">
+                        <div class="sender-logout" style="position: absolute; bottom: 20px; right: 20px">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Save">
                         </div>
@@ -136,11 +140,21 @@
     .sender-option {
         width: 50%;
         height: 40px;
+        margin-bottom: 10px;
     }
 
     .sender-container {
         font-family: 'Roboto', sans-serif !important;
+        font-size: 14px;
+        color: #000;
+        line-height: 18px;
     }
+
+    .sender-select-label {
+        display: inline-block;
+        width: 160px;
+    }
+
     .sender-logout {
         display: flex;
         justify-content: flex-end;
@@ -248,7 +262,9 @@
         border-color: #ccc;
         border-radius: 5px;
         color: #000;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 28px;
+        color: #000;
         height: 40px;
         max-width: 100%;
     }
@@ -291,9 +307,11 @@
     }
 
     .sender-header {
-        font-size: 22px;
-        color: #222;
-        line-height: 22px;
+        font-size: 16px;
+        color: #000;
+        line-height: 24px;
+        font-weight: 500;
+        margin-bottom: 20px;
     }
 
     .sender-big-header {
@@ -312,8 +330,57 @@
         padding: 20px;
     }
 
-    .sender-input {
+    .sender-woo-lists {
+        width: 292px;
+        height: 40px;
+        margin: 5px 0 0;
+        padding: 13px 11px 12px 12px;
+        border-radius: 5px !important;
+        border: 1px solid #cccccc !important;
+        background-color: #ffffff;
+        color: #000000 !important;
+    }
+    .sender-select-wrap {
+        position: relative;
+    }
+    .sender-select-wrap::after {
+        height: 0 !important;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #000;
+        top: 50%;
+        right: 12px;
+        content: " ";
+        display: block;
+        pointer-events: none;
+        position: absolute;
+    }
 
+    .sender-select-wrap:focus-within::after {
+        transform: rotate(180deg);
+    }
+
+    .sender-woo-lists:hover:not([disabled]) {
+        color: #000000 !important;
+        border-radius: 5px !important;
+        border: 1px solid #aaaaaa !important;
+    }
+    .sender-woo-lists {
+       background: none !important;
+    }
+    @-moz-document url-prefix(){
+        .sender-woo-lists{border: 1px solid #CCC; border-radius: 4px; box-sizing: border-box; position: relative; overflow: hidden;}
+        .sender-woo-lists select { width: 110%; background-position: right 30px center !important; border: none !important;}
+    }
+    /* For IE10 */
+    select.sender-woo-lists::-ms-expand {
+        display: none !important;
+    }
+    select.sender-woo-lists:focus {
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     input[type="checkbox"] {
@@ -325,7 +392,6 @@
     /* Text color for the label */
     input[type="checkbox"] + span {
         cursor: pointer;
-        font: 16px sans-serif;
         color: black;
     }
 
