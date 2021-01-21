@@ -37,8 +37,10 @@
         		return;
 			}
 
+            echo $args['before_widget'];
         	$code = $instance['form'];
-			echo "<div class='widget sender-form-field' data-sender-form-id='$code'></div>";
+			echo "<div class='sender-form-field' data-sender-form-id='$code'></div>";
+            echo $args['after_widget'];
 		}
 
 
