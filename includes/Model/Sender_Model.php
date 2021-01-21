@@ -79,6 +79,9 @@ class Sender_Model
 
 		$wpdb->query( $wpdb->prepare($sqlQuery, ...$changes));
 		$this->dirtyAttributes = [];
+
+		$this->id = $wpdb->insert_id;
+
 		return $this;
 	}
 
