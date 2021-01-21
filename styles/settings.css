@@ -334,8 +334,17 @@ input[type="checkbox"]:disabled + span {
      align-items: center;
  }
 .sender-form-title {
+    font-family: 'Roboto', sans-serif !important;
     padding: 10px;
-    font-weight: bolder;
+    height: 32px;
+    font-weight: 500;
+    color: #000;
+    border-bottom: 1px solid #cccccc;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 .sender-form-is-selected {
     border: 1px solid #ff8d00 !important;
@@ -349,11 +358,16 @@ input[type="checkbox"]:disabled + span {
     border-radius: 5px;
     height: 190px;
 }
-.sender-form-thumbnail img {
+
+.sender-form-select > .sender-form-thumbnail {
     width: 100%;
-}
-.sender-form-thumbnail {
-    width: 100%;
+    border: none;
+    box-sizing: border-box;
+    height: calc(100% - 52px);
+    border-radius: 5px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
 }
 .display-none {
     display:none;

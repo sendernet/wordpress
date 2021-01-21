@@ -1,3 +1,4 @@
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
 <h3>Select form</h3>
 <label class="display-none" for="<?php echo esc_attr($this->get_field_id( 'form' )); ?>">Select form</label>
@@ -30,6 +31,7 @@
             ?>
 		<div class="sender-form-select <?= $selected ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" ';?>">
 			<div class="sender-form-title">
+                <span>
 				<?php
                     $name = esc_html($form->title);
                     if(strlen($name) > 20){
@@ -37,9 +39,9 @@
                     }
                     echo $name;
                     ?>
+                </span>
 			</div>
-			<div class="sender-form-thumbnail">
-				<img src="<?=$form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>" alt="thumbnail">
+			<div class="sender-form-thumbnail" style="background-image: url('<?=$form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>') ">
 			</div>
 		</div>
 
