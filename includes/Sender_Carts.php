@@ -159,8 +159,6 @@ class Sender_Carts
 			$newCart->save();
 
 			$cartData = $this->senderPrepareCartData($newCart);
-            var_dump($cartData);
-
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
 		}
 
