@@ -11,6 +11,7 @@
         'sender_allow_tracking',
         'sender_customers_list',
         'sender_registration_list',
+        'sender_account_message'
     ];
 
     global $wpdb;
