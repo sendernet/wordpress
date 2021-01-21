@@ -18,7 +18,7 @@ class Sender_Templates_Loader
 	function senderInitSidebar()
 	{
 		add_action('admin_post_submit-sender-settings', 'senderSubmitForm');
-		add_menu_page('Sender Automated Emails Marketing', 'Sender.net', 'manage_options', 'sender-settings', [&$this, 'senderAddSidebar']);
+		add_menu_page('Sender Automated Emails Marketing', 'Sender.net', 'manage_options', 'sender-settings', [&$this, 'senderAddSidebar'], plugin_dir_url( $this->sender->senderBaseFile). 'assets/images/settings.png');
 	}
 
 	function senderHandleFormPost()

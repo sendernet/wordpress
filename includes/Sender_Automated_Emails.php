@@ -15,7 +15,7 @@ class Sender_Automated_Emails
 		'sender_registration_list'  => 0,
 	];
 
-	private $senderBaseFile;
+	public $senderBaseFile;
 	public $senderApi;
 
 	public function __construct($senderBaseFile)
@@ -41,6 +41,7 @@ class Sender_Automated_Emails
         }
 
 		$this->senderCreateSettingsTemplates();
+		$this->senderEnqueueStyles();
 
 		if (!$this->senderApiKey()) {
 			return;
@@ -211,6 +212,16 @@ class Sender_Automated_Emails
         }
 
         new Sender_Templates_Loader($this);
+    }
+
+    private function senderEnqueueStyles()
+    {
+        add_action( 'admin_init', [&$this,'senderInitStyles']);
+    }
+
+    public function senderInitStyles()
+    {
+        wp_enqueue_style('sender-styles', plugin_dir_url( $this->senderBaseFile). 'includes/settings.css');
     }
 
 }
