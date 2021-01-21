@@ -22,12 +22,14 @@
 
     foreach ($tables as $table){
         $name = $wpdb->prefix . $table;
-        $wpdb->query( "DROP TABLE {$name}");
+        $wpdb->query( "DROP TABLE IF EXISTS {$name}");
     }
 
     foreach ($availableSettings as $setting)
     {
-        delete_option($setting);
+    	if (get_option($setting)) {
+			delete_option($setting);
+		}
     }
 
 ?>
