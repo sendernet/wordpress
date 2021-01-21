@@ -30,8 +30,13 @@
             ?>
 		<div class="sender-form-select <?= $selected ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" ';?>">
 			<div class="sender-form-title">
-				<?php echo esc_html($form->title); ?>
-
+				<?php
+                    $name = esc_html($form->title);
+                    if(strlen($name) > 20){
+                        $name = substr($name, 0, 20) . '...';
+                    }
+                    echo $name;
+                    ?>
 			</div>
 			<div class="sender-form-thumbnail">
 				<img src="<?=$form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>" alt="thumbnail">
@@ -55,6 +60,7 @@
 	}
 	.sender-form-title {
 		padding: 10px;
+        font-weight: bolder;
 	}
 	.sender-form-is-selected {
 		border: 1px solid #ff8d00 !important;
@@ -63,10 +69,10 @@
 	.sender-form-select {
         cursor: pointer;
 		width: 125px;
-		margin: 5px;
+		margin: 3px;
 		border: 1px solid #ccc;
 		border-radius: 5px;
-        height: 200px;
+        height: 190px;
 	}
     .sender-form-thumbnail img {
 		width: 100%;
