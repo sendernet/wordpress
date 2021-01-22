@@ -147,7 +147,7 @@ class Sender_Carts
 			$cart->cart_data = $cartData;
 			$cart->save();
 			$cartData = $this->senderPrepareCartData($cart);
-            $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", [$cartData, $session]);
+            $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
 			return;
 		}
 
@@ -159,7 +159,6 @@ class Sender_Carts
 			$newCart->save();
 
 			$cartData = $this->senderPrepareCartData($newCart);
-            var_dump($cartData);
 
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
 		}
