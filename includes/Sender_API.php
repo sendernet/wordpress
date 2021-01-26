@@ -57,11 +57,16 @@ class Sender_API
 	{
 		$list = get_option('sender_customers_list');
 
-		$email = wc_get_order($params['orderId'])->get_billing_email();
+		$wcOrder = wc_get_order($params['orderId']);
+		$email = $wcOrder->get_billing_email();
+		$firstname = $wcOrder->get_billing_first_name();
+		$lastname = $wcOrder->get_billing_last_name();
 
 		$data = [
 			'external_id' => $params['cartId'],
 			'email' => $email,
+			'firstname' => $firstname,
+			'lastname' => $lastname,
             'resource_key' => $this->senderGetResourceKey()
 		];
 
