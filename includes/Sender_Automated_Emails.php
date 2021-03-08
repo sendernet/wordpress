@@ -31,14 +31,11 @@ class Sender_Automated_Emails
 		$this->senderSetupOptions()
             ->senderAddFilters();
 
-		if($this->senderIsWooEnabled())
-        {
-            if( !class_exists('Sender_Repository') ) {
-                require_once("Sender_Repository.php" );
-            }
-
-            register_activation_hook( $senderBaseFile, [new Sender_Repository(), 'senderCreateTables']);
+        if( !class_exists('Sender_Repository') ) {
+            require_once("Sender_Repository.php" );
         }
+
+        register_activation_hook( $senderBaseFile, [new Sender_Repository(), 'senderCreateTables']);
 
         $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
