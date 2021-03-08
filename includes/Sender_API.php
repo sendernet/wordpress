@@ -43,7 +43,7 @@ class Sender_API
 
 	public function senderGetGroups()
 	{
-		$data = wp_remote_request($this->senderBaseUrl . 'tags', $this->senderBaseRequestArguments());
+		$data = wp_remote_request($this->senderBaseUrl . 'tags?limit=100', $this->senderBaseRequestArguments());
 		return $this->senderBuildResponse($data);
 	}
 
