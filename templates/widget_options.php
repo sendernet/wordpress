@@ -57,8 +57,9 @@
 
         formSelect.addEventListener('click', function (formSelect){
             var select = document.querySelector('.sender-invisible-form-select');
+            jQuery('.sender-invisible-form-select option[value="' + this.getAttribute('data-id') + '"]').prop('selected', true);
+            jQuery('.sender-invisible-form-select').trigger('change');
             select.value = this.getAttribute('data-id');
-
             var event = document.createEvent('HTMLEvents');
             event.initEvent('change', true, false);
             select.dispatchEvent(event);
