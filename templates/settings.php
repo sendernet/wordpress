@@ -9,10 +9,6 @@
                 </div>
                 <h2 class="sender-header">Enter your API key</h2>
 
-                <div>
-                    <a href="#" class="sender-link">Click here</a> if you are not sure where to find it
-
-                </div>
                 <div class="sender-flex-center-column">
                 <div class="flex-grow-1"></div>
 
@@ -27,6 +23,10 @@
                            class="sender-input sender-text-input ">
                     <input type="submit" name="submit" id="submit" class="sender-cta-button"
                            value="Begin">
+
+                    <div class="sender-api-text">
+                        <a href="https://help.sender.net/knowledgebase/api-documentation/" target="_blank" class="sender-link">Click here</a> if you are not sure where to find it
+                    </div>
                 </div>
             </form>
 
@@ -45,13 +45,12 @@
                     <div class="sender-logout">
                         <div >
 							<?php if ($user->account->active_plan->type === 'PAYG') {
-								echo "Pay as you go plan";
+								echo "Activated";
 							} else {
 								if ($user->account->active_plan->type === 'SUBSCRIPTION') {
-
-									echo "Monthly subscription";
+									echo "Activated";
 								} else {
-									echo "Free plan";
+									echo "Activated";
 								}
 							}
 							?>
@@ -81,8 +80,9 @@
                                     <span>Allow tracking</span>
                                 </label>
                             </div>
+
                             <div class="sender-option">
-                                <label class="sender-select-label" for="sender_customers_list">Customers list</label>
+                                <label class="sender-select-label" for="sender_customers_list">Save "Recent buyers" to:</label>
                                 <span class="sender-select-wrap">
                                     <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
                                         echo 'disabled';
@@ -94,8 +94,9 @@
                                     </select>
                                 </span>
                             </div>
+
                             <div class="sender-option">
-                                <label class="sender-select-label" for="sender_registration_list">Users who registered list</label>
+                                <label class="sender-select-label" for="sender_registration_list">Save "Registered" customers to:</label>
                                 <span class="sender-select-wrap">
                                     <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
                                         echo 'disabled';
@@ -107,11 +108,16 @@
                                     </select>
                                 </span>
                             </div>
+
                         </div>
                         <div class="flex-grow-1"></div>
                         <div class="sender-logout" style="position: absolute; bottom: 20px; right: 20px">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Save">
+                            <?php if(isset($_GET['submit'])){
+                                echo "Changes saved";
+                            }
+                            ?>
                         </div>
                     </form>
                 </div>

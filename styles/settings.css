@@ -107,6 +107,7 @@
 }
 
 .sender-flex-center-column {
+    margin-top: 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -173,11 +174,15 @@
     max-width: 80%;
     margin: 200px auto;
     width: 543px;
-    height: 315px;
+    height: 270px;
     background: white;
     display: flex;
     flex-direction: column;
     padding: 35px !important;
+}
+
+.sender-api-text {
+    margin-top: 20px;
 }
 
 .sender-link {
