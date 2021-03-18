@@ -5,20 +5,19 @@
 		<?php if (!$apiKey) { ?>
             <form method="post" action='' class="sender-box required-api-key" novalidate="novalidate">
                 <div class="sender-login-image">
-                    <img src="/wp-content/plugins/sender/assets/images/logo.png">
+                    <img src="/wp-content/plugins/sender/assets/images/logo.svg" class="sender-logo d-block">
                 </div>
-                <h2 class="sender-header">Enter your API key</h2>
 
                 <div class="sender-flex-center-column">
                 <div class="flex-grow-1"></div>
 
                 <?php if(get_option('sender_account_message')) { ?>
-                    <div class="sender-is-danger sender-padding-10" >
+                    <div class="mb-20 is-danger is-notification is-danger" >
 						<?php echo get_option('sender_account_message') ?>
                     </div>
 				<?php } ?>
 
-
+                    <div class="sender-form-label">Enter your API key</div>
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input ">
                     <input type="submit" name="submit" id="submit" class="sender-cta-button"
@@ -34,7 +33,7 @@
             <div class="sender-settings-grid">
                 <div class="flex-column sender-box">
                     <div class="sender-logo">
-                        <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.png'; ?>"
+                        <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.svg'; ?>"
                              alt="Sender logo">
                     </div>
                     <div class="sender-username">
@@ -77,7 +76,7 @@
                                            name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
 										echo 'checked';
 									} ?> >
-                                    <span>Allow tracking</span>
+                                    <span>Enable tracking</span>
                                 </label>
                             </div>
 
@@ -109,15 +108,15 @@
                                 </span>
                             </div>
 
+                            <div class="sender-woocommerce-text">
+                                <a href="#" target="_blank" class="sender-link">Click here</a> for more information
+                            </div>
+
                         </div>
                         <div class="flex-grow-1"></div>
                         <div class="sender-logout" style="position: absolute; bottom: 20px; right: 20px">
                             <input type="submit" name="submit" id="submit" class="sender-cta-button"
                                    value="Save">
-                            <?php if(isset($_GET['submit'])){
-                                echo "Changes saved";
-                            }
-                            ?>
                         </div>
                     </form>
                 </div>

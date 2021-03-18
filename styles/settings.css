@@ -5,13 +5,19 @@
 }
 
 /* Settings page */
-.sender-is-danger {
-     color: #b41d1d !important;
-     border: solid 1px #b41d1d;
-     background-color: #ffe9e9;
-     border-radius: 5px;
+.is-notification {
+    border-radius: 5px;
+    padding: 11px 12px;
+    font-size: 13px;
+    line-height: 16px;
+}
 
- }
+.is-notification.is-danger {
+    color: #b41d1d;
+    border: solid 1px #b41d1d;
+    background-color: #ffe9e9;
+}
+
 .sender-margin-top-10 {
     margin-top: 10px;
 }
@@ -20,6 +26,27 @@
 }
 .h-100 {
     height: 100%;
+}
+
+img {
+    height: auto;
+    max-width: 100%;
+}
+
+.sender-logo {
+    height: 40px;
+}
+
+.sender-login-image {
+    margin-bottom: 30px;
+}
+
+.d-block {
+    display: block;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
 }
 
 .sender-options {
@@ -38,6 +65,17 @@
     font-size: 14px;
     color: #000;
     line-height: 18px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 20px 0 0;
+}
+
+@media screen and (max-width: 782px) {
+    .sender-container {
+        padding: 10px 10px 0 0;
+    }
 }
 
 .sender-select-label {
@@ -106,8 +144,13 @@
     grid-row: 2 / 2;
 }
 
+.sender-flex-column {
+    width: 500px;
+    max-width: 100%;
+}
+
 .sender-flex-center-column {
-    margin-top: 15px;
+    /*margin-top: 20px;*/
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -141,10 +184,11 @@
 
 .sender-cta-button:focus {
     background-color: #e67f00 !important;
+    outline: none;
 }
 
-.sender-input {
-    margin: 10px 0;
+.sender-form-label {
+    margin-bottom: 5px;
 }
 
 .sender-text-input {
@@ -155,7 +199,6 @@
     color: #000;
     font-size: 14px;
     line-height: 28px;
-    color: #000;
     height: 40px;
     max-width: 100%;
 }
@@ -171,20 +214,23 @@
 }
 
 .required-api-key {
-    max-width: 80%;
-    margin: 200px auto;
-    width: 543px;
-    height: 270px;
     background: white;
     display: flex;
     flex-direction: column;
-    padding: 35px !important;
+    max-width: 100%;
+}
+
+.sender-box.required-api-key {
+    padding: 30px 30px 20px;
 }
 
 .sender-api-text {
     margin-top: 20px;
 }
 
+.sender-woocommerce-text{
+    margin-top: 10px;
+}
 .sender-link {
     color: #ff8d00;
 }
@@ -206,7 +252,7 @@
     color: #000;
     line-height: 24px;
     font-weight: 500;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .sender-big-header {
@@ -218,7 +264,7 @@
 }
 
 .sender-box {
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
     border: 1px solid #ddd;
     background: white;
