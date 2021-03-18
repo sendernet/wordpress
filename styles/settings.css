@@ -1,3 +1,13 @@
+/* global */
+
+body * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    word-break: break-word;
+}
+
+
 /* sidebar icon */
 #adminmenu #toplevel_page_sender-settings .wp-menu-image img {
     padding: 9px 0 0 0;
@@ -33,8 +43,12 @@ img {
     max-width: 100%;
 }
 
-.sender-logo {
+.sender-logo:not(.is-small) {
     height: 40px;
+}
+
+.sender-logo.is-small {
+    height: 32px;
 }
 
 .sender-login-image {
@@ -43,6 +57,10 @@ img {
 
 .d-block {
     display: block;
+}
+
+.is-justified-between {
+    justify-content: space-between;
 }
 
 .mb-20 {
@@ -54,10 +72,16 @@ img {
     flex-direction: column;
 }
 
-.sender-option {
-    width: 50%;
-    height: 40px;
-    margin-bottom: 10px;
+.sender-option:first-child {
+    position: relative;
+    min-height: 20px;
+    display: flex;
+}
+
+.sender-option select {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .sender-container {
@@ -80,14 +104,58 @@ img {
 
 .sender-select-label {
     display: inline-block;
-    width: 160px;
+    /* width: 160px; */
 }
 
 .sender-logout {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
     align-items: center;
+}
 
+.sender-logout.negative-margin {
+    margin-bottom: -20px;
+}
+
+.sender-logout .status-display {
+    display: flex;
+    align-items: center;
+}
+
+.sender-logout .checkbox {
+    content: "";
+    height: 24px;
+    width: 24px;
+    border: 2px solid #1db44e;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.sender-logout .tick {
+    height: 6px;
+    width: 10px;
+    top: 6px;
+    left: 5px;
+    border-left: 2px solid #1db44e;
+    border-bottom: 2px solid #1db44e;
+    transform: rotate(-45deg);
+    position: absolute;
+}
+
+.sender-logout .tick + span {
+    padding-left: 26px;
+}
+
+.sender-logout > div:first-child {
+    margin-right: 20px;
+}
+
+.sender-logout .btn-wrap {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .mb-10 {
@@ -97,10 +165,6 @@ img {
 .flex-column {
     display: flex;
     flex-direction: column;
-}
-
-.flex-grow-1 {
-    flex-grow: 1;
 }
 
 .no-padding {
@@ -130,27 +194,21 @@ img {
 
 
 .sender-settings-grid {
-    margin: 40px;
-    margin-left: 20px;
     display: grid;
-    grid-template-columns: 500px auto;
-    grid-template-rows: 250px auto;
-    grid-row-gap: 40px;
-    grid-column-gap: 40px;
-}
-
-.sender-forms-list {
-    grid-column: 1 / span 2;
-    grid-row: 2 / 2;
+    grid-row-gap: 30px;
+    grid-column-gap: 30px;
+    grid-template-columns: 450px 450px;
 }
 
 .sender-flex-column {
-    width: 500px;
     max-width: 100%;
 }
 
+.sender-flex-column.is-single {
+    width: 500px;
+}
+
 .sender-flex-center-column {
-    /*margin-top: 20px;*/
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -169,48 +227,70 @@ img {
     font-weight: 700;
     border-radius: 5px !important;
     box-shadow: none !important;
-
+    outline: none !important;
     color: #fff;
     font-size: 14px;
+}
+
+.sender-cta-button.is-medium {
+    padding: 10px 20px;
+}
+
+.sender-cta-button.is-large {
+    font-size: 15px;
+    padding: 13px 20px;
+    line-height: 20px;
 }
 
 .sender-cta-button:hover {
     background-color: #ffae00 !important;
 }
 
-.sender-cta-button:active {
+.sender-cta-button:active, .sender-cta-button:focus {
     background-color: #e67f00 !important;
-}
-
-.sender-cta-button:focus {
-    background-color: #e67f00 !important;
-    outline: none;
 }
 
 .sender-form-label {
     margin-bottom: 5px;
 }
 
-.sender-text-input {
-    box-shadow: none;
+input {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+input.sender-text-input {
+    box-shadow: none !important;
+    outline: none !important;
     padding: 7px 12px;
     border-color: #ccc;
     border-radius: 5px;
     color: #000;
-    font-size: 14px;
-    line-height: 28px;
+    font-size: 13px;
     height: 40px;
     max-width: 100%;
 }
 
-.sender-text-input::placeholder {
+input::-webkit-input-placeholder {
     color: #999;
 }
 
-.sender-text-input:focus {
+input::-moz-placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+input:-moz-placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+input:-ms-input-placeholder {
+    color: #999;
+}
+
+.sender-text-input:focus, .sender-text-input:hover {
     border-color: #aaa !important;
-    box-shadow: none !important;
-    outline: none !important;
 }
 
 .required-api-key {
@@ -222,16 +302,25 @@ img {
 
 .sender-box.required-api-key {
     padding: 30px 30px 20px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
 }
 
 .sender-api-text {
-    margin-top: 20px;
+    font-size: 12px;
+    line-height: 17px;
+    color: #555555;
+    text-align: center;
 }
 
-.sender-woocommerce-text{
-    margin-top: 10px;
+a.sender-link {
+    color: #000000;
+    text-decoration: underline;
+    transition: color 0.2s;
+    box-shadow: none;
+    outline: none;
 }
-.sender-link {
+
+a.sender-link:hover {
     color: #ff8d00;
 }
 
@@ -252,7 +341,7 @@ img {
     color: #000;
     line-height: 24px;
     font-weight: 500;
-    margin-bottom: 5px;
+    /*margin-bottom: 5px;*/
 }
 
 .sender-big-header {
@@ -265,16 +354,18 @@ img {
 
 .sender-box {
     border-radius: 5px;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
-    border: 1px solid #ddd;
     background: white;
+}
+
+.sender-box:not(.required-api-key) {
+    border: 1px solid #ddd;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
     padding: 20px;
 }
 
 .sender-woo-lists {
-    width: 292px;
+    width: 100%;
     height: 40px;
-    margin: 5px 0 0;
     padding: 13px 11px 12px 12px;
     border-radius: 5px !important;
     border: 1px solid #cccccc !important;
@@ -326,11 +417,19 @@ select.sender-woo-lists:focus {
 
 input[type="checkbox"] {
     position: absolute;
+    left: 0;
     opacity: 0;
     z-index: -1;
 }
 
 /* Text color for the label */
+label.checkbox-label {
+    line-height: 18px;
+    padding-left: 30px;
+    top: 1px;
+    position: relative;
+}
+
 input[type="checkbox"] + span {
     cursor: pointer;
     color: black;
@@ -340,13 +439,13 @@ input[type="checkbox"] + span {
 input[type="checkbox"] + span:before {
     content: '';
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 5px;
     display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 0.5em;
-    margin-top: 0.5em;
-    vertical-align: -2px;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    left: 0;
+    top: -1px;
 }
 
 /* Adding a dotted border around the active tabbed-into checkbox */
@@ -364,10 +463,9 @@ input[type="checkbox"]:checked + span:before {
     background-position: center;
     /* The size of the checkmark icon, you may/may not need this */
     background-size: 11px;
-    border-radius: 5px;
     background-color: #ff8d00;
     color: white;
-    border: 1px solid transparent;
+    border: 1px solid #ff8d00;
 }
 
 /* Disabled checkbox styles */
