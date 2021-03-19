@@ -1,7 +1,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<div class="sender-container">
-    <div class="sender-flex-column <?php if(!$apiKey) { echo 'is-single'; } ?>">
+<div class="sender-container <?php if(!$apiKey) { echo 'single-column'; } ?>">
+    <div class="sender-flex-column">
 		<?php if (!$apiKey) { ?>
             <form method="post" action='' class="sender-box required-api-key" novalidate="novalidate">
                 <div class="sender-login-image">
@@ -29,7 +29,7 @@
             </form>
 
 		<?php } else {  ?>
-            <div class="sender-settings-grid">
+            <div class="sender-settings-layout">
                 <div class="flex-column sender-box is-justified-between">
                     <div>
                         <div class="mb-20">
@@ -47,7 +47,7 @@
                             <div class="checkbox">
                                 <span class="tick"></span>
                             </div>
-                            <span>
+                            <div class="status-text">
                                 <?php if ($user->account->active_plan->type === 'PAYG') {
                                     echo "Activated";
                                 } else {
@@ -58,7 +58,7 @@
                                     }
                                 }
                                 ?>
-                            </span>
+                            </div>
                         </div>
                         <div class="btn-wrap">
                             <form method="post" action='' class="mb-20">

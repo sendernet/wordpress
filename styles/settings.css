@@ -89,16 +89,21 @@ img {
     font-size: 14px;
     color: #000;
     line-height: 18px;
-    min-height: 100vh;
+    padding: 30px 20px 0 0;
+}
+
+.sender-container.single-column {
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 20px 20px 0 0;
+}
+
+.sender-container.single-column .sender-flex-column {
+    width: 500px;
 }
 
 @media screen and (max-width: 782px) {
     .sender-container {
-        padding: 10px 10px 0 0;
+        padding: 20px 10px 0 0;
     }
 }
 
@@ -108,8 +113,6 @@ label {
 
 .sender-select-label {
     display: inline-block;
-    /* cursor: initial; */
-    /* width: 160px; */
 }
 
 .sender-logout {
@@ -121,6 +124,15 @@ label {
 .sender-logout .status-display {
     display: flex;
     align-items: center;
+    position: relative;
+}
+
+.sender-logout .status-text {
+    color: #555;
+    line-height: 20px;
+    position: relative;
+    top: 2px;
+    padding-left: 34px;
 }
 
 .sender-logout .checkbox {
@@ -129,7 +141,9 @@ label {
     width: 24px;
     border: 2px solid #1db44e;
     border-radius: 50%;
-    position: relative;
+    top: 0;
+    left: 0;
+    position: absolute;
     flex-shrink: 0;
     margin-right: 10px;
 }
@@ -151,6 +165,11 @@ label {
 
 .sender-logout > div:first-child {
     margin-right: 20px;
+}
+
+.sender-logout .sender-woocommerce-text {
+    line-height: 20px;
+    color: #555;
 }
 
 .sender-logout .btn-wrap {
@@ -193,19 +212,21 @@ label {
     padding: 20px;
 }
 
+.sender-settings-layout {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+}
 
-.sender-settings-grid {
-    display: grid;
-    grid-row-gap: 30px;
-    grid-column-gap: 30px;
-    grid-template-columns: 450px 450px;
+.sender-settings-layout > div:first-child {
+    margin-bottom: 30px;
 }
 
 .sender-flex-column {
     max-width: 100%;
 }
 
-.sender-flex-column.is-single {
+.sender-container.single-column .sender-flex-column {
     width: 500px;
 }
 
