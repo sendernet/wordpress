@@ -16,7 +16,6 @@ body * {
 
 /* Settings page */
 .is-notification {
-    border-radius: 5px;
     padding: 11px 12px;
     font-size: 13px;
     line-height: 16px;
@@ -28,12 +27,6 @@ body * {
     background-color: #ffe9e9;
 }
 
-.sender-margin-top-10 {
-    margin-top: 10px;
-}
-.sender-padding-10 {
-    padding: 10px;
-}
 .h-100 {
     height: 100%;
 }
@@ -59,29 +52,32 @@ img {
     display: block;
 }
 
+.d-flex {
+    display: flex;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
 .is-justified-between {
     justify-content: space-between;
+}
+
+.is-relative {
+    position: relative;
+}
+
+.border-radius-5 {
+    border-radius: 5px;
 }
 
 .mb-20 {
     margin-bottom: 20px;
 }
 
-.sender-options {
-    display: flex;
-    flex-direction: column;
-}
-
 .sender-option:first-child {
-    position: relative;
     min-height: 20px;
-    display: flex;
-}
-
-.sender-option select {
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: 0;
 }
 
 .sender-container {
@@ -93,12 +89,19 @@ img {
 }
 
 .sender-container.single-column {
-    display: flex;
     justify-content: center;
 }
 
 .sender-container.single-column .sender-flex-column {
     width: 500px;
+}
+
+.sender-flex-column {
+    max-width: 100%;
+}
+
+.sender-flex-center-column {
+    justify-content: center;
 }
 
 @media screen and (max-width: 782px) {
@@ -116,21 +119,20 @@ label {
 }
 
 .sender-logout {
-    display: flex;
     flex-wrap: wrap;
     align-items: center;
 }
 
 .sender-logout .status-display {
-    display: flex;
     align-items: center;
-    position: relative;
+}
+
+.default-text {
+    color: #555;
+    line-height: 20px;
 }
 
 .sender-logout .status-text {
-    color: #555;
-    line-height: 20px;
-    position: relative;
     top: 2px;
     padding-left: 34px;
 }
@@ -144,7 +146,6 @@ label {
     top: 0;
     left: 0;
     position: absolute;
-    flex-shrink: 0;
 }
 
 .sender-logout .tick {
@@ -166,31 +167,13 @@ label {
     margin-right: 20px;
 }
 
-.sender-logout .sender-woocommerce-text {
-    line-height: 20px;
-    color: #555;
-}
-
 .sender-logout .btn-wrap {
     flex-grow: 1;
-    display: flex;
     justify-content: flex-end;
 }
 
 .mb-10 {
     margin-bottom: 10px !important;
-}
-
-.flex-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.no-padding {
-    padding: 0px !important;
-}
-.sender-form-stats {
-    margin-left: 10px;
 }
 
 .sender-form-thumbnail {
@@ -204,32 +187,12 @@ label {
     height: 100%;
 }
 
-.sender-form-row {
-    display: flex;
-    height: 60px;
-    border-bottom: 1px solid #ccc;
-    padding: 20px;
-}
-
 .sender-settings-layout {
-    display: flex;
-    flex-direction: column;
     max-width: 500px;
 }
 
 .sender-settings-layout > div:first-child {
     margin-bottom: 30px;
-}
-
-.sender-flex-column {
-    max-width: 100%;
-}
-
-.sender-flex-center-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
 }
 
 .sender-cta-button {
@@ -238,9 +201,8 @@ label {
     justify-content: center;
     text-align: center;
     white-space: nowrap;
-    height: unset !important;
+    height: unset;
     font-weight: 700;
-    border-radius: 5px !important;
     box-shadow: none !important;
     outline: none !important;
     color: #fff;
@@ -259,11 +221,11 @@ label {
 }
 
 .sender-cta-button:hover {
-    background-color: #ffae00 !important;
+    background-color: #ffae00;
 }
 
 .sender-cta-button:active, .sender-cta-button:focus {
-    background-color: #e67f00 !important;
+    background-color: #e67f00;
 }
 
 .sender-form-label {
@@ -274,6 +236,7 @@ input, select.sender-woo-lists {
     margin-left: 0;
     margin-right: 0;
     font-size: 13px;
+    max-width: 100%;
 }
 
 input.sender-text-input {
@@ -281,7 +244,6 @@ input.sender-text-input {
     outline: none !important;
     padding: 7px 12px;
     border-color: #ccc;
-    border-radius: 5px;
     color: #000;  
     height: 40px;
     max-width: 100%;
@@ -305,14 +267,13 @@ input:-ms-input-placeholder {
     color: #999;
 }
 
-.sender-text-input:focus, .sender-text-input:hover {
-    border-color: #aaa !important;
+input.sender-text-input:focus, 
+input.sender-text-input:hover {
+    border-color: #aaa;
 }
 
 .required-api-key {
     background: white;
-    display: flex;
-    flex-direction: column;
     max-width: 100%;
 }
 
@@ -357,7 +318,6 @@ a.sender-link:hover {
     color: #000;
     line-height: 24px;
     font-weight: 500;
-    /*margin-bottom: 5px;*/
 }
 
 .sender-big-header {
@@ -369,7 +329,6 @@ a.sender-link:hover {
 }
 
 .sender-box {
-    border-radius: 5px;
     background: white;
 }
 
@@ -383,38 +342,27 @@ select:disabled {
     opacity: 1;
 }
 
-/* todo: refactor, get rid of !important rule cases */
-
-.sender-woo-lists {
+.sender-options .sender-select-wrap select.sender-woo-lists {
     width: 100%;
     height: 40px;
-    border-radius: 5px !important;
-    border: 1px solid #cccccc !important;
-    background-color: #ffffff;
-    color: #000000 !important;
-    padding: 7px 32px 7px 12px !important;
-    text-shadow: none !important;
+    border: 1px solid #cccccc;
+    background: none;
+    color: #000000;
+    padding: 7px 32px 7px 12px;
+    text-shadow: none;
+}
+
+.sender-options .sender-select-wrap .sender-woo-lists:not([disabled]):hover, 
+.sender-options .sender-select-wrap .sender-woo-lists:not([disabled]):focus  {
+    border-color: #aaaaaa;
 }
 
 .sender-select-wrap {
     height: 40px;
-    position: relative;
 }
 
-.sender-woo-lists:not([disabled]):hover, .sender-woo-lists:not([disabled]):focus  {
-    border-color: #aaaaaa !important;
-}
-
-.dropdown-wrap.disabled label {
-    cursor: initial;
-}
-
-.dropdown-wrap.disabled .sender-select-wrap {
-    opacity: 0.7;
-}
-
-.sender-select-wrap::after {
-    height: 0 !important;
+.dropdown-wrap .sender-select-wrap::after {
+    height: 0;
     width: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
@@ -428,8 +376,8 @@ select:disabled {
     position: absolute;
 }
 
-.sender-woo-lists {
-    background: none !important;
+.dropdown-wrap.disabled .sender-select-wrap {
+    opacity: 0.7;
 }
 @-moz-document url-prefix(){
     .sender-woo-lists{border: 1px solid #CCC; border-radius: 4px; box-sizing: border-box; position: relative; overflow: hidden;}
@@ -456,7 +404,6 @@ label.checkbox-label {
     line-height: 18px;
     padding-left: 30px;
     top: 1px;
-    position: relative;
     cursor: pointer;
 }
 
