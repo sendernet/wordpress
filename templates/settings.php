@@ -11,7 +11,7 @@
                 <div class="sender-flex-center-column">
 
                 <?php if(get_option('sender_account_message')) { ?>
-                    <div class="mb-20 is-danger is-notification is-danger" >
+                    <div class="mb-20 is-notification is-danger" >
 						<?php echo get_option('sender_account_message') ?>
                     </div>
 				<?php } ?>
