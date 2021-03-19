@@ -16,7 +16,7 @@
                     </div>
 				<?php } ?>
 
-                    <div class="sender-form-label">Enter your API key</div>
+                    <label for="sender_api_key" class="sender-form-label">Enter your API key</label>
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input mb-20">
                     <input type="submit" name="submit" id="submit" class="sender-cta-button is-large mb-20"
@@ -42,7 +42,7 @@
                         </div>
                     </div>
 
-                    <div class="sender-logout is-justified-between negative-margin">
+                    <div class="sender-logout is-justified-between">
                         <div class="status-display mb-20">
                             <div class="checkbox">
                                 <span class="tick"></span>
@@ -60,12 +60,14 @@
                                 ?>
                             </span>
                         </div>
-                        <form method="post" action='' class="mb-20">
-                            <input name="sender_api_key" type="hidden" id="sender_api_key" value=""
-                                   class="sender-input sender-text-input ">
-                            <input type="submit" name="submit" id="submit" class="sender-cta-button is-medium"
-                                   value="Change user">
-                        </form>
+                        <div class="btn-wrap">
+                            <form method="post" action='' class="mb-20">
+                                <input name="sender_api_key" type="hidden" id="sender_api_key" value=""
+                                    class="sender-input sender-text-input ">
+                                <input type="submit" name="submit" id="submit" class="sender-cta-button is-medium"
+                                    value="Change user">
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <?php if ($wooEnabled) { ?>
@@ -86,35 +88,39 @@
                             </div>
 
                             <div class="sender-option mb-20">
-                                <label class="sender-select-label sender-form-label" for="sender_customers_list">Save "Recent buyers" to:</label>
-                                <span class="sender-select-wrap">
-                                    <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
-                                        echo 'disabled';
-                                    } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
-                                        <option value="0">No list</option>
-                                        <?php foreach ($groups as $tag): ?>
-                                            <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </span>
+                                <div class="dropdown-wrap">
+                                    <label data-role="multiselect" class="sender-select-label sender-form-label" for="sender_customers_list">Save "Recent buyers" to:</label>
+                                    <div class="sender-select-wrap">
+                                        <select form="sender-form-settings" class="sender-woo-lists" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
+                                            echo 'disabled';
+                                        } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
+                                            <option value="0">No list</option>
+                                            <?php foreach ($groups as $tag): ?>
+                                                <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="sender-option mb-20">
-                                <label class="sender-select-label sender-form-label" for="sender_registration_list">Save "Registered" customers to:</label>
-                                <span class="sender-select-wrap">
-                                    <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
-                                        echo 'disabled';
-                                        } ?> name="sender_registration_list" class="sender-woo-lists" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
-                                            <option value="0">No list</option>
-                                        <?php foreach ($groups as $tag): ?>
-                                            <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </span>
+                                <div class="dropdown-wrap">
+                                    <label data-role="multiselect1" class="sender-select-label sender-form-label" for="sender_registration_list">Save "Registered" customers to:</label>
+                                    <div class="sender-select-wrap">
+                                        <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
+                                            echo 'disabled';
+                                            } ?> name="sender_registration_list" class="sender-woo-lists" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
+                                                <option value="0">No list</option>
+                                            <?php foreach ($groups as $tag): ?>
+                                                <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
-                        <div class="sender-logout is-justified-between negative-margin">
+                        <div class="sender-logout is-justified-between">
                         <div class="sender-woocommerce-text mb-20">
                                 <a href="#" target="_blank" class="sender-link">Click here</a> for more information
                             </div>
@@ -132,7 +138,16 @@
 </div>
 
 <script>
-    jQuery('#sender_allow_tracking').on('change', function (ev){
-        jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
+    var checkboxEl = jQuery('#sender_allow_tracking');
+
+    jQuery(document).ready(function() {
+        if(!checkboxEl[0].checked) {
+            jQuery('.dropdown-wrap').addClass('disabled');
+        }
+    });
+
+    checkboxEl.on('change', function (ev){
+        jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
+        jQuery('.dropdown-wrap').toggleClass('disabled', !jQuery(ev.currentTarget).is(':checked'));
     });
 </script>

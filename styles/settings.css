@@ -102,8 +102,13 @@ img {
     }
 }
 
+label {
+    cursor: initial;
+}
+
 .sender-select-label {
     display: inline-block;
+    /* cursor: initial; */
     /* width: 160px; */
 }
 
@@ -111,10 +116,6 @@ img {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-}
-
-.sender-logout.negative-margin {
-    margin-bottom: -20px;
 }
 
 .sender-logout .status-display {
@@ -254,9 +255,10 @@ img {
     margin-bottom: 5px;
 }
 
-input {
+input[type="text"], select.sender-woo-lists {
     margin-left: 0;
     margin-right: 0;
+    font-size: 13px;
 }
 
 input.sender-text-input {
@@ -265,8 +267,7 @@ input.sender-text-input {
     padding: 7px 12px;
     border-color: #ccc;
     border-radius: 5px;
-    color: #000;
-    font-size: 13px;
+    color: #000;  
     height: 40px;
     max-width: 100%;
 }
@@ -360,29 +361,51 @@ a.sender-link:hover {
 .sender-box:not(.required-api-key) {
     border: 1px solid #ddd;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
-    padding: 20px;
+    padding: 20px 20px 0;
 }
+
+select:disabled {
+    opacity: 1;
+}
+
+/* todo: refactor, get rid of !important rule cases */
 
 .sender-woo-lists {
     width: 100%;
     height: 40px;
-    padding: 13px 11px 12px 12px;
     border-radius: 5px !important;
     border: 1px solid #cccccc !important;
     background-color: #ffffff;
     color: #000000 !important;
+    padding: 7px 32px 7px 12px !important;
+    text-shadow: none !important;
 }
+
 .sender-select-wrap {
+    height: 40px;
     position: relative;
 }
+
+.sender-woo-lists:not([disabled]):hover, .sender-woo-lists:not([disabled]):focus  {
+    border-color: #aaaaaa !important;
+}
+
+.dropdown-wrap.disabled label {
+    cursor: initial;
+}
+
+.dropdown-wrap.disabled .sender-select-wrap {
+    opacity: 0.7;
+}
+
 .sender-select-wrap::after {
     height: 0 !important;
     width: 0;
-    height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 5px solid #000;
     top: 50%;
+    transform: translateY(-50%);
     right: 12px;
     content: " ";
     display: block;
@@ -390,15 +413,6 @@ a.sender-link:hover {
     position: absolute;
 }
 
-.sender-select-wrap:focus-within::after {
-    transform: rotate(180deg);
-}
-
-.sender-woo-lists:hover:not([disabled]) {
-    color: #000000 !important;
-    border-radius: 5px !important;
-    border: 1px solid #aaaaaa !important;
-}
 .sender-woo-lists {
     background: none !important;
 }
@@ -428,6 +442,7 @@ label.checkbox-label {
     padding-left: 30px;
     top: 1px;
     position: relative;
+    cursor: pointer;
 }
 
 input[type="checkbox"] + span {
