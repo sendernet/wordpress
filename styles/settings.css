@@ -103,7 +103,7 @@ img {
 
 @media screen and (max-width: 782px) {
     .sender-container {
-        padding: 20px 10px 0 0;
+        padding-right: 10px;
     }
 }
 
@@ -145,7 +145,6 @@ label {
     left: 0;
     position: absolute;
     flex-shrink: 0;
-    margin-right: 10px;
 }
 
 .sender-logout .tick {
@@ -226,10 +225,6 @@ label {
     max-width: 100%;
 }
 
-.sender-container.single-column .sender-flex-column {
-    width: 500px;
-}
-
 .sender-flex-center-column {
     display: flex;
     flex-direction: column;
@@ -239,10 +234,8 @@ label {
 
 .sender-cta-button {
     background-color: #ff8d00;
-    border-color: transparent;
     cursor: pointer;
     justify-content: center;
-    padding: 12px 20px;
     text-align: center;
     white-space: nowrap;
     height: unset !important;
@@ -252,15 +245,16 @@ label {
     outline: none !important;
     color: #fff;
     font-size: 14px;
+    border: none;
 }
 
 .sender-cta-button.is-medium {
-    padding: 10px 20px;
+    padding: 12px 20px;
 }
 
 .sender-cta-button.is-large {
     font-size: 15px;
-    padding: 13px 20px;
+    padding: 15px 20px;
     line-height: 20px;
 }
 
@@ -276,7 +270,7 @@ label {
     margin-bottom: 5px;
 }
 
-input[type="text"], select.sender-woo-lists {
+input, select.sender-woo-lists {
     margin-left: 0;
     margin-right: 0;
     font-size: 13px;
