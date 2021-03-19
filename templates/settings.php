@@ -23,7 +23,7 @@
                            value="Begin">
 
                     <div class="sender-api-text">
-                        <a href="https://help.sender.net/knowledgebase/api-documentation/" target="_blank" class="sender-link">Click here</a> if you are not sure where to find it
+                        <a href="https://help.sender.net/knowledgebase/access-tokens/" target="_blank" class="sender-link">Click here</a> if you are not sure where to find it
                     </div>
                 </div>
             </form>
@@ -122,7 +122,7 @@
                         </div>
                         <div class="sender-logout is-justified-between">
                         <div class="sender-woocommerce-text mb-20">
-                                <a href="#" target="_blank" class="sender-link">Click here</a> for more information
+                                <a href="https://help.sender.net/knowledgebase/the-documentation-for-woocommerce-plugin/" target="_blank" class="sender-link">Click here</a> for documentation of WooCommerce plugin
                             </div>
                             <div class="btn-wrap">
                                 <input type="submit" name="submit" id="submit" class="sender-cta-button is-medium mb-20"
