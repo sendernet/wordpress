@@ -78,7 +78,7 @@
                         <div class="sender-options d-flex flex-column">
                             <div class="sender-option d-flex is-relative mb-20">
                                 <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
-                                <label for="sender_allow_tracking" class="checkbox-label position-relative">
+                                <label for="sender_allow_tracking" class="checkbox-label is-relative">
                                     <input class="sender-checkbox" type="checkbox" id="sender_allow_tracking"
                                            value="sender_allow_tracking"
                                            name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
