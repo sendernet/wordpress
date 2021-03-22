@@ -15,8 +15,9 @@
 						<?php echo get_option('sender_account_message') ?>
                     </div>
 				<?php } ?>
-
-                    <label for="sender_api_key" class="sender-form-label">Enter your API key</label>
+                    <div class="d-flex">
+                        <label for="sender_api_key" class="sender-form-label">Enter your API key</label>
+                    </div>  
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input mb-20 border-radius-5">
                     <input type="submit" name="submit" id="submit" class="sender-cta-button is-large mb-20 border-radius-5"
@@ -141,9 +142,9 @@
     var checkboxEl = jQuery('#sender_allow_tracking');
 
     jQuery(document).ready(function() {
-        if(!checkboxEl[0].checked) {
+        if(checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.dropdown-wrap').addClass('disabled');
-        }
+        }        
     });
 
     checkboxEl.on('change', function (ev){
