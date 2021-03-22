@@ -90,12 +90,12 @@
 
                             <div class="sender-option mb-20">
                                 <div class="dropdown-wrap">
-                                    <label data-role="multiselect" class="sender-select-label sender-form-label" for="sender_customers_list">Save "Recent buyers" to:</label>
+                                    <label data-role="multiselect" class="sender-select-label sender-form-label" for="sender_customers_list">Save "Guest Checkouts" to:</label>
                                     <div class="sender-select-wrap is-relative">
                                         <select form="sender-form-settings" class="sender-woo-lists border-radius-5" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
                                             echo 'disabled';
                                         } ?> id="sender_customers_list" value="<?=get_option('sender_customers_list')?>">
-                                            <option value="0">No list</option>
+                                            <option value="0">Select a list</option>
                                             <?php foreach ($groups as $tag): ?>
                                                 <option  <?= get_option('sender_customers_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
                                             <?php endforeach; ?>
@@ -106,12 +106,12 @@
 
                             <div class="sender-option mb-20">
                                 <div class="dropdown-wrap">
-                                    <label data-role="multiselect1" class="sender-select-label sender-form-label" for="sender_registration_list">Save "Registered" customers to:</label>
+                                    <label data-role="multiselect1" class="sender-select-label sender-form-label" for="sender_registration_list">Save "Customers accounts" to:</label>
                                     <div class="sender-select-wrap is-relative">
                                         <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
                                             echo 'disabled';
                                             } ?> name="sender_registration_list" class="sender-woo-lists border-radius-5" id="sender_registration_list" value="<?=get_option('sender_registration_list')?>">
-                                                <option value="0">No list</option>
+                                                <option value="0">Select a list</option>
                                             <?php foreach ($groups as $tag): ?>
                                                 <option  <?= get_option('sender_registration_list') == $tag->id ? 'selected' : '' ?>  value="<?=$tag->id?>"><?=$tag->title?></option>
                                             <?php endforeach; ?>
