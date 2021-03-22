@@ -84,6 +84,7 @@
                                            name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
 										echo 'checked';
 									} ?> >
+                                    <span class="visible-checkbox" style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
                                     <span>Enable tracking</span>
                                 </label>
                             </div>

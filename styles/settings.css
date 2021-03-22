@@ -404,35 +404,36 @@ label.checkbox-label {
     cursor: pointer;
 }
 
-input[type="checkbox"] + span {
+input[type="checkbox"] + .visible-checkbox {
     cursor: pointer;
     color: black;
 }
 
 /* Checkbox un-checked style */
-input[type="checkbox"] + span:before {
+.visible-checkbox {
     content: '';
     border: 1px solid #ddd;
     border-radius: 5px;
     display: inline-block;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     position: absolute;
     left: 0;
     top: -1px;
 }
 
 /* Adding a dotted border around the active tabbed-into checkbox */
-input[type="checkbox"]:focus + span:before,
-input[type="checkbox"] + span:hover:before {
+input[type="checkbox"]:focus + .visible-checkbox,
+input[type="checkbox"] + .visible-checkbox:hover {
     /* Visible in the full-color space */
     box-shadow: none;
     outline: none;
 }
 /* Checked checkbox style (in this case the background is green #e7ffba, change this to change the color) */
-input[type="checkbox"]:checked + span:before {
+
+input[type="checkbox"]:checked + .visible-checkbox {
     /* NOTE: Replace the url with a path to an SVG of a checkmark to get a checkmark icon */
-    background-image: url('/wp-content/plugins/sender/assets/images/white_check.png');
+    /* background-image: url('/wp-content/plugins/sender/assets/images/white_check.png'); */
     background-repeat: no-repeat;
     background-position: center;
     /* The size of the checkmark icon, you may/may not need this */
@@ -443,7 +444,7 @@ input[type="checkbox"]:checked + span:before {
 }
 
 /* Disabled checkbox styles */
-input[type="checkbox"]:disabled + span {
+input[type="checkbox"]:disabled + .visible-checkbox {
     cursor: default;
     color: black;
     opacity: 0.5;
