@@ -76,13 +76,13 @@ img {
     color: #000;
     line-height: 18px;
     padding: 30px 20px 0 0;
+    word-break: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .sender-container * {
     box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    word-break: break-word;
 }
 
 .sender-container.single-column {
