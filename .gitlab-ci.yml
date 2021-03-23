@@ -23,3 +23,4 @@ move-to-svn:
 deploy:
     stage: deploy
     script: #todo deploy to 
+        - ls -la
