@@ -5,32 +5,33 @@
 }
 
 /* Settings page */
-.is-notification {
+.sender-notification {
     padding: 11px 12px;
     font-size: 13px;
     line-height: 16px;
 }
 
-.is-notification.is-danger {
+.sender-notification.sender-is-danger {
     color: #b41d1d;
     border: solid 1px #b41d1d;
     background-color: #ffe9e9;
 }
 
-.h-100 {
+.sender-h-100 {
     height: 100%;
 }
 
-img {
+.sender-logo {
     height: auto;
     max-width: 100%;
+    display: block;
 }
 
-.sender-logo:not(.is-small) {
+.sender-logo:not(.sender-small) {
     height: 40px;
 }
 
-.sender-logo.is-small {
+.sender-logo.sender-small {
     height: 32px;
 }
 
@@ -38,31 +39,27 @@ img {
     margin-bottom: 30px;
 }
 
-.d-block {
-    display: block;
-}
-
-.d-flex {
+.sender-d-flex {
     display: flex;
 }
 
-.flex-column {
+.sender-flex-dir-column {
     flex-direction: column;
 }
 
-.is-justified-between {
+.sender-justified-between {
     justify-content: space-between;
 }
 
-.is-relative {
+.sender-p-relative {
     position: relative;
 }
 
-.border-radius-5 {
+.sender-br-5 {
     border-radius: 5px;
 }
 
-.mb-20 {
+.sender-mb-20 {
     margin-bottom: 20px;
 }
 
@@ -85,11 +82,11 @@ img {
     box-sizing: border-box;
 }
 
-.sender-container.single-column {
+.sender-container.sender-single-column {
     justify-content: center;
 }
 
-.sender-container.single-column .sender-flex-column {
+.sender-container.sender-single-column .sender-flex-column {
     width: 500px;
 }
 
@@ -107,7 +104,7 @@ img {
     }
 }
 
-label {
+.sender-label {
     cursor: initial;
 }
 
@@ -120,21 +117,21 @@ label {
     align-items: center;
 }
 
-.sender-logout .status-display {
+.sender-logout .sender-status-display {
     align-items: center;
 }
 
-.default-text {
+.sender-default-text {
     color: #555;
     line-height: 20px;
 }
 
-.sender-logout .status-text {
+.sender-logout .sender-status-text {
     top: 2px;
     padding-left: 34px;
 }
 
-.sender-logout .checkbox {
+.sender-green-checkbox {
     content: "";
     height: 24px;
     width: 24px;
@@ -145,7 +142,7 @@ label {
     position: absolute;
 }
 
-.sender-logout .tick {
+.sender-green-checkbox .sender-checkbox-tick {
     height: 6px;
     width: 10px;
     top: 6px;
@@ -156,7 +153,7 @@ label {
     position: absolute;
 }
 
-.sender-logout .tick + span {
+.sender-green-checkbox .sender-checkbox-tick + span {
     padding-left: 26px;
 }
 
@@ -164,13 +161,9 @@ label {
     margin-right: 20px;
 }
 
-.sender-logout .btn-wrap {
+.sender-logout .sender-btn-wrap {
     flex-grow: 1;
     justify-content: flex-end;
-}
-
-.mb-10 {
-    margin-bottom: 10px !important;
 }
 
 .sender-form-thumbnail {
@@ -207,11 +200,11 @@ label {
     border: none;
 }
 
-.sender-cta-button.is-medium {
+.sender-cta-button.sender-medium {
     padding: 12px 20px;
 }
 
-.sender-cta-button.is-large {
+.sender-cta-button.sender-large {
     font-size: 15px;
     padding: 15px 20px;
     line-height: 20px;
@@ -229,7 +222,7 @@ label {
     margin-bottom: 5px;
 }
 
-input, select.sender-woo-lists {
+input.sender-input, select.sender-woo-lists {
     margin-left: 0;
     margin-right: 0;
     font-size: 13px;
@@ -246,21 +239,21 @@ input.sender-text-input {
     max-width: 100%;
 }
 
-input::-webkit-input-placeholder {
+input.sender-input::-webkit-input-placeholder {
     color: #999;
 }
 
-input::-moz-placeholder {
-    color: #999;
-    opacity: 1;
-}
-
-input:-moz-placeholder {
+input.sender-input::-moz-placeholder {
     color: #999;
     opacity: 1;
 }
 
-input:-ms-input-placeholder {
+input.sender-input:-moz-placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+input.sender-input:-ms-input-placeholder {
     color: #999;
 }
 
@@ -269,12 +262,9 @@ input.sender-text-input:hover {
     border-color: #aaa;
 }
 
-.required-api-key {
+.sender-box.sender-api-key {
     background: white;
     max-width: 100%;
-}
-
-.sender-box.required-api-key {
     padding: 30px 30px 20px;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
 }
@@ -329,13 +319,13 @@ a.sender-link:hover {
     background: white;
 }
 
-.sender-box:not(.required-api-key) {
+.sender-box:not(.sender-api-key) {
     border: 1px solid #ddd;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, .1);
     padding: 20px 20px 0;
 }
 
-select:disabled {
+select.sender-woo-lists:disabled {
     opacity: 1;
 }
 
@@ -358,7 +348,7 @@ select:disabled {
     height: 40px;
 }
 
-.dropdown-wrap .sender-select-wrap::after {
+.sender-dropdown-wrap .sender-select-wrap::after {
     height: 0;
     width: 0;
     border-left: 5px solid transparent;
@@ -373,7 +363,7 @@ select:disabled {
     position: absolute;
 }
 
-.dropdown-wrap.disabled .sender-select-wrap {
+.sender-dropdown-wrap.sender-disabled .sender-select-wrap {
     opacity: 0.7;
 }
 @-moz-document url-prefix(){
@@ -389,7 +379,7 @@ select.sender-woo-lists:focus {
     box-shadow: none !important;
 }
 
-input[type="checkbox"] {
+.sender-checkbox {
     position: absolute;
     left: 0;
     opacity: 0;
@@ -397,20 +387,20 @@ input[type="checkbox"] {
 }
 
 /* Text color for the label */
-label.checkbox-label {
+label.sender-checkbox-label {
     line-height: 18px;
     padding-left: 30px;
     top: 1px;
     cursor: pointer;
 }
 
-input[type="checkbox"] + .visible-checkbox {
+.sender-checkbox + .sender-visible-checkbox {
     cursor: pointer;
     color: black;
 }
 
 /* Checkbox un-checked style */
-.visible-checkbox {
+.sender-visible-checkbox {
     content: '';
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -423,15 +413,15 @@ input[type="checkbox"] + .visible-checkbox {
 }
 
 /* Adding a dotted border around the active tabbed-into checkbox */
-input[type="checkbox"]:focus + .visible-checkbox,
-input[type="checkbox"] + .visible-checkbox:hover {
+.sender-checkbox:focus + .sender-visible-checkbox,
+.sender-checkbox + .sender-visible-checkbox:hover {
     /* Visible in the full-color space */
     box-shadow: none;
     outline: none;
 }
 /* Checked checkbox style (in this case the background is green #e7ffba, change this to change the color) */
 
-input[type="checkbox"]:checked + .visible-checkbox {
+.sender-checkbox:checked + .sender-visible-checkbox {
     /* NOTE: Replace the url with a path to an SVG of a checkmark to get a checkmark icon */
     /* background-image: url('/wp-content/plugins/sender/assets/images/white_check.png'); */
     background-repeat: no-repeat;
@@ -444,7 +434,7 @@ input[type="checkbox"]:checked + .visible-checkbox {
 }
 
 /* Disabled checkbox styles */
-input[type="checkbox"]:disabled + .visible-checkbox {
+.sender-checkbox:disabled + .sender-visible-checkbox {
     cursor: default;
     color: black;
     opacity: 0.5;
@@ -493,6 +483,6 @@ input[type="checkbox"]:disabled + .visible-checkbox {
     background-position: center center;
     background-size: contain;
 }
-.display-none {
+.sender-d-none {
     display:none;
 }

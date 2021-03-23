@@ -1,8 +1,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
 <h3>Select form</h3>
-<label class="display-none" for="<?php echo esc_attr($this->get_field_id( 'form' )); ?>">Select form</label>
-<select class="display-none sender-invisible-form-select" id="<?php echo esc_attr($this->get_field_id( 'form' )); ?>" name="<?php echo esc_attr($this->get_field_name( 'form' )); ?>" class="widefat" style="width:100%;">
+<label class="sender-d-none" for="<?php echo esc_attr($this->get_field_id( 'form' )); ?>">Select form</label>
+<select class="sender-d-none sender-invisible-form-select" id="<?php echo esc_attr($this->get_field_id( 'form' )); ?>" name="<?php echo esc_attr($this->get_field_name( 'form' )); ?>" class="widefat" style="width:100%;">
 	<option disabled selected>Select your form</option>
 	<?php
 	foreach($forms as $form) {
