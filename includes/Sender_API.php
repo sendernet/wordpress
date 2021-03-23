@@ -37,7 +37,7 @@ class Sender_API
 
 	public function senderGetForms()
 	{
-		$data = wp_remote_request($this->senderBaseUrl . 'forms?type=embed&is_active=1', $this->senderBaseRequestArguments());
+		$data = wp_remote_request($this->senderBaseUrl . 'forms?type=embed&is_active=1&limit=100', $this->senderBaseRequestArguments());
 		return $this->senderBuildResponse($data);
 	}
 
