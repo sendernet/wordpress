@@ -25,5 +25,5 @@ deploy:
     script: #todo deploy to 
         - cd sender-net-automated-emails
         - svn add --force trunk/*
-        - ls -la
+        - svn cleanup 
         - svn ci -m 'Minor update'
