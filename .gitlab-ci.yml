@@ -1,0 +1,25 @@
+stages:
+    - pull-wordpress-svn
+    - clean-up
+    - move-to-svn
+    - deploy
+
+pull-wordpress-svn:
+    stage: pull-wordpress-svn
+    script: 
+        - svn co https://plugins.svn.wordpress.org/sender-net-automated-emails
+
+clean-up:
+    stage: clean-up
+    script: 
+        - rm .idea -rf
+        - rm .git -rf
+move-to-svn:
+    stage: move-to-svn
+    script:
+        - rsync -a --exclude 'sender-net-automated-emails' . sender-net-automated-emails/trunk/
+
+
+deploy:
+    stage: deploy
+    script: #todo deploy to 
