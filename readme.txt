@@ -47,8 +47,6 @@ All features available on Sender are accessible and easy to use even for those w
 
 = Installation =
 
-INSTALLATION
-
 1. Install using the WordPress built-in Plugin installer, or Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
 2. Active Sender plugin through the "Plugins" menu in Wordpress admin.
 3. Click on "Sender.net" in the left side menu.
