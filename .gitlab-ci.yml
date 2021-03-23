@@ -7,7 +7,7 @@ cache:
     untracked: true
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-        - .sender-net-automated-emails/
+        - sender-net-automated-emails
 
 pull-wordpress-svn:
     stage: pull-wordpress-svn
@@ -23,4 +23,7 @@ move-to-svn:
 deploy:
     stage: deploy
     script: #todo deploy to 
+        - cd sender-net-automated-emails
+        - svn add trunk/*
         - ls -la
+        - svn ci -m 'Minor update' --username $SENDER_WP_SVN_USER --password "$SENDER_WP_SVN_PASS"
