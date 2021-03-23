@@ -22,11 +22,8 @@ move-to-svn:
 
 deploy:
     stage: deploy
-    script: #todo deploy to
-        - echo $CI_COMMIT_MESSAGE
-        - echo ${CI_COMMIT_MESSAGE}
-        - echo '${CI_COMMIT_MESSAGE}'
-        - echo '$CI_COMMIT_MESSAGE'
+    script:
+        - echo "$CI_COMMIT_MESSAGE"
 #        - cd sender-net-automated-emails
 #        - svn add --force trunk/*
 #        - svn cleanup
