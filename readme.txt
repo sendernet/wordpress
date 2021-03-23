@@ -55,3 +55,8 @@ INSTALLATION
 4. Enter your API key: go to Sender app settings -> Select API access tokens -> Create API token (valid: Forever) -> Copy token code and insert to Wordpress plugin page.
 5. Select "Enable tracking" and your list, which you can create on Sender app.
 6. That's it. Now you can use Sender platform with Wordpress to send your emails.
+
+== Changelog ==
+
+= 2.0.2 - 2021-03-23 =
+* Tweak: Minor bug fixes
