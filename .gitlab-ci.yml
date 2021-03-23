@@ -1,23 +1,23 @@
 stages:
     - pull-wordpress-svn
-    - clean-up
     - move-to-svn
     - deploy
+
+cache:
+    untracked: true
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+        - .sender-net-automated-emails/
 
 pull-wordpress-svn:
     stage: pull-wordpress-svn
     script: 
         - svn co https://plugins.svn.wordpress.org/sender-net-automated-emails
 
-clean-up:
-    stage: clean-up
-    script: 
-        - rm .idea -rf
-        - rm .git -rf
 move-to-svn:
     stage: move-to-svn
     script:
-        - rsync -a --exclude 'sender-net-automated-emails' . sender-net-automated-emails/trunk/
+        - rsync -a --exclude .git --exclude .idea --exclude 'sender-net-automated-emails' . sender-net-automated-emails/trunk/
 
 
 deploy:
