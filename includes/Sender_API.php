@@ -126,7 +126,7 @@ class Sender_API
 			];
 
 			if ($list) {
-				$data['list_id'] = (int) $list;
+				$data['list_id'] = $list;
 			}
 
 			$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
