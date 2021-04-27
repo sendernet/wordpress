@@ -30,7 +30,7 @@
                     }
                 }
 
-                $pName = $product->get_name();
+                $pName = str_replace("\"", '\\"', $product->get_name());
                 $pDescription = str_replace("\"", '\\"', $product->get_description());
                 $pPrice = $product->get_regular_price();
                 $pCurrency = get_option('woocommerce_currency');

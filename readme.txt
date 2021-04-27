@@ -10,7 +10,9 @@ URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-Sender.net is an email marketing platform tailored for smaller businesses and e-commerce ventures. Sender is highly dedicated to delivering the best user experience possible and includes features for process automation and boosting email response rates. Our users can create beautiful and optimized emails up to 2 times faster.
+Sender.net is an email marketing platform tailored for smaller businesses and e-commerce ventures. [Sender](https://www.sender.net/) is highly dedicated to delivering the best user experience possible and includes features for process automation and boosting email response rates. Our users can create beautiful and optimized emails up to 2 times faster.
+
+https://www.youtube.com/watch?v=wXPvQ2_o9UM
 
 Sender has a “Free Forever” plan that aims to help out new businesses and e-commerce websites: 
 
@@ -18,7 +20,7 @@ Sender has a “Free Forever” plan that aims to help out new businesses and e-
  * Up to 15 000 emails per month
  * 24/7 customer support
 
-Make sending targeted emails simple by integrating Sender into WordPress. Instead of relying on third-party dashboards, you will be able to send any automated emails right from your page such as:
+Make sending targeted emails simple by integrating Sender into WordPress. Instead of relying on third-party dashboards, you will be able to [send any automated emails](https://www.sender.net/email-automation/?utm_source=wordpress&utm_medium=description&utm_campaign=link) right from your page such as:
 
  * Abandoned cart emails
  * Welcome emails
@@ -27,15 +29,28 @@ Make sending targeted emails simple by integrating Sender into WordPress. Instea
  * Shipping information emails
  * Any other event-based emails
 
-There are additional features available after joining Sender and integrating our plugin into WordPress. Sender automatically retrieves important data from your website or e-commerce platform, allowing you to:
+There are additional [features](https://www.sender.net/features/?utm_source=wordpress&utm_medium=description&utm_campaign=link) available after joining Sender and integrating our plugin into WordPress. Our plugin retrieves important data from your website or e-commerce platform, allowing you to:
 
  * Manage client profiles and data.
  * Create email campaigns.
- * Use our Drag & Drop email builder.
- * Create newsletter signup forms and pop-ups.
+ * [Use our Drag & Drop email builder.](https://www.sender.net/create-emails/)
+ * [Create newsletter signup forms and pop-ups.](https://www.sender.net/audience/)
  * Send promotional offers and newsletters.
 
-All features available on Sender are accessible and easy to use even for those without any technical experience.
+Additionally, Sender automatically installs the necessary form and pop-up snippets, making all the features accessible and easy to use even for those without any technical experience.
+
+== Screenshots ==
+1. Create sophisticated workflows, sit back and watch
+2. Compose stunning emails in a heartbeat
+3. Grow your audience with newsletter signup forms & pop-ups
+4. Compose stunning emails in a heartbeat
+5. Recover your abandoned carts
+
+== Frequently Asked Questions ==
+
+= How can I reach Sender support? =
+
+Our customer support team is always ready to help you with your day-to-day tasks, so don’t hesitate to [contact us](https://www.sender.net/contact-us/). We don’t just direct you to a self-serving FAQ page when what you really need is a straightforward answer. Here you can find our [Help Center](https://help.sender.net/). Live chat working 24/7.
 
 == Installation ==
 
