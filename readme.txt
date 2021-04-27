@@ -73,3 +73,5 @@ Our customer support team is always ready to help you with your day-to-day tasks
 
 = 2.0.2 - 2021-03-23 =
 * Tweak: Minor bug fixes
+= 2.0.3 - 2021-04-27 =
+* Tweak: Fixed bug not adding to list
