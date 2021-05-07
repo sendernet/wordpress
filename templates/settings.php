@@ -91,7 +91,7 @@
 
                             <div class="sender-option sender-mb-20">
                                 <div class="sender-dropdown-wrap">
-                                    <label class="sender-label sender-select-label sender-form-label" for="sender_customers_list">Save "Guest Checkouts" to:</label>
+                                    <label class="sender-label sender-select-label sender-form-label" for="sender_customers_list">Save "Customers who made a purchase" to:</label>
                                     <div class="sender-select-wrap sender-p-relative">
                                         <select form="sender-form-settings" class="sender-woo-lists sender-br-5" name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
                                             echo 'disabled';
@@ -107,7 +107,7 @@
 
                             <div class="sender-option sender-mb-20">
                                 <div class="sender-dropdown-wrap">
-                                    <label class="sender-label sender-select-label sender-form-label" for="sender_registration_list">Save "Customers accounts" to:</label>
+                                    <label class="sender-label sender-select-label sender-form-label" for="sender_registration_list">Save "New registrations" to:</label>
                                     <div class="sender-select-wrap sender-p-relative">
                                         <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
                                             echo 'disabled';
