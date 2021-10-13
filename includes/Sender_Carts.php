@@ -55,7 +55,7 @@ class Sender_Carts
 			"external_id" => $cart->id,
 			"url"         => wc_get_cart_url() . '&hash=' . $cart->id,
 			"currency"    => 'EUR',
-			"grand_total" => $total,
+			"order_total" => $total,
 			"products"    => [],
 		];
 
