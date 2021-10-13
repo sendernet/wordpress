@@ -8,7 +8,7 @@
    Plugin Name: Sender.net email marketing
    Plugin URI: https://sender.net
    description: Sender email marketing tool
-   Version: 2.0.3
+   Version: 2.0.4
    Author: Sender
    Author URI: https://sender.net
    License: GPL2
