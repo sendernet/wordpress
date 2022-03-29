@@ -81,6 +81,9 @@ class Sender_Automated_Emails
 		foreach ($this->availableSettings as $name => $defaultValue) {
 			if (isset($updates[$name])) {
 				update_option($name, $updates[$name]);
+                if ($name === 'sender_api_key'){
+                    $this->senderApi->senderAddStore();
+                }
 			}
 		}
 	}

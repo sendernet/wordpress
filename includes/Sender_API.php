@@ -165,4 +165,19 @@ class Sender_API
 		return json_decode($response['body']);
 	}
 
+    public function senderAddStore()
+    {
+        $storeParams = [
+            'domain' => get_site_url(),
+            'name' => get_bloginfo('name'),
+            'type' => 'wordpress'
+        ];
+
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($storeParams)]);
+
+        $response = wp_remote_post($this->senderBaseUrl . 'stores', $params);
+
+        return $this->senderBuildResponse($response);
+    }
+
 }
