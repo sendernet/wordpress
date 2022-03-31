@@ -13,6 +13,7 @@ class Sender_Automated_Emails
         'sender_account_message'    => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
+        'sender_store_register'     => false,
 	];
 
 	public $senderBaseFile;
@@ -93,6 +94,10 @@ class Sender_Automated_Emails
 		foreach ($this->availableSettings as $name => $defaultValue) {
 			if (!get_option($name)) {
 				add_option($name, $defaultValue);
+                if ($name === 'sender_store_register'){
+                    $this->senderApi->senderAddStore();
+                    update_option('sender_store_register', true);
+                }
 			}
 		}
 		return $this;
@@ -103,6 +108,7 @@ class Sender_Automated_Emails
 		if (!$this->senderApiKey()) {
 			update_option('sender_account_message', false);
 			update_option('sender_resource_key', false);
+			update_option('sender_store_register', false);
 			return false;
 		}
 
@@ -110,6 +116,7 @@ class Sender_Automated_Emails
 
 		if(isset($user->message)) {
 			update_option('sender_api_key', false);
+            update_option('sender_store_register', false);
 			update_option('sender_account_message', $user->message);
 			update_option('sender_resource_key', false);
 			return false;
