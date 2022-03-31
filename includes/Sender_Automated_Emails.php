@@ -84,6 +84,7 @@ class Sender_Automated_Emails
 				update_option($name, $updates[$name]);
                 if ($name === 'sender_api_key'){
                     $this->senderApi->senderAddStore();
+                    update_option('sender_store_register', true);
                 }
 			}
 		}
