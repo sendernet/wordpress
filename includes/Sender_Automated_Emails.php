@@ -82,10 +82,6 @@ class Sender_Automated_Emails
 		foreach ($this->availableSettings as $name => $defaultValue) {
 			if (isset($updates[$name])) {
 				update_option($name, $updates[$name]);
-                if ($name === 'sender_api_key'){
-                    $this->senderApi->senderAddStore();
-                    update_option('sender_store_register', true);
-                }
 			}
 		}
 	}
@@ -95,10 +91,6 @@ class Sender_Automated_Emails
 		foreach ($this->availableSettings as $name => $defaultValue) {
 			if (!get_option($name)) {
 				add_option($name, $defaultValue);
-                if ($name === 'sender_store_register'){
-                    $this->senderApi->senderAddStore();
-                    update_option('sender_store_register', true);
-                }
 			}
 		}
 		return $this;
@@ -125,6 +117,12 @@ class Sender_Automated_Emails
 
 		update_option('sender_resource_key', $user->account->resource_key);
 		update_option('sender_account_message', false);
+
+        if (get_option('sender_store_register') == false){
+            if ($this->senderApi->senderAddStore()) {
+                update_option('sender_store_register', true);
+            }
+        }
 
 		return true;
 	}

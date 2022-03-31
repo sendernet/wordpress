@@ -177,6 +177,10 @@ class Sender_API
 
         $response = wp_remote_post($this->senderBaseUrl . 'stores', $params);
 
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
         return $this->senderBuildResponse($response);
     }
 
