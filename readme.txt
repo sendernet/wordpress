@@ -77,5 +77,5 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Tweak: Fixed bug not adding to list
 = 2.0.4 - 2021-10-13 =
 * Tweak: Fixed bug not correct order total condition validation
-= 2.0.5 - 2022-03-29 =
+= 2.0.5 - 2022-04-05 =
 * Tweak: Adding store in sender app
