@@ -119,7 +119,9 @@ class Sender_Automated_Emails
 
         if (get_option('sender_store_register') == false){
             if ($store = $this->senderApi->senderAddStore()) {
-                update_option('sender_store_register', $store->data->id);
+                if (isset($store->data, $store->data->id)) {
+                    update_option('sender_store_register', $store->data->id);
+                }
             }
         }
 
