@@ -50,7 +50,8 @@ class Sender_Templates_Loader
 		if ($apiKey) {
 			$user = $this->sender->senderApi->senderGetAccount();
 			$groups = $this->sender->senderApi->senderGetGroups()->data;
-		}
+            update_option('sender_stored_api_key', $apiKey);
+        }
 
 		require_once('settings.php');
 	}
