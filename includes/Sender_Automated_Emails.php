@@ -118,11 +118,7 @@ class Sender_Automated_Emails
 		update_option('sender_account_message', false);
 
         if (get_option('sender_store_register') == false){
-            if ($store = $this->senderApi->senderAddStore()) {
-                if (isset($store->data, $store->data->id)) {
-                    update_option('sender_store_register', $store->data->id);
-                }
-            }
+            $this->senderStore();
         }
 
 		return true;
@@ -229,6 +225,14 @@ class Sender_Automated_Emails
     public function senderInitStyles()
     {
         wp_enqueue_style('sender-styles', plugin_dir_url( $this->senderBaseFile). 'styles/settings.css');
+    }
+
+    public function senderStore()
+    {
+        $store = $this->senderApi->senderAddStore();
+        if (isset($store->data, $store->data->id)) {
+            update_option('sender_store_register', $store->data->id);
+        }
     }
 
 }
