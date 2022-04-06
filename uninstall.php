@@ -16,8 +16,8 @@
         'sender_customers_list',
         'sender_registration_list',
         'sender_account_message',
-        'sender_stored_api_key',
         'sender_store_register',
+        'sender_account_disconnected'
     ];
 
     global $wpdb;

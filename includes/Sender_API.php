@@ -190,7 +190,7 @@ class Sender_API
             'headers' => [
                 'Content-Type'  => 'application/json',
                 'Accept'        => 'application/json',
-                'Authorization' => 'Bearer ' . get_option('sender_stored_api_key'),
+                'Authorization' => 'Bearer ' . get_option('sender_api_key'),
             ],
             'method' => 'DELETE'
         ];

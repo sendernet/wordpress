@@ -14,7 +14,7 @@ class Sender_Automated_Emails
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
         'sender_store_register'     => false,
-        'sender_stored_api_key'     => false
+        'sender_account_disconnected' => false,
 	];
 
 	public $senderBaseFile;
@@ -42,7 +42,7 @@ class Sender_Automated_Emails
         $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
 
-		if (!$this->senderApiKey()) {
+		if (!$this->senderApiKey() || get_option('sender_account_disconnected')) {
 			return;
 		}
 
@@ -116,10 +116,6 @@ class Sender_Automated_Emails
 
 		update_option('sender_resource_key', $user->account->resource_key);
 		update_option('sender_account_message', false);
-
-        if (get_option('sender_store_register') == false){
-            $this->senderStore();
-        }
 
 		return true;
 	}
