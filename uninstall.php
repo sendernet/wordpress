@@ -5,16 +5,25 @@
         exit;
     }
 
+    if (!class_exists('Sender_API')) {
+        require_once 'includes/Sender_API.php';
+    }
+
     $availableSettings = [
         'sender_api_key',
         'sender_resource_key',
         'sender_allow_tracking',
         'sender_customers_list',
         'sender_registration_list',
-        'sender_account_message'
+        'sender_account_message',
+        'sender_store_register',
+        'sender_account_disconnected'
     ];
 
     global $wpdb;
+
+    $senderApi = new Sender_API();
+    $senderApi->senderDeleteStore();
 
     $tables = [
       "sender_automated_emails_carts",
