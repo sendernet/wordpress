@@ -1,8 +1,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<div class="sender-container <?php if(!$apiKey) { echo 'sender-single-column sender-d-flex'; } ?>">
+<div class="sender-container <?php if(!$apiKey || get_option('sender_account_disconnected')) { echo 'sender-single-column sender-d-flex'; } ?>">
     <div class="sender-flex-column">
-		<?php if (!$apiKey) { ?>
+		<?php if (!$apiKey || get_option('sender_account_disconnected')) { ?>
             <form method="post" action='' class="sender-box sender-br-5 sender-api-key sender-d-flex sender-flex-dir-column" novalidate="novalidate">
                 <div class="sender-login-image">
                     <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.svg'; ?>" class="sender-logo" alt="Sender logo">
@@ -20,6 +20,8 @@
                     </div>  
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input sender-mb-20 sender-br-5">
+                    <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value=""
+                           class="sender-input sender-text-input sender-br-5">
                     <input type="submit" name="submit" id="submit" class="sender-cta-button sender-large sender-mb-20 sender-br-5"
                            value="Begin">
 
@@ -63,7 +65,7 @@
                         </div>
                         <div class="sender-btn-wrap sender-d-flex">
                             <form method="post" action='' class="sender-mb-20">
-                                <input name="sender_api_key" type="hidden" id="sender_api_key" value=""
+                                <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value="true"
                                     class="sender-input sender-text-input sender-br-5">
                                 <input type="submit" name="submit" id="submit" class="sender-cta-button sender-medium sender-br-5"
                                     value="Change user">

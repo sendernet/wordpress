@@ -47,10 +47,11 @@ class Sender_Templates_Loader
 		$apiKey = get_option( 'sender_api_key' );
 		$wooEnabled = $this->sender->senderIsWooEnabled();
 
-		if ($apiKey) {
+		if ($apiKey && !get_option('sender_account_disconnected')) {
 			$user = $this->sender->senderApi->senderGetAccount();
 			$groups = $this->sender->senderApi->senderGetGroups()->data;
-		}
+            $this->sender->senderStore();
+        }
 
 		require_once('settings.php');
 	}

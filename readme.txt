@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 5.7
 Requires PHP: 5.6
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,3 +77,5 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Tweak: Fixed bug not adding to list
 = 2.0.4 - 2021-10-13 =
 * Tweak: Fixed bug not correct order total condition validation
+= 2.0.5 - 2022-04-05 =
+* Tweak: Adding store in sender app

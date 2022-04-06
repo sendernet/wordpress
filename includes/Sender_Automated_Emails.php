@@ -13,6 +13,8 @@ class Sender_Automated_Emails
         'sender_account_message'    => false,
 		'sender_customers_list'     => 0,
 		'sender_registration_list'  => 0,
+        'sender_store_register'     => false,
+        'sender_account_disconnected' => false,
 	];
 
 	public $senderBaseFile;
@@ -40,7 +42,7 @@ class Sender_Automated_Emails
         $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
 
-		if (!$this->senderApiKey()) {
+		if (!$this->senderApiKey() || get_option('sender_account_disconnected')) {
 			return;
 		}
 
@@ -219,6 +221,14 @@ class Sender_Automated_Emails
     public function senderInitStyles()
     {
         wp_enqueue_style('sender-styles', plugin_dir_url( $this->senderBaseFile). 'styles/settings.css');
+    }
+
+    public function senderStore()
+    {
+        $store = $this->senderApi->senderAddStore();
+        if (isset($store->data, $store->data->id)) {
+            update_option('sender_store_register', $store->data->id);
+        }
     }
 
 }

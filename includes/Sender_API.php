@@ -165,4 +165,43 @@ class Sender_API
 		return json_decode($response['body']);
 	}
 
+    public function senderAddStore()
+    {
+        $storeParams = [
+            'domain' => get_site_url(),
+            'name' => get_bloginfo('name'),
+            'type' => 'wordpress'
+        ];
+
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($storeParams)]);
+
+        $response = wp_remote_post($this->senderBaseUrl . 'stores', $params);
+
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return $this->senderBuildResponse($response);
+    }
+
+    public function senderDeleteStore()
+    {
+        $removingStoreParams =  [
+            'headers' => [
+                'Content-Type'  => 'application/json',
+                'Accept'        => 'application/json',
+                'Authorization' => 'Bearer ' . get_option('sender_api_key'),
+            ],
+            'method' => 'DELETE'
+        ];
+
+        $response = wp_remote_request($this->senderBaseUrl . 'stores/' . get_option('sender_store_register'), $removingStoreParams);
+
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return $this->senderBuildResponse($response);
+    }
+
 }
