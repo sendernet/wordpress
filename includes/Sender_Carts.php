@@ -50,10 +50,19 @@ class Sender_Carts
 		$total = $this->senderGetWoo()->cart->total;
 		$user = (new Sender_User())->find($cart->user_id);
 
+        $baseUrl = wc_get_cart_url();
+        $lastCharacter = substr($baseUrl,-1);
+
+        if (strcmp($lastCharacter, '/') === 0 ) {
+            $cartUrl = rtrim($baseUrl, '/') . '?hash=' . $cart->id;
+        } else {
+            $cartUrl = $baseUrl . '&hash=' . $cart->id;
+        }
+
 		$data = [
 			"visitor_id"  => $user->visitor_id,
 			"external_id" => $cart->id,
-			"url"         => wc_get_cart_url() . '&hash=' . $cart->id,
+			"url"         => $cartUrl,
 			"currency"    => 'EUR',
 			"order_total" => $total,
 			"products"    => [],
