@@ -53,36 +53,6 @@ class Sender_API
 		return $this->senderBuildResponse($data);
 	}
 
-	public function senderConvertCart($params)
-	{
-		$list = get_option('sender_customers_list');
-
-		$wcOrder = wc_get_order($params['orderId']);
-		$email = $wcOrder->get_billing_email();
-		$firstname = $wcOrder->get_billing_first_name();
-		$lastname = $wcOrder->get_billing_last_name();
-
-		$data = [
-			'external_id' => $params['cartId'],
-			'email' => $email,
-			'firstname' => $firstname,
-			'lastname' => $lastname,
-            'resource_key' => $this->senderGetResourceKey()
-		];
-
-		$url = $this->senderStatsBaseUrl . 'carts/' . $params['cartId'] . '/convert';
-
-		if ($list) {
-			$data['list_id'] = $list;
-		}
-
-		$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
-
-		$response = wp_remote_post($url, $params);
-
-		return $this->senderBuildResponse($response);
-	}
-
 	public function senderDeleteCart($wpCartId)
 	{
 		$data = ['resource_key' => $this->senderGetResourceKey()];
@@ -91,15 +61,6 @@ class Sender_API
 
 		return $this->senderBuildResponse($response);
 	}
-
-    public function senderTrackCart(array $cartParams)
-    {
-        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
-
-        $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
-
-        return $this->senderBuildResponse($response);
-    }
 
     public function senderUpdateCart(array $cartParams)
     {

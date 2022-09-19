@@ -18,7 +18,8 @@ class Sender_Carts
 
 	private function senderAddCartsActions()
 	{
-		add_action('woocommerce_checkout_order_processed', [&$this, 'senderConvertCart'], 10, 1);
+        add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
+        add_action( 'woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
 		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
 
 		return $this;
@@ -31,17 +32,41 @@ class Sender_Carts
 		return $this;
 	}
 
-	public function senderConvertCart($orderId)
-	{
-		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
+    public function prepareConvertCart($orderId)
+    {
+        $session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-		$cart = (new Sender_Cart())->findBy('session', $session);
+        $cart = (new Sender_Cart())->findBy('session', $session);
+        $cart->cart_status = '2';
+        $cart->save();
+    }
 
-		$this->sender->senderApi->senderApiShutdownCallback("senderConvertCart", ['cartId' => $cart->id, 'orderId' => $orderId]);
+    public function senderConvertCart($orderId)
+    {
+        $session = $this->senderGetWoo()->session->get_session_cookie()[0];
 
-		$cart->cart_status = '2';
-		$cart->save();
-	}
+        $cart = (new Sender_Cart())->findBy('session', $session);
+        $list = get_option('sender_customers_list');
+        $wcOrder = wc_get_order($orderId);
+        $email = $wcOrder->get_billing_email();
+        $firstname = $wcOrder->get_billing_first_name();
+        $lastname = $wcOrder->get_billing_last_name();
+
+        $cartData = [
+            'external_id' => $cart->id,
+            'email' => $email,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'resource_key' => $this->senderGetResourceKey()
+        ];
+
+        if ($list) {
+            $cartData['list_id'] = $list;
+        }
+
+        add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
+        do_action('wp_head', json_encode($cartData));
+    }
 
 	public function senderPrepareCartData($cart)
 	{
@@ -66,6 +91,7 @@ class Sender_Carts
 			"currency"    => 'EUR',
 			"order_total" => $total,
 			"products"    => [],
+            'resource_key' => $this->senderGetResourceKey()
 		];
 
 		foreach ($items as $item => $values) {
@@ -142,35 +168,35 @@ class Sender_Carts
 
 		$cart = (new Sender_Cart())->findBy('session', $session);
 
-		if (empty($items) && $cart) {
-			$cart->delete();
-			if ($cart->cart_status == "2") {
-				return;
-			}
+        if (empty($items) && $cart) {
+            $cart->delete();
+            if ($cart->cart_status == "2") {
+                return;
+            }
             $this->sender->senderApi->senderApiShutdownCallback("senderDeleteCart", $cart->id);
 
             return;
-		}
+        }
 
-		if ($cart && !empty($items)) {
-			$cart->cart_data = $cartData;
-			$cart->save();
-			$cartData = $this->senderPrepareCartData($cart);
+        if ($cart && !empty($items)) {
+            $cart->cart_data = $cartData;
+            $cart->save();
+            $cartData = $this->senderPrepareCartData($cart);
             $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
-			return;
-		}
+            return;
+        }
 
-		if (!empty($items)) {
-			$newCart = new Sender_Cart();
-			$newCart->cart_data = $cartData;
-			$newCart->user_id = $this->senderGetVisitor()->id;
-			$newCart->session = $session;
-			$newCart->save();
+        if (!empty($items)) {
+            $newCart = new Sender_Cart();
+            $newCart->cart_data = $cartData;
+            $newCart->user_id = $this->senderGetVisitor()->id;
+            $newCart->session = $session;
+            $newCart->save();
+            $cartData = $this->senderPrepareCartData($newCart);
 
-			$cartData = $this->senderPrepareCartData($newCart);
-
-            $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
-		}
+            add_action('wp_head', [&$this, 'addTrackCartScript'], 10, 10);
+            do_action('wp_head', json_encode($cartData));
+        }
 
 	}
 
@@ -243,4 +269,34 @@ class Sender_Carts
 		return $template;
 	}
 
+    public function senderGetResourceKey()
+    {
+        $key = get_option('sender_resource_key');
+
+        if(!$key){
+            $user = $this->senderGetAccount();
+            $key = $user->account->resource_key;
+            update_option('sender_resource_key', $key);
+        }
+
+        return $key;
+    }
+
+    public function addTrackCartScript($cartData)
+    {
+        echo "
+			<script>
+			sender('trackCart', $cartData)
+            </script>
+		";
+    }
+
+    public function addConvertCartScript($cartData)
+    {
+        echo "
+			<script>
+			sender('convertCart', $cartData)
+            </script>
+		";
+    }
 }
