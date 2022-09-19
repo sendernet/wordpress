@@ -169,10 +169,10 @@ class Sender_Carts
 		$cart = (new Sender_Cart())->findBy('session', $session);
 
         if (empty($items) && $cart) {
-            $cart->delete();
             if ($cart->cart_status == "2") {
                 return;
             }
+            $cart->delete();
             $this->sender->senderApi->senderApiShutdownCallback("senderDeleteCart", $cart->id);
 
             return;
