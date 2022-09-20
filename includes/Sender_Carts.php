@@ -51,13 +51,15 @@ class Sender_Carts
         $email = $wcOrder->get_billing_email();
         $firstname = $wcOrder->get_billing_first_name();
         $lastname = $wcOrder->get_billing_last_name();
+        $phone = $wcOrder->get_billing_phone();
 
         $cartData = [
             'external_id' => $cart->id,
             'email' => $email,
             'firstname' => $firstname,
             'lastname' => $lastname,
-            'resource_key' => $this->senderGetResourceKey()
+            'resource_key' => $this->senderGetResourceKey(),
+            'phone' => $phone,
         ];
 
         if ($list) {
