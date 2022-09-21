@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
 class Sender_Carts
 {
 	private $sender;
+    private $senderSessionCookie;
 
 	public function __construct($sender)
 	{
@@ -14,12 +15,17 @@ class Sender_Carts
 
 		$this->senderAddCartsActions()
             ->senderAddCartsFilters();
+        if (!isset($_COOKIE['sender_site_visitor'])) {
+            return false;
+        }
+
+        $this->senderSessionCookie = $_COOKIE['sender_site_visitor'];
 	}
 
 	private function senderAddCartsActions()
 	{
         add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
-        add_action( 'woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
+        add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
 		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
 
 		return $this;
@@ -34,18 +40,15 @@ class Sender_Carts
 
     public function prepareConvertCart($orderId)
     {
-        $session = $this->senderGetWoo()->session->get_session_cookie()[0];
-
-        $cart = (new Sender_Cart())->findBy('session', $session);
+        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
         $cart->cart_status = '2';
         $cart->save();
     }
 
     public function senderConvertCart($orderId)
     {
-        $session = $this->senderGetWoo()->session->get_session_cookie()[0];
+        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
 
-        $cart = (new Sender_Cart())->findBy('session', $session);
         $list = get_option('sender_customers_list');
         $wcOrder = wc_get_order($orderId);
         $email = $wcOrder->get_billing_email();
@@ -166,9 +169,7 @@ class Sender_Carts
 			return;
 		}
 
-		$session = $this->senderGetWoo()->session->get_session_cookie()[0];
-
-		$cart = (new Sender_Cart())->findBy('session', $session);
+        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
 
         if (empty($items) && $cart) {
             if ($cart->cart_status == "2") {
@@ -192,7 +193,7 @@ class Sender_Carts
             $newCart = new Sender_Cart();
             $newCart->cart_data = $cartData;
             $newCart->user_id = $this->senderGetVisitor()->id;
-            $newCart->session = $session;
+            $newCart->session = $this->senderSessionCookie;
             $newCart->save();
             $cartData = $this->senderPrepareCartData($newCart);
 
