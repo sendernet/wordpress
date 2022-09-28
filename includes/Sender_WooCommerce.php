@@ -107,7 +107,7 @@
 
         public function sendCustomersToSender($customers)
         {
-            $list = [get_option('sender_registration_list')];
+            $list = [get_option('sender_customers_list')];
 
             foreach ($customers as $customerId) {
                 $customer = get_user_meta($customerId);
