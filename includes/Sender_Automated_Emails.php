@@ -15,6 +15,7 @@ class Sender_Automated_Emails
 		'sender_registration_list'  => 0,
         'sender_store_register'     => false,
         'sender_account_disconnected' => false,
+        'sender_wocommerce_sync' => 0,
 	];
 
 	public $senderBaseFile;
