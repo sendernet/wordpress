@@ -165,4 +165,16 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
+    public function senderExportData($exportData)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($exportData),  'data_format' => 'body']);
+
+        $response = wp_remote_post($this->senderBaseUrl . 'stores/'. get_option('sender_store_register') .'/import_shop_data', $params);
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return $this->senderBuildResponse($response);
+    }
+
 }

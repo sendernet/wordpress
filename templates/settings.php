@@ -17,7 +17,7 @@
 				<?php } ?>
                     <div class="sender-d-flex">
                         <label for="sender_api_key" class="sender-label sender-form-label">Enter your API key</label>
-                    </div>  
+                    </div>
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input sender-mb-20 sender-br-5">
                     <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value=""
@@ -39,7 +39,7 @@
                             <img src="<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/logo.svg'; ?>"
                             class="sender-logo sender-small"  alt="Sender logo">
                         </div>
-                    
+
                         <div class="sender-username sender-mb-20">
                             <div class="sender-header"><?php echo $user->account->title ?></div>
                         </div>
@@ -131,10 +131,24 @@
                             <div class="sender-btn-wrap sender-d-flex">
                                 <input type="submit" name="submit" id="submit" class="sender-cta-button sender-medium sender-mb-20 sender-br-5"
                                     value="Save">
-                            </div>       
+                            </div>
                         </div>
                     </form>
                 </div>
+                    <div style="margin-top: 40px" class="sender-plugin-settings sender-box sender-br-5 sender-p-relative ">
+                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
+                              id="sender-export-data">
+                            <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync"
+                                       value="0"
+                                       class="sender-input sender-text-input sender-br-5">
+                                <input type="submit" name="submit" id="submit"
+                                       class="sender-cta-button sender-medium sender-br-5"
+                                       value="Sync with Sender">
+                                <span style="padding-left: 15px">Export your customer list to your Sender application</span>
+                            </div>
+                        </form>
+                    </div>
                 <?php } ?>
             </div>
 		<?php } ?>
@@ -147,7 +161,7 @@
     jQuery(document).ready(function() {
         if(checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
-        }        
+        }
     });
 
     checkboxEl.on('change', function (ev){
