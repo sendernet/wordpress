@@ -145,7 +145,7 @@
                                 <input type="submit" name="submit" id="submit"
                                        class="sender-cta-button sender-medium sender-br-5"
                                        value="Sync with Sender">
-                                <span style="padding-left: 15px">Export your customer list to your Sender application</span>
+                                <span style="padding-left: 15px">Sync you shop with Sender application</span>
                             </div>
                         </form>
                     </div>
