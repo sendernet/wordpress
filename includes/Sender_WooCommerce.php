@@ -15,6 +15,7 @@
         if (!get_option('sender_wocommerce_sync')) {
             $this->exportCustomers();
             $this->exportProducts();
+            $this->exportOrders();
         }
 
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
@@ -108,11 +109,11 @@
         public function sendCustomersToSender($customers)
         {
             $list = [get_option('sender_customers_list')];
-
+            $customersExportData = [];
             foreach ($customers as $customerId) {
                 $customer = get_user_meta($customerId);
                 if (isset($customer['billing_email'])) {
-                    $customerListWithMeta[] = [
+                    $customersExportData[] = [
                         'email' => $customer['billing_email'][0],
                         'firstname' => $customer['first_name'][0] ?: null,
                         'lastname' => $customer['last_name'][0] ?: null,
@@ -122,7 +123,7 @@
                 }
             }
 
-            $this->sender->senderApi->senderExportData(['customers' => $customerListWithMeta]);
+            $this->sender->senderApi->senderExportData(['customers' => $customersExportData]);
         }
 
         public function exportProducts()
@@ -156,6 +157,57 @@
             }
 
             $this->sender->senderApi->senderExportData(['products' => $productExportData]);
+
+            return true;
+        }
+
+        public function exportOrders()
+        {
+            global $wpdb;
+            $orders = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_type = 'shop_order'");
+            $ordersExportData = [];
+
+            foreach ($orders as $order) {
+
+                $orderData = [
+                    'status' => $order->post_status,
+                    'updated_at' => $order->post_modified,
+                    'created_at' => $order->post_date,
+                    'remote_id' => $order->ID,
+                    'name' => $order->post_name,
+                    'currency' => get_woocommerce_currency(),
+                ];
+
+                $productsData = $wpdb->get_results("SELECT * FROM wp_wc_order_product_lookup
+            INNER JOIN wp_wc_product_meta_lookup on wp_wc_product_meta_lookup.product_id = wp_wc_order_product_lookup.product_id
+            LEFT JOIN wp_posts on wp_posts.id = wp_wc_order_product_lookup.product_id
+            where wp_wc_order_product_lookup.order_id = $order->ID");
+
+                $orderData['products'] = [];
+                foreach ($productsData as $key => $product) {
+                    $regularPrice = $product->min_price;
+                    $salePrice = $product->max_price;
+
+                    if ($regularPrice <= 0) {
+                        $regularPrice = 1;
+                    }
+
+                    $discount = round(100 - ($salePrice / $regularPrice * 100));
+                    $orderData['price'] = $product->product_net_revenue;
+                    $orderData['products'][$key] = [
+                        'sku' => $product->sku,
+                        'name' => $product->post_title,
+                        'price' => $product->max_price,
+                        'qty' => $product->product_qty,
+                        'discount' => (string)$discount,
+                        'currency' => get_woocommerce_currency(),
+                        'image' => get_the_post_thumbnail_url($product->product_id),
+                    ];
+                }
+
+                $ordersExportData[] = $orderData;
+            }
+            $this->sender->senderApi->senderExportData(['orders' => $ordersExportData]);
 
             return true;
         }
