@@ -7,12 +7,14 @@ if (!defined('ABSPATH')) {
 class Sender_WooCommerce
 {
     private $sender;
+    private $tablePrefix;
 
     public function __construct($sender)
     {
         $this->sender = $sender;
 
         if (!get_option('sender_wocommerce_sync')) {
+            $this->getTablePrefix();
             $this->exportCustomers();
             $this->exportProducts();
             $this->exportOrders();
@@ -129,9 +131,10 @@ class Sender_WooCommerce
     public function exportProducts()
     {
         global $wpdb;
-        $products = $wpdb->get_results("SELECT * FROM wp_posts 
-                      INNER JOIN wp_wc_product_meta_lookup ON wp_wc_product_meta_lookup.product_id = wp_posts.id
-                      WHERE post_type = 'product'");
+        $products = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts 
+                      INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup ON ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'posts.id
+                      WHERE post_type = "product"');
+
         $productExportData = [];
         $currency = get_woocommerce_currency();
         foreach ($products as $product) {
@@ -164,7 +167,7 @@ class Sender_WooCommerce
     public function exportOrders()
     {
         global $wpdb;
-        $orders = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_type = 'shop_order'");
+        $orders = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order"');
 
         $ordersCount = count($orders);
         $chunkSize = 50;
@@ -174,7 +177,9 @@ class Sender_WooCommerce
         $ordersExportData = [];
 
         for ($x = 0; $x <= $loopTimes; $x++) {
-            $chunkedOrders = $wpdb->get_results("SELECT * FROM wp_posts WHERE post_type = 'shop_order' LIMIT $chunkSize OFFSET $ordersExported");
+            $chunkedOrders = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" LIMIT ' . $chunkSize . '
+             OFFSET ' . $ordersExported);
+
             foreach ($chunkedOrders as $order) {
                 $orderData = [
                     'status' => $order->post_status,
@@ -185,10 +190,10 @@ class Sender_WooCommerce
                     'currency' => get_woocommerce_currency(),
                 ];
 
-                $productsData = $wpdb->get_results("SELECT * FROM wp_wc_order_product_lookup
-            INNER JOIN wp_wc_product_meta_lookup on wp_wc_product_meta_lookup.product_id = wp_wc_order_product_lookup.product_id
-            LEFT JOIN wp_posts on wp_posts.id = wp_wc_order_product_lookup.product_id
-            where wp_wc_order_product_lookup.order_id = $order->ID");
+                $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
+            INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup on ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
+            LEFT JOIN ' . $this->tablePrefix . 'posts on ' . $this->tablePrefix . 'posts.id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
+            where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = '.$order->ID);
 
                 $orderData['products'] = [];
                 foreach ($productsData as $key => $product) {
@@ -219,5 +224,11 @@ class Sender_WooCommerce
         }
 
         return true;
+    }
+
+    public function getTablePrefix()
+    {
+        global $wpdb;
+        $this->tablePrefix = $wpdb->prefix;
     }
 }
