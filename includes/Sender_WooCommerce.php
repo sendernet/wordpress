@@ -196,6 +196,7 @@ class Sender_WooCommerce
             where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = '.$order->ID);
 
                 $orderData['products'] = [];
+                $orderPrice = 0;
                 foreach ($productsData as $key => $product) {
                     $regularPrice = $product->min_price;
                     $salePrice = $product->max_price;
@@ -205,7 +206,7 @@ class Sender_WooCommerce
                     }
 
                     $discount = round(100 - ($salePrice / $regularPrice * 100));
-                    $orderData['price'] = $product->product_net_revenue;
+                    $orderPrice += $product->max_price * $product->product_qty;
                     $orderData['products'][$key] = [
                         'sku' => $product->sku,
                         'name' => $product->post_title,
@@ -217,6 +218,7 @@ class Sender_WooCommerce
                     ];
                 }
 
+                $orderData['price'] = $orderPrice;
                 $ordersExportData[] = $orderData;
             }
             $this->sender->senderApi->senderExportData(['orders' => $ordersExportData]);
