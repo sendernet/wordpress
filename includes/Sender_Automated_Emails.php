@@ -43,9 +43,14 @@ class Sender_Automated_Emails
         $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
 
-		if (!$this->senderApiKey() || get_option('sender_account_disconnected')) {
+		if (!$this->senderApiKey() || get_option('sender_account_disconnected') || !get_option('sender_store_register')) {
 			return;
 		}
+
+        if (!$this->senderApi->senderGetStore()){
+            update_option('sender_account_disconnected', true);
+            return;
+        };
 
        if($this->senderIsWooEnabled()){
            if (!class_exists('Sender_User')) {

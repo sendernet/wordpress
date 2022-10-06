@@ -126,6 +126,17 @@ class Sender_API
 		return json_decode($response['body']);
 	}
 
+    public function senderGetStore()
+    {
+        $response = wp_remote_request($this->senderBaseUrl  . 'stores/' . get_option('sender_store_register'), $this->senderBaseRequestArguments());
+
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function senderAddStore()
     {
         $storeParams = [
