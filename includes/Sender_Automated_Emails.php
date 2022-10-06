@@ -79,14 +79,18 @@ class Sender_Automated_Emails
 		return $this;
 	}
 
-	public function updateSettings($updates)
-	{
-		foreach ($this->availableSettings as $name => $defaultValue) {
-			if (isset($updates[$name])) {
-				update_option($name, $updates[$name]);
-			}
-		}
-	}
+    public function updateSettings($updates)
+    {
+        foreach ($this->availableSettings as $name => $defaultValue) {
+            if (isset($updates[$name])) {
+                update_option($name, $updates[$name]);
+                if ($name === 'sender_account_disconnected' && !empty($updates[$name])){
+                    update_option('sender_wocommerce_sync', 0);
+                    $this->senderApi->senderDeleteStore();
+                };
+            }
+        }
+    }
 
 	private function senderSetupOptions()
 	{
