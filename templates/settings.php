@@ -145,7 +145,7 @@
                                 <input type="submit" name="submit" id="submit"
                                        class="sender-cta-button sender-medium sender-br-5"
                                        value="Sync with Sender">
-                                <span style="padding-left: 15px">Sync you shop with Sender application</span>
+                                <span style="padding-left: 15px">Import all subscribers, orders and products from your WooCommerce store into your Sender account.</span>
                             </div>
                         </form>
                     </div>
