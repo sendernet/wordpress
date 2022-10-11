@@ -46,6 +46,7 @@ class Sender_Repository
             `updated` int(11) NOT NULL,
             `wp_user_id` int(11),
             `visitor_id` varchar(32),
+            `sender_newsletter` TINYINT(1)
             PRIMARY KEY (`id`)
             ) $wcap_collate";
 
@@ -53,7 +54,8 @@ class Sender_Repository
 
         $map = [
             'visitor_id' => 'varchar(32)',
-            'wp_user_id' => 'int(11)'
+            'wp_user_id' => 'int(11)',
+            'sender_newsletter' => 'TINYINT(1)'
         ];
 
         foreach ($map as $column => $type)

@@ -90,11 +90,32 @@ class Sender_API
 				$data['list_id'] = $list;
 			}
 
-			$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
-			$response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
+            if (get_user_meta($userId, 'sender_newsletter', true)) {
+                $data['newsletter'] = get_user_meta($userId, 'sender_newsletter', true);
+            }
+
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+            $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
+
+            return $this->senderBuildResponse($response);
+        }
+    }
+
+    public function senderAddToNewsletterNotRegisteredUsers($userData)
+    {
+        if (isset($userData['email'])) {
+            $data = [
+                'email' => $userData['email'],
+                'firstname' => $userData['first_name'],
+                'lastname' => $userData['last_name'],
+                'visitor_id' => $_COOKIE['sender_site_visitor'],
+                'newsletter' => (boolean)$userData['newsletter']
+            ];
+
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+            $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
 			return $this->senderBuildResponse($response);
-
 		}
 	}
 

@@ -28,12 +28,34 @@ class Sender_Carts
         add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
 		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
 
-		return $this;
-	}
+        add_action( 'woocommerce_review_order_before_submit', [&$this,'senderAddNewsletterCheck'],10 );
+        add_action( 'woocommerce_edit_account_form', [&$this,'senderAddNewsletterCheck'] );
 
-	private function senderAddCartsFilters()
-	{
-		add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
+        add_action( 'woocommerce_checkout_update_order_meta', [&$this,'senderAddNewsletterFromOrder']);
+        add_action( 'woocommerce_save_account_details', [&$this,'senderAddNewsletterCheckFromAccount'], 10, 1 );
+
+        return $this;
+    }
+
+    public function senderAddNewsletterFromOrder($orderId)
+    {
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            add_post_meta($orderId, 'sender_newsletter', sanitize_text_field($_POST['sender_newsletter']));
+        }
+    }
+
+    public function senderAddNewsletterCheckFromAccount($userId)
+    {
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_user_meta($userId, 'sender_newsletter', 1);
+        }else{
+            update_user_meta($userId, 'sender_newsletter', 0);
+        }
+    }
+
+    private function senderAddCartsFilters()
+    {
+        add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
 
 		return $this;
 	}
@@ -67,6 +89,31 @@ class Sender_Carts
 
         if ($list) {
             $cartData['list_id'] = $list;
+        }
+
+        $metaOrderNewsletter = get_post_meta($orderId, 'sender_newsletter', true);
+        if ($metaOrderNewsletter) {
+            $wpUserId = get_current_user_id();
+            if ($wpUserId) {
+                update_user_meta($wpUserId, 'sender_newsletter', 1);
+                $this->trackUser();
+            } else {
+                $user = (new Sender_User())->findBy('visitor_id', $this->senderSessionCookie);
+                $user->email = $email;
+                $user->first_name = $firstname;
+                $user->last_name = $lastname;
+                $user->sender_newsletter = 1;
+
+                $userData = [
+                    'email' => $email,
+                    'first_name' => $firstname,
+                    'last_name' => $lastname,
+                    'newsletter' => $user->sender_newsletter
+                ];
+
+                $this->sender->senderApi->senderApiShutdownCallback("senderAddToNewsletterNotRegisteredUsers", $userData);
+                $user->save();
+            }
         }
 
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
@@ -302,4 +349,19 @@ class Sender_Carts
             </script>
 		";
     }
+
+    /**
+     * @return void
+     */
+    public function senderAddNewsletterCheck() {
+        $currentValue = get_user_meta( get_current_user_id(),'sender_newsletter', true);
+        woocommerce_form_field( 'sender_newsletter', array(
+            'type' => 'checkbox',
+            'class' => array('form-row mycheckbox'),
+            'label_class' => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
+            'input_class' => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
+            'label'         => 'Subscriber to our newsletter',
+        ), $currentValue);
+    }
+
 }
