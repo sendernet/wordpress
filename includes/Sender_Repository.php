@@ -46,7 +46,7 @@ class Sender_Repository
             `updated` int(11) NOT NULL,
             `wp_user_id` int(11),
             `visitor_id` varchar(32),
-            `sender_newsletter` TINYINT(1)
+            `sender_newsletter` TINYINT(1),
             PRIMARY KEY (`id`)
             ) $wcap_collate";
 
