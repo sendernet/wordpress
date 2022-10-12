@@ -15,6 +15,7 @@ class Sender_Automated_Emails
 		'sender_registration_list'  => 0,
         'sender_store_register'     => false,
         'sender_account_disconnected' => false,
+        'sender_wocommerce_sync' => 0,
 	];
 
 	public $senderBaseFile;
@@ -42,9 +43,14 @@ class Sender_Automated_Emails
         $this->senderEnqueueStyles();
 		$this->senderCreateSettingsTemplates();
 
-		if (!$this->senderApiKey() || get_option('sender_account_disconnected')) {
+		if (!$this->senderApiKey() || get_option('sender_account_disconnected') || !get_option('sender_store_register')) {
 			return;
 		}
+
+        if (!$this->senderApi->senderGetStore()){
+            update_option('sender_account_disconnected', true);
+            return;
+        };
 
        if($this->senderIsWooEnabled()){
            if (!class_exists('Sender_User')) {
@@ -78,14 +84,18 @@ class Sender_Automated_Emails
 		return $this;
 	}
 
-	public function updateSettings($updates)
-	{
-		foreach ($this->availableSettings as $name => $defaultValue) {
-			if (isset($updates[$name])) {
-				update_option($name, $updates[$name]);
-			}
-		}
-	}
+    public function updateSettings($updates)
+    {
+        foreach ($this->availableSettings as $name => $defaultValue) {
+            if (isset($updates[$name])) {
+                update_option($name, $updates[$name]);
+                if ($name === 'sender_account_disconnected' && !empty($updates[$name])){
+                    update_option('sender_wocommerce_sync', 0);
+                    $this->senderApi->senderDeleteStore();
+                };
+            }
+        }
+    }
 
 	private function senderSetupOptions()
 	{

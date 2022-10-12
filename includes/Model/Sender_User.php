@@ -29,4 +29,5 @@ class Sender_User extends Sender_Model
 
 	protected $wp_user_id;
 
+    protected $sender_newsletter;
 }

@@ -2,9 +2,9 @@
 Contributors: augustask
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 5.7
+Tested up to: 6.0.2
 Requires PHP: 5.6
-Stable tag: 2.0.6
+Stable tag: 2.1.0
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -81,3 +81,8 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Tweak: Adding store in sender app
 = 2.0.6 - 2022-05-09 =
 * Tweak: Bug on cart url parameter
+= 2.1.0 - 2022-10-12 =
+* Javascript to handle cart creation and conversion
+* WordPress version compatibility updated
+* Data export to sender app in Connected Stores tab
+* Subscribe to newsletter option for checkout and account details

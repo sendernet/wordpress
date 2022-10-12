@@ -53,36 +53,6 @@ class Sender_API
 		return $this->senderBuildResponse($data);
 	}
 
-	public function senderConvertCart($params)
-	{
-		$list = get_option('sender_customers_list');
-
-		$wcOrder = wc_get_order($params['orderId']);
-		$email = $wcOrder->get_billing_email();
-		$firstname = $wcOrder->get_billing_first_name();
-		$lastname = $wcOrder->get_billing_last_name();
-
-		$data = [
-			'external_id' => $params['cartId'],
-			'email' => $email,
-			'firstname' => $firstname,
-			'lastname' => $lastname,
-            'resource_key' => $this->senderGetResourceKey()
-		];
-
-		$url = $this->senderStatsBaseUrl . 'carts/' . $params['cartId'] . '/convert';
-
-		if ($list) {
-			$data['list_id'] = $list;
-		}
-
-		$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
-
-		$response = wp_remote_post($url, $params);
-
-		return $this->senderBuildResponse($response);
-	}
-
 	public function senderDeleteCart($wpCartId)
 	{
 		$data = ['resource_key' => $this->senderGetResourceKey()];
@@ -91,15 +61,6 @@ class Sender_API
 
 		return $this->senderBuildResponse($response);
 	}
-
-    public function senderTrackCart(array $cartParams)
-    {
-        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
-
-        $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
-
-        return $this->senderBuildResponse($response);
-    }
 
     public function senderUpdateCart(array $cartParams)
     {
@@ -129,11 +90,32 @@ class Sender_API
 				$data['list_id'] = $list;
 			}
 
-			$params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
-			$response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
+            if (get_user_meta($userId, 'sender_newsletter', true)) {
+                $data['newsletter'] = get_user_meta($userId, 'sender_newsletter', true);
+            }
+
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+            $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
+
+            return $this->senderBuildResponse($response);
+        }
+    }
+
+    public function senderAddToNewsletterNotRegisteredUsers($userData)
+    {
+        if (isset($userData['email'])) {
+            $data = [
+                'email' => $userData['email'],
+                'firstname' => $userData['first_name'],
+                'lastname' => $userData['last_name'],
+                'visitor_id' => $_COOKIE['sender_site_visitor'],
+                'newsletter' => (boolean)$userData['newsletter']
+            ];
+
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+            $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
 			return $this->senderBuildResponse($response);
-
 		}
 	}
 
@@ -164,6 +146,17 @@ class Sender_API
 	{
 		return json_decode($response['body']);
 	}
+
+    public function senderGetStore()
+    {
+        $response = wp_remote_request($this->senderBaseUrl  . 'stores/' . get_option('sender_store_register'), $this->senderBaseRequestArguments());
+
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return true;
+    }
 
     public function senderAddStore()
     {
@@ -197,6 +190,18 @@ class Sender_API
 
         $response = wp_remote_request($this->senderBaseUrl . 'stores/' . get_option('sender_store_register'), $removingStoreParams);
 
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return $this->senderBuildResponse($response);
+    }
+
+    public function senderExportData($exportData)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($exportData),  'data_format' => 'body']);
+
+        $response = wp_remote_post($this->senderBaseUrl . 'stores/'. get_option('sender_store_register') .'/import_shop_data', $params);
         if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
             return false;
         }
