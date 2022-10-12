@@ -136,7 +136,7 @@ class Sender_WooCommerce
                       WHERE post_type = "product"');
 
         $productExportData = [];
-        $currency = get_woocommerce_currency();
+        $currency = get_option('woocommerce_currency');
         foreach ($products as $product) {
 
             $image = null;
@@ -187,7 +187,7 @@ class Sender_WooCommerce
                     'created_at' => $order->post_date,
                     'remote_id' => $order->ID,
                     'name' => $order->post_name,
-                    'currency' => get_woocommerce_currency(),
+                    'currency' => get_option('woocommerce_currency'),
                 ];
 
                 $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
@@ -213,7 +213,7 @@ class Sender_WooCommerce
                         'price' => $product->max_price,
                         'qty' => $product->product_qty,
                         'discount' => (string)$discount,
-                        'currency' => get_woocommerce_currency(),
+                        'currency' => get_option('woocommerce_currency'),
                         'image' => get_the_post_thumbnail_url($product->product_id),
                     ];
                 }

@@ -86,3 +86,5 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * WordPress version compatibility updated
 * Data export to sender app in Connected Stores tab
 * Subscribe to newsletter option for checkout and account details
+= 2.1.1 - 2022-10-12 =
+* Quick fix method import
