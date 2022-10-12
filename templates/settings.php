@@ -135,21 +135,25 @@
                         </div>
                     </form>
                 </div>
-                    <div style="margin-top: 40px" class="sender-plugin-settings sender-box sender-br-5 sender-p-relative ">
+                    <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between">
                         <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
                               id="sender-export-data">
-                            <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                            <div class="sender-mb-20">
                                 <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync"
                                        value="0"
                                        class="sender-input sender-text-input sender-br-5">
-                                <input type="submit" name="submit" id="submit"
-                                       class="sender-cta-button sender-medium sender-br-5"
-                                       value="Sync with Sender">
-                                <span style="padding-left: 15px">Import all subscribers, orders and products from your WooCommerce store into your Sender account.</span>
+                                <div class="sender-btn-wrap sender-d-flex">
+                                    <input type="submit" name="submit" id="submit"
+                                           class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
+                                           value="Sync with Sender">
+                                    <div id="sender-import-text" class="sender-default-text">
+                                        Import all subscribers, orders and products from your WooCommerce store into your Sender account.
+                                        <a target="_blank" class="sender-link" href="https://app.sender.net/settings/connected-stores">See your store information</a>
+                                    </div>
+                                </div>
                             </div>
                         </form>
-                    </div>
-                <?php } ?>
+                    </div>                <?php } ?>
             </div>
 		<?php } ?>
     </div>
