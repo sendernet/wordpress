@@ -85,7 +85,7 @@ class Sender_Carts
             'lastname' => $lastname,
             'resource_key' => $this->senderGetResourceKey(),
             'phone' => $phone,
-            'order_id' => $orderId
+            'order_id' => (string)$orderId
         ];
 
         if ($list) {
