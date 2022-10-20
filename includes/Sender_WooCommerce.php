@@ -21,6 +21,31 @@ class Sender_WooCommerce
         }
 
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
+        add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
+    }
+
+    public function senderAddUserAfterManualOrderCreation($orderId)
+    {
+        $postMeta = get_post_meta($orderId);
+        if($postMeta && isset($postMeta['_billing_email'][0])){
+            $visitorId = $this->sender->senderApi->generateVisitorId();
+            if (!$visitorId->id){
+                return;
+            }
+
+            $subscriberData = array(
+                'email' => $postMeta['_billing_email'][0],
+                'firstname' => $postMeta['_billing_first_name'][0] ?: null,
+                'lastname' => $postMeta['_billing_last_name'][0] ?: null,
+                'visitor_id' => $visitorId->id,
+            );
+
+            if (get_option('sender_customers_list')){
+                $subscriberData['list_id'] = get_option('sender_customers_list');
+            }
+
+            $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
+        }
     }
 
     public function senderAddProductImportScript()
