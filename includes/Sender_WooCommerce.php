@@ -181,13 +181,19 @@ class Sender_WooCommerce
              OFFSET ' . $ordersExported);
 
             foreach ($chunkedOrders as $order) {
+                $remoteId = get_post_meta($order->ID, 'sender_remote_id', true);
+                if (!$remoteId) {
+                    $remoteId = get_post_meta($order->ID, '_order_key', true);
+                }
+
                 $orderData = [
                     'status' => $order->post_status,
                     'updated_at' => $order->post_modified,
                     'created_at' => $order->post_date,
-                    'remote_id' => $order->ID,
+                    'remote_id' => $remoteId,
                     'name' => $order->post_name,
                     'currency' => get_option('woocommerce_currency'),
+                    'order_id' => $order->ID
                 ];
 
                 $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
