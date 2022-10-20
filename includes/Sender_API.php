@@ -101,18 +101,10 @@ class Sender_API
         }
     }
 
-    public function senderAddToNewsletterNotRegisteredUsers($userData)
+    public function senderTrackNotRegisteredUsers($userData)
     {
-        if (isset($userData['email'])) {
-            $data = [
-                'email' => $userData['email'],
-                'firstname' => $userData['first_name'],
-                'lastname' => $userData['last_name'],
-                'visitor_id' => $_COOKIE['sender_site_visitor'],
-                'newsletter' => (boolean)$userData['newsletter']
-            ];
-
-            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
+        if (isset($userData['email']) && isset($userData['visitor_id'])) {
+            $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($userData)]);
             $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
 			return $this->senderBuildResponse($response);
@@ -202,6 +194,20 @@ class Sender_API
         $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($exportData),  'data_format' => 'body']);
 
         $response = wp_remote_post($this->senderBaseUrl . 'stores/'. get_option('sender_store_register') .'/import_shop_data', $params);
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
+            return false;
+        }
+
+        return $this->senderBuildResponse($response);
+    }
+
+    public function generateVisitorId()
+    {
+        $data = ['resource_key' => $this->senderGetResourceKey()];
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data),  'data_format' => 'body']);
+
+        $response = wp_remote_post($this->senderStatsBaseUrl . 'get_visitor_id/' , $params);
+
         if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
             return false;
         }

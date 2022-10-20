@@ -109,10 +109,11 @@ class Sender_Carts
                     'email' => $email,
                     'first_name' => $firstname,
                     'last_name' => $lastname,
-                    'newsletter' => $user->sender_newsletter
+                    'newsletter' => (boolean) $user->sender_newsletter,
+                    'visitor_id' => $this->senderSessionCookie,
                 ];
 
-                $this->sender->senderApi->senderApiShutdownCallback("senderAddToNewsletterNotRegisteredUsers", $userData);
+                $this->sender->senderApi->senderApiShutdownCallback("senderTrackNotRegisteredUsers", $userData);
                 $user->save();
             }
         }
