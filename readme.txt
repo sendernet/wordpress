@@ -63,9 +63,9 @@ On the other hand, dumping every single email as a broadcast to your entire list
 
 = Leveraging the Text Message (SMS) =
 
-While your email automation is all set to deliver that abandoned cart email to abandoning visitors or that completed new order email to every buying customer, SMS notifications have their own place.
+While your [email automation](https://www.sender.net/email-automation/) is all set to deliver that abandoned cart email to abandoning visitors or that completed new order email to every buying customer, SMS notifications have their own place.
 
-After all, over [95%](https://www.smscomparison.com/mass-text-messaging/2022-statistics/) of text messages are read and responded to inside of 3 minutes.
+After all, over [90% of text messages are read and responded to inside of 3 minutes.](https://www.sender.net/sms-open-rates/)
 
 Sender helps you easily compose and send personalized text messages to prospects and customers at scale, developing deeper relationships with them.
 
