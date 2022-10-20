@@ -1,43 +1,117 @@
-=== Sender.net for WordPress ===
+=== Sender - Newsletter, SMS and Email Marketing Automation for WooCommerce ===
 Contributors: augustask
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.0.2
+Tested up to: 6.0.3
 Requires PHP: 5.6
-Stable tag: 2.1.0
+Stable tag: 2.1.2
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
 
-Sender.net is an email marketing platform tailored for smaller businesses and e-commerce ventures. [Sender](https://www.sender.net/) is highly dedicated to delivering the best user experience possible and includes features for process automation and boosting email response rates. Our users can create beautiful and optimized emails up to 2 times faster.
+= Introduction =
 
-https://www.youtube.com/watch?v=wXPvQ2_o9UM
+[Sender](https://www.sender.net/) is an all-in-one email & SMS marketing platform designed keeping the challenges of ecommerce and small businesses in mind.
 
-Sender has a “Free Forever” plan that aims to help out new businesses and e-commerce websites: 
+Whether you are just starting to build your list or planning to scale and grow your business more, Sender gives you the perfect mix of capabilities to stay competitive.
 
- * Up to 2500 subscribers per month
- * Up to 15 000 emails per month
- * 24/7 customer support
+Design dynamic popups and newsletter signup forms to attract interested prospects on the front while using the tool’s email and SMS features to nurture them through their buying journey.
 
-Make sending targeted emails simple by integrating Sender into WordPress. Instead of relying on third-party dashboards, you will be able to [send any automated emails](https://www.sender.net/email-automation/?utm_source=wordpress&utm_medium=description&utm_campaign=link) right from your page such as:
+= Run Marketing Automation Magic =
 
- * Abandoned cart emails
- * Welcome emails
- * Onboarding emails
- * Order confirmation emails
- * Shipping information emails
- * Any other event-based emails
+Marketing automation is the process of automating your email & SMS communication based on time-based or action-based triggers to convey the right message to your prospects at the right time.
 
-There are additional [features](https://www.sender.net/features/?utm_source=wordpress&utm_medium=description&utm_campaign=link) available after joining Sender and integrating our plugin into WordPress. Our plugin retrieves important data from your website or e-commerce platform, allowing you to:
+Sender offers an array of prebuilt features to take the heavy lifting out of email marketing. Specifically, you can use Sender to send out the following email sequence types to your store prospects and customers:
 
- * Manage client profiles and data.
- * Create email campaigns.
- * [Use our Drag & Drop email builder.](https://www.sender.net/create-emails/)
- * [Create newsletter signup forms and pop-ups.](https://www.sender.net/audience/)
- * Send promotional offers and newsletters.
+* Abandoned cart recovery email
+* Purchase order confirmation email
+* Now back in stock notification email
+* Win-back, Cross-sell, Reactivation email
+* Feedback, Review request email
+* Welcome email to new client
 
-Additionally, Sender automatically installs the necessary form and pop-up snippets, making all the features accessible and easy to use even for those without any technical experience.
+and many more.
+
+Every type of email workflow, from one-time transactional emails to an ongoing drip campaign, is easy to implement using Sender.
+
+= Send Beautiful Newsletters That Engage Readers =
+
+A newsletter is an almost perfect way to stay in touch with both your fans and customers alike. While almost every email marketing tool out there features a way for you to compose and edit your email campaign, Sender goes a step further and includes features that make it your go-to newsletter plugin for wordpress.
+
+Email newsletter design from scratch is a breeze with the drag-and-drop email builder. If you don’t have much time to design your email, Sender includes a free email templates library from which you can simply import a premade, high-converting template in a single click.
+
+Sending out a promotional email for your online store? Use the 1-click product import feature to import all details, including the product image, pricing, and description in one shot inside your email.
+
+While setting up email campaigns is easy and straightforward, the primary benefit of using Sender for your newsletter marketing is the high-reputation infrastructure that promises high deliverability. This means that you will often land inside your prospects’ inboxes rather than the Promotions tab or Spam folder, ensuring higher chances of being read.
+
+= Growing a List of Fans =
+
+Grow your list of subscribers effortlessly without needing a dedicated email designer. Sender’s super simple popup and newsletter signup form builder helps you create custom, branded designs, even if you’ve never done this before.
+
+Sender offers you a variety of FREE premade layouts as part of the templates library to enable you to design your own responsive newsletter form or ecommerce popup in no time.
+
+Whether you are looking for a simple, mobile-friendly, embeddable newsletter signup form or a fancy exit intent popup, making your own from scratch is equally easy with straightforward drag-and-drop actions.
+
+= Laser-Targeted Messaging =
+
+Your emails are more likely to be responded to, and acted upon when they are personalized and extremely relevant to the reader.
+
+Sender helps you customize your email components, such as the subject line, preview text header, and the email body using common data points such as first names, locations, or custom user info collected using the forms before.
+
+On the other hand, dumping every single email as a broadcast to your entire list is a deadly mistake. Segment your prospects into groups based on common characteristics (for e.g. customers vs prospects) so you are delivering relevant offers to each group at all times.
+
+= Leveraging the Text Message (SMS) =
+
+While your [email automation](https://www.sender.net/email-automation/) is all set to deliver that abandoned cart email to abandoning visitors or that completed new order email to every buying customer, SMS notifications have their own place.
+
+After all, over [90% of text messages are read and responded to inside of 3 minutes.](https://www.sender.net/sms-open-rates/)
+
+Sender helps you easily compose and send personalized text messages to prospects and customers at scale, developing deeper relationships with them.
+
+To ensure the best user experience at all times, while also striving to make your business look good, Sender strictly adheres to stringent standards such as GDPR and TCPA.
+
+Sender’s infrastructure chooses the best SMS routes at all times to ensure reliable and timely sending of your business text messages worldwide.
+
+= One-Stop Email & SMS Dashboard =
+
+Sender helps you manage your email marketing and SMS messaging from the same dashboard without switching between tabs or using third-party software to help automate controls.
+
+While prepaid text messaging already comes at extremely affordable rates, subscribing to the Professional plan ensures that you get FREE SMS credits equal in value to your plan amount every month.
+
+= Advanced Reporting Capabilities =
+
+Sender offers both basic and advanced reporting capabilities for your email and SMS campaigns. You can monitor:
+
+* Sales reports
+* Email and SMS performance reports
+* Individual subscriber activity, and more
+
+What’s more, you can even view the performance of your email newsletter vis-a-vis the recipient’s geographical location.
+
+= Amazing 24/7 Live Support =
+
+Sender’s platform is simple and straightforward to use for both new and experienced users alike.
+
+However, should you feel the need to ask a quick question or have an advanced scenario you need expert help with, you have easy access to:
+
+* 24-by-7 Live Chat Support
+* Email Helpdesk
+* Extensive Help Center tutorials
+* Exclusive access to a dedicated success manager (Professional plan & above)
+
+= Get Started for FREE =
+
+It's a no-brainer for businesses to get started with Sender thanks to its FREE forever plan, which includes:
+
+* Up to 15,000 emails per month;
+* Up to 2,500 subscribers;
+* Unlimited popups and forms;
+* Unlimited email automation workflows;
+* Unlimited email segmentation;
+* 24-by-7 Customer support;
+
+Whatever industry or niche you are operating out of, regardless of the size of your business, sending automated emails is easy when you choose Sender.
 
 == Screenshots ==
 1. Create sophisticated workflows, sit back and watch
@@ -88,3 +162,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Subscribe to newsletter option for checkout and account details
 = 2.1.1 - 2022-10-12 =
 * Quick fix method import
+= 2.1.2 - 2022-10-20 =
+* Readme updates
+* Order data export fix

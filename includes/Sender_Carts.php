@@ -40,7 +40,7 @@ class Sender_Carts
     public function senderAddNewsletterFromOrder($orderId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            add_post_meta($orderId, 'sender_newsletter', sanitize_text_field($_POST['sender_newsletter']));
+            update_post_meta($orderId, 'sender_newsletter', sanitize_text_field($_POST['sender_newsletter']));
         }
     }
 
@@ -85,6 +85,7 @@ class Sender_Carts
             'lastname' => $lastname,
             'resource_key' => $this->senderGetResourceKey(),
             'phone' => $phone,
+            'order_id' => (string)$orderId
         ];
 
         if ($list) {
@@ -115,6 +116,8 @@ class Sender_Carts
                 $user->save();
             }
         }
+
+        update_post_meta($orderId, 'sender_remote_id', $cart->id);
 
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
