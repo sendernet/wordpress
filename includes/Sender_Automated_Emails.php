@@ -196,7 +196,7 @@ class Sender_Automated_Emails
             require_once("Sender_Forms_Widget.php" );
         }
 
-        register_widget( new Sender_Forms_Widget($this));
+        register_widget('Sender_Forms_Widget');
     }
 
     public function senderAddPluginLinks($links)
