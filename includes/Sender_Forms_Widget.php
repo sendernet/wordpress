@@ -4,54 +4,52 @@
         exit;
     }
 
-    class Sender_Forms_Widget extends  WP_Widget
+class Sender_Forms_Widget extends  WP_Widget
+{
+    public function __construct()
     {
-        private $sender;
+        /* Widget settings. */
+        $widget_ops = [
+            'classname' => 'sae_sender_form',
+            'description' => __('Add Sender.net form to your website.', 'framework')
+        ];
 
-        public function __construct($sender)
-        {
-            $this->sender = $sender;
+        /* Widget control settings. */
+        $control_ops = [
+            'id_base' => 'sender_automated_emails_widget'
+        ];
 
-            /* Widget settings. */
-            $widget_ops = [
-                'classname' => 'sae_sender_form',
-                'description' => __('Add Sender.net form to your website.', 'framework')
-            ];
+        /* Create the widget. */
+        parent::__construct('sender_automated_emails_widget', __('Sender.net Form', 'framework'), $widget_ops, $control_ops);
+    }
 
-            /* Widget control settings. */
-            $control_ops = [
-                'id_base' => 'sender_automated_emails_widget'
-            ];
+    public function update( $newInstance, $oldInstance )
+    {
+        $instance = [];
 
-            /* Create the widget. */
-            parent::__construct('sender_automated_emails_widget', __('Sender.net Form', 'framework'), $widget_ops, $control_ops);
+        $instance['form'] = ( ! empty( $newInstance['form'] ) ) ? strip_tags( $newInstance['form'] ) : '';
+
+        return $instance;
+    }
+
+
+    public function widget($args, $instance)
+    {
+        if (!isset($instance['form'])) {
+            return;
         }
 
-		public function update( $newInstance, $oldInstance )
-        {
-			$instance = [];
+        echo $args['before_widget'];
+        $code = $instance['form'];
+        echo "<div class='sender-form-field' data-sender-form-id='$code'></div>";
+        echo $args['after_widget'];
+    }
 
-			$instance['form'] = ( ! empty( $newInstance['form'] ) ) ? strip_tags( $newInstance['form'] ) : '';
-			return $instance;
-		}
+    public function form( $instance )
+    {
+        $senderApi = new Sender_API();
+        $forms = $senderApi->senderGetForms()->data;
 
-
-		public function widget( $args, $instance )
-        {
-        	if (!isset($instance['form'])) {
-        		return;
-			}
-
-            echo $args['before_widget'];
-        	$code = $instance['form'];
-			echo "<div class='sender-form-field' data-sender-form-id='$code'></div>";
-            echo $args['after_widget'];
-		}
-
-
-		function form( $instance )
-        {
-			$forms = $this->sender->senderApi->senderGetForms()->data;
-			require(dirname(dirname(__FILE__)) . '/templates/widget_options.php');
-		}
-	}
+        require(dirname(dirname(__FILE__)) . '/templates/widget_options.php');
+    }
+}

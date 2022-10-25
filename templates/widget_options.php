@@ -1,13 +1,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-<h3>Select form</h3>
-<label class="sender-d-none" for="<?php echo esc_attr($this->get_field_id( 'form' )); ?>">Select form</label>
+<label for="<?php echo esc_attr($this->get_field_id( 'form' )); ?>">Select form</label>
 <select class="sender-d-none sender-invisible-form-select" id="<?php echo esc_attr($this->get_field_id( 'form' )); ?>" name="<?php echo esc_attr($this->get_field_name( 'form' )); ?>" class="widefat" style="width:100%;">
 	<option disabled selected>Select your form</option>
 	<?php
 	foreach($forms as $form) {
         $selected = false;
-        if(isset($instance['form'])){
+        if (isset($instance['form'])) {
             $selected = $form->settings->embed_hash == $instance['form'];
         }
         ?>
@@ -16,6 +15,7 @@
 	}
 	?>
 </select>
+
 <div class="sender-widget-container">
 
 	<?php
@@ -27,24 +27,24 @@
             ?>
 		<div class="sender-form-select <?= $selected ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" ';?>">
 			<div class="sender-form-title">
-                <span>
+                <span style="font-weight: 500!important;">
 				<?php
                     $name = esc_html($form->title);
-                    if(strlen($name) > 20){
-                        $name = substr($name, 0, 20) . '...';
+                    if(strlen($name) > 12){
+                        $name = substr($name, 0, 12) . '...';
                     }
                     echo $name;
                     ?>
                 </span>
-			</div>
-			<div class="sender-form-thumbnail" style="background-image: url('<?=$form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>') ">
-			</div>
-		</div>
+            </div>
+            <div class="sender-form-thumbnail">
+                <img src="<?php echo $form->thumbnail_url ? $form->thumbnail_url : 'https://cdn.sender.net/rsz_antrinis_logotipas.png' ?>">
+            </div>
+        </div>
 
 		<?php
 	}
 	?>
-
 
 </div>
 
