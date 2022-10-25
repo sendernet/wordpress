@@ -30,9 +30,11 @@ class Sender_Carts
 
         add_action( 'woocommerce_review_order_before_submit', [&$this,'senderAddNewsletterCheck'],10 );
         add_action( 'woocommerce_edit_account_form', [&$this,'senderAddNewsletterCheck'] );
+        add_action( 'woocommerce_register_form', [&$this,'senderAddNewsletterCheck'] );
 
         add_action( 'woocommerce_checkout_update_order_meta', [&$this,'senderAddNewsletterFromOrder']);
         add_action( 'woocommerce_save_account_details', [&$this,'senderAddNewsletterCheckFromAccount'], 10, 1 );
+        add_action( 'woocommerce_created_customer', [&$this,'senderAddNewsletterCheckFromAccount'], 10, 1 );
 
         return $this;
     }
