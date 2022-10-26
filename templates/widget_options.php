@@ -27,7 +27,7 @@
             ?>
 		<div class="sender-form-select <?= $selected ? 'sender-form-is-selected' : '' ?>" data-id="<?php echo esc_attr($form->settings->embed_hash).'" ';?>">
 			<div class="sender-form-title">
-                <span style="font-weight: 500!important;">
+                <span style="font-weight: 500!important; font-size:12px;">
 				<?php
                     $name = esc_html($form->title);
                     if(strlen($name) > 12){
