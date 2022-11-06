@@ -27,9 +27,9 @@ class Sender_WooCommerce
     public function senderAddUserAfterManualOrderCreation($orderId)
     {
         $postMeta = get_post_meta($orderId);
-        if($postMeta && isset($postMeta['_billing_email'][0])){
+        if ($postMeta && isset($postMeta['_billing_email'][0])) {
             $visitorId = $this->sender->senderApi->generateVisitorId();
-            if (!$visitorId->id){
+            if (!$visitorId->id) {
                 return;
             }
 
@@ -40,7 +40,7 @@ class Sender_WooCommerce
                 'visitor_id' => $visitorId->id,
             );
 
-            if (get_option('sender_customers_list')){
+            if (get_option('sender_customers_list')) {
                 $subscriberData['list_id'] = get_option('sender_customers_list');
             }
 
@@ -224,7 +224,7 @@ class Sender_WooCommerce
                 $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
             INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup on ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
             LEFT JOIN ' . $this->tablePrefix . 'posts on ' . $this->tablePrefix . 'posts.id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
-            where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = '.$order->ID);
+            where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = ' . $order->ID);
 
                 $orderData['products'] = [];
                 $orderPrice = 0;
