@@ -1,10 +1,10 @@
 <?php
 
-    if ( ! defined( 'ABSPATH' ) ) {
-        exit;
-    }
+if (!defined('ABSPATH')) {
+    exit;
+}
 
-class Sender_Forms_Widget extends  WP_Widget
+class Sender_Forms_Widget extends WP_Widget
 {
     public function __construct()
     {
@@ -23,11 +23,11 @@ class Sender_Forms_Widget extends  WP_Widget
         parent::__construct('sender_automated_emails_widget', __('Sender.net Form', 'framework'), $widget_ops, $control_ops);
     }
 
-    public function update( $newInstance, $oldInstance )
+    public function update($newInstance, $oldInstance)
     {
         $instance = [];
 
-        $instance['form'] = ( ! empty( $newInstance['form'] ) ) ? strip_tags( $newInstance['form'] ) : '';
+        $instance['form'] = (!empty($newInstance['form'])) ? strip_tags($newInstance['form']) : '';
 
         return $instance;
     }
@@ -45,10 +45,21 @@ class Sender_Forms_Widget extends  WP_Widget
         echo $args['after_widget'];
     }
 
-    public function form( $instance )
+    public function form($instance)
     {
         $senderApi = new Sender_API();
-        $forms = $senderApi->senderGetForms()->data;
+        $forms = $senderApi->senderGetForms();
+        if (isset($forms->data)) {
+            $formsData = [];
+            foreach ($forms->data as $form) {
+                $formsData[] = [
+                    'embed_hash' => $form->settings->embed_hash,
+                    'title' => $form->title,
+                    'thumbnail_url' => $form->thumbnail_url
+                ];
+            }
+            update_option('sender_forms_data', $formsData);
+        }
 
         require(dirname(dirname(__FILE__)) . '/templates/widget_options.php');
     }
