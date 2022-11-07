@@ -167,7 +167,7 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.1.2 - 2022-10-20 =
 * Readme updates
 * Order data export fix
-= 2.1.2 - 2022-11-07 =
+= 2.1.3 - 2022-11-07 =
 * Support FE builder with sender form widget
 * Handle x-rate limitation
 * Adding subscribe to newsletter checkbox in checkout and account register/edit
