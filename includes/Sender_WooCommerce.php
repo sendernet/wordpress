@@ -174,7 +174,7 @@ class Sender_WooCommerce
                 'description' => $product->post_content,
                 'sku' => $product->sku,
                 'quantity' => $product->stock_quantity,
-                'remote_product_id' => $product->product_id,
+                'remote_productId' => $product->product_id,
                 'image' => [$image],
                 'price' => number_format($product->max_price, 2),
                 'status' => $product->post_status,
@@ -215,10 +215,10 @@ class Sender_WooCommerce
                     'status' => $order->post_status,
                     'updated_at' => $order->post_modified,
                     'created_at' => $order->post_date,
-                    'remote_id' => $remoteId,
+                    'remoteId' => $remoteId,
                     'name' => $order->post_name,
                     'currency' => get_option('woocommerce_currency'),
-                    'order_id' => $order->ID
+                    'orderId' => $order->ID
                 ];
 
                 $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
