@@ -4,9 +4,11 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.0.3
 Requires PHP: 5.6
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
+
+[Sender](https://www.sender.net/) is an all-in-one email & SMS marketing platform designed keeping the challenges of ecommerce and small businesses in mind.
 
 == Description ==
 
@@ -165,3 +167,7 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.1.2 - 2022-10-20 =
 * Readme updates
 * Order data export fix
+= 2.1.2 - 2022-11-07 =
+* Support FE builder with sender form widget
+* Handle x-rate limitation
+* Adding subscribe to newsletter checkbox in checkout and account register/edit

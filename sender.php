@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 Plugin Name: Sender.net email marketing
 Plugin URI: https://sender.net
 description: Sender email marketing tool
-Version: 2.1.2
+Version: 2.1.3
 Author: Sender
 Author URI: https://sender.net
 License: GPL2
