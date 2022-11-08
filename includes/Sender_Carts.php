@@ -1,38 +1,40 @@
 <?php
 
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
 class Sender_Carts
 {
-	private $sender;
+    private $sender;
     private $senderSessionCookie;
 
-	public function __construct($sender)
-	{
-		$this->sender = $sender;
+    public function __construct($sender)
+    {
+        $this->sender = $sender;
 
-		$this->senderAddCartsActions()
+        $this->senderAddCartsActions()
             ->senderAddCartsFilters();
         if (!isset($_COOKIE['sender_site_visitor'])) {
             return false;
         }
 
         $this->senderSessionCookie = $_COOKIE['sender_site_visitor'];
-	}
+    }
 
-	private function senderAddCartsActions()
-	{
+    private function senderAddCartsActions()
+    {
         add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
         add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
-		add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+        add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
 
-        add_action( 'woocommerce_review_order_before_submit', [&$this,'senderAddNewsletterCheck'],10 );
-        add_action( 'woocommerce_edit_account_form', [&$this,'senderAddNewsletterCheck'] );
+        add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
+        add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
+        add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
 
-        add_action( 'woocommerce_checkout_update_order_meta', [&$this,'senderAddNewsletterFromOrder']);
-        add_action( 'woocommerce_save_account_details', [&$this,'senderAddNewsletterCheckFromAccount'], 10, 1 );
+        add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
+        add_action('woocommerce_save_account_details', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
+        add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
 
         return $this;
     }
@@ -48,7 +50,7 @@ class Sender_Carts
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'sender_newsletter', 1);
-        }else{
+        } else {
             update_user_meta($userId, 'sender_newsletter', 0);
         }
     }
@@ -57,8 +59,8 @@ class Sender_Carts
     {
         add_filter('template_include', [&$this, 'senderRecoverCart'], 99, 1);
 
-		return $this;
-	}
+        return $this;
+    }
 
     public function prepareConvertCart($orderId)
     {
@@ -109,10 +111,11 @@ class Sender_Carts
                     'email' => $email,
                     'first_name' => $firstname,
                     'last_name' => $lastname,
-                    'newsletter' => $user->sender_newsletter
+                    'newsletter' => (boolean)$user->sender_newsletter,
+                    'visitor_id' => $this->senderSessionCookie,
                 ];
 
-                $this->sender->senderApi->senderApiShutdownCallback("senderAddToNewsletterNotRegisteredUsers", $userData);
+                $this->sender->senderApi->senderApiShutdownCallback("senderTrackNotRegisteredUsers", $userData);
                 $user->save();
             }
         }
@@ -123,101 +126,101 @@ class Sender_Carts
         do_action('wp_head', json_encode($cartData));
     }
 
-	public function senderPrepareCartData($cart)
-	{
+    public function senderPrepareCartData($cart)
+    {
 
-		$items = $this->senderGetCart();
-		$total = $this->senderGetWoo()->cart->total;
-		$user = (new Sender_User())->find($cart->user_id);
+        $items = $this->senderGetCart();
+        $total = $this->senderGetWoo()->cart->total;
+        $user = (new Sender_User())->find($cart->user_id);
 
         $baseUrl = wc_get_cart_url();
-        $lastCharacter = substr($baseUrl,-1);
+        $lastCharacter = substr($baseUrl, -1);
 
-        if (strcmp($lastCharacter, '/') === 0 ) {
+        if (strcmp($lastCharacter, '/') === 0) {
             $cartUrl = rtrim($baseUrl, '/') . '?hash=' . $cart->id;
         } else {
             $cartUrl = $baseUrl . '&hash=' . $cart->id;
         }
 
-		$data = [
-			"visitor_id"  => $user->visitor_id,
-			"external_id" => $cart->id,
-			"url"         => $cartUrl,
-			"currency"    => 'EUR',
-			"order_total" => $total,
-			"products"    => [],
+        $data = [
+            "visitor_id" => $user->visitor_id,
+            "external_id" => $cart->id,
+            "url" => $cartUrl,
+            "currency" => 'EUR',
+            "order_total" => $total,
+            "products" => [],
             'resource_key' => $this->senderGetResourceKey()
-		];
+        ];
 
-		foreach ($items as $item => $values) {
+        foreach ($items as $item => $values) {
 
-			$_product = wc_get_product($values['data']->get_id());
-			$regularPrice = (int)get_post_meta($values['product_id'], '_regular_price', true);
-			$salePrice = (int)get_post_meta($values['product_id'], '_sale_price', true);
+            $_product = wc_get_product($values['data']->get_id());
+            $regularPrice = (int)get_post_meta($values['product_id'], '_regular_price', true);
+            $salePrice = (int)get_post_meta($values['product_id'], '_sale_price', true);
 
-			if ($regularPrice <= 0) {
-				$regularPrice = 1;
-			}
+            if ($regularPrice <= 0) {
+                $regularPrice = 1;
+            }
 
-			$discount = round(100 - ($salePrice / $regularPrice * 100));
+            $discount = round(100 - ($salePrice / $regularPrice * 100));
 
-			$prod = [
-				'sku'           => $values['data']->get_sku(),
-				'name'          => (string)$_product->get_title(),
-				'price'         => (string)$regularPrice,
-				'price_display' => (string)$_product->get_price() . get_woocommerce_currency_symbol(),
-				'discount'      => (string)$discount,
-				'qty'           => $values['quantity'],
-				'image'         => get_the_post_thumbnail_url($values['data']->get_id()),
-			];
+            $prod = [
+                'sku' => $values['data']->get_sku(),
+                'name' => (string)$_product->get_title(),
+                'price' => (string)$regularPrice,
+                'price_display' => (string)$_product->get_price() . get_woocommerce_currency_symbol(),
+                'discount' => (string)$discount,
+                'qty' => $values['quantity'],
+                'image' => get_the_post_thumbnail_url($values['data']->get_id()),
+            ];
 
-			$data['products'][] = $prod;
-		}
+            $data['products'][] = $prod;
+        }
 
-		return $data;
-	}
+        return $data;
+    }
 
-	public function trackUser()
-	{
-		if (!is_user_logged_in() || !isset($_COOKIE['sender_site_visitor'])) {
-			return;
-		}
+    public function trackUser()
+    {
+        if (!is_user_logged_in() || !isset($_COOKIE['sender_site_visitor'])) {
+            return;
+        }
 
-		$wpUser = wp_get_current_user();
-		$wpId = $wpUser->ID;
+        $wpUser = wp_get_current_user();
+        $wpId = $wpUser->ID;
 
-		$visitorId = sanitize_text_field($_COOKIE['sender_site_visitor']);
-		$user = (new Sender_User())->findBy('wp_user_id', $wpId);
+        $visitorId = sanitize_text_field($_COOKIE['sender_site_visitor']);
+        $user = (new Sender_User())->findBy('wp_user_id', $wpId);
 
-		if (!$user) {
-			$user = (new Sender_User())->findBy('visitor_id', $visitorId);
-		}
+        if (!$user) {
+            $user = (new Sender_User())->findBy('visitor_id', $visitorId);
+        }
 
-		if (!$user) {
-			$user = new Sender_User();
-		}
+        if (!$user) {
+            $user = new Sender_User();
+        }
 
-		$user->visitor_id = $visitorId;
-		$user->wp_user_id = $wpId;
-		$user->email = $wpUser->user_email;
+        $user->visitor_id = $visitorId;
+        $user->wp_user_id = $wpId;
+        $user->email = $wpUser->user_email;
 
-		if ($user->isDirty()) {
+        if ($user->isDirty()) {
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
         }
 
-		$user->save();
-	}
+        $user->save();
+    }
 
-	public function senderCartUpdated()
-	{
-		$this->trackUser();
-		$items = $this->senderGetCart();
+    public function senderCartUpdated()
+    {
+        $this->trackUser();
+        $items = $this->senderGetCart();
 
-		$cartData = serialize($items);
+        $cartData = serialize($items);
 
-		if (!$this->senderGetWoo()->session->get_session_cookie()) {
-			return;
-		}
+        if (!$this->senderGetWoo()->session->get_session_cookie()) {
+            return;
+        }
 
         $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
 
@@ -251,82 +254,82 @@ class Sender_Carts
             do_action('wp_head', json_encode($cartData));
         }
 
-	}
+    }
 
-	public function senderGetVisitor()
-	{
-		$visitor = $_COOKIE['sender_site_visitor'];
-		$user = (new Sender_User())->findBy('visitor_id', $visitor);
+    public function senderGetVisitor()
+    {
+        $visitor = $_COOKIE['sender_site_visitor'];
+        $user = (new Sender_User())->findBy('visitor_id', $visitor);
 
-		if (!$user) {
-			$user = new Sender_User();
-			$user->visitor_id = $visitor;
-			$user->save();
-		}
-		return $user;
-	}
+        if (!$user) {
+            $user = new Sender_User();
+            $user->visitor_id = $visitor;
+            $user->save();
+        }
+        return $user;
+    }
 
-	public function senderGetCart()
-	{
-		return $this->senderGetWoo()->cart->get_cart();
-	}
+    public function senderGetCart()
+    {
+        return $this->senderGetWoo()->cart->get_cart();
+    }
 
-	public function senderGetWoo()
-	{
-		global $woocommerce;
+    public function senderGetWoo()
+    {
+        global $woocommerce;
 
-		if (function_exists('WC')) {
-			return WC();
-		}
+        if (function_exists('WC')) {
+            return WC();
+        }
 
-		return $woocommerce;
-	}
+        return $woocommerce;
+    }
 
-	public function senderRecoverCart($template)
-	{
+    public function senderRecoverCart($template)
+    {
 
-		if (!isset($_GET['hash'])) {
-			return $template;
-		}
+        if (!isset($_GET['hash'])) {
+            return $template;
+        }
 
-		$cartId = sanitize_text_field($_GET['hash']);
+        $cartId = sanitize_text_field($_GET['hash']);
 
-		$cart = (new Sender_Cart())->find($cartId);
+        $cart = (new Sender_Cart())->find($cartId);
 
-		if (!$cart || $cart->cart_recovered ) {
-			return $template;
-		}
+        if (!$cart || $cart->cart_recovered) {
+            return $template;
+        }
 
-		$cart->cart_recovered = '1';
-		$cart->save();
+        $cart->cart_recovered = '1';
+        $cart->save();
 
-		$cartData = unserialize($cart->cart_data);
+        $cartData = unserialize($cart->cart_data);
 
-		if (empty($cartData)) {
-			return $template;
-		}
+        if (empty($cartData)) {
+            return $template;
+        }
 
-		$wooCart = new WC_Cart();
+        $wooCart = new WC_Cart();
 
-		foreach ($cartData as $product) {
+        foreach ($cartData as $product) {
             $wooCart->add_to_cart(
-				(int)$product['product_id'],
-				(int)$product['quantity'],
-				(int)$product['variation_id'],
-				$product['variation']
-			);
-		}
+                (int)$product['product_id'],
+                (int)$product['quantity'],
+                (int)$product['variation_id'],
+                $product['variation']
+            );
+        }
 
-		new WC_Cart_Session($wooCart);
+        new WC_Cart_Session($wooCart);
 
-		return $template;
-	}
+        return $template;
+    }
 
     public function senderGetResourceKey()
     {
         $key = get_option('sender_resource_key');
 
-        if(!$key){
+        if (!$key) {
             $user = $this->senderGetAccount();
             $key = $user->account->resource_key;
             update_option('sender_resource_key', $key);
@@ -356,14 +359,15 @@ class Sender_Carts
     /**
      * @return void
      */
-    public function senderAddNewsletterCheck() {
-        $currentValue = get_user_meta( get_current_user_id(),'sender_newsletter', true);
-        woocommerce_form_field( 'sender_newsletter', array(
+    public function senderAddNewsletterCheck()
+    {
+        $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+        woocommerce_form_field('sender_newsletter', array(
             'type' => 'checkbox',
             'class' => array('form-row mycheckbox'),
             'label_class' => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
             'input_class' => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
-            'label'         => 'Subscriber to our newsletter',
+            'label' => 'Subscriber to our newsletter',
         ), $currentValue);
     }
 

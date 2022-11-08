@@ -1,21 +1,21 @@
 <?php
 
-    if (!defined('ABSPATH')) {
-        exit;
-    }
+if (!defined('ABSPATH')) {
+    exit;
+}
 
-   /*
-   Plugin Name: Sender.net email marketing
-   Plugin URI: https://sender.net
-   description: Sender email marketing tool
-   Version: 2.1.2
-   Author: Sender
-   Author URI: https://sender.net
-   License: GPL2
-   */
+/*
+Plugin Name: Sender.net email marketing
+Plugin URI: https://sender.net
+description: Sender email marketing tool
+Version: 2.1.3
+Author: Sender
+Author URI: https://sender.net
+License: GPL2
+*/
 
-    if( !class_exists( 'Sender_Automated_Emails' ) ) {
-        require_once( "includes/Sender_Automated_Emails.php" );
-    }
+if (!class_exists('Sender_Automated_Emails')) {
+    require_once("includes/Sender_Automated_Emails.php");
+}
 
-    new Sender_Automated_Emails(__FILE__);
+new Sender_Automated_Emails(__FILE__);
