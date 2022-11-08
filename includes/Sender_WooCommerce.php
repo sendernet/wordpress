@@ -21,6 +21,31 @@ class Sender_WooCommerce
         }
 
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
+        add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
+    }
+
+    public function senderAddUserAfterManualOrderCreation($orderId)
+    {
+        $postMeta = get_post_meta($orderId);
+        if ($postMeta && isset($postMeta['_billing_email'][0])) {
+            $visitorId = $this->sender->senderApi->generateVisitorId();
+            if (!$visitorId->id) {
+                return;
+            }
+
+            $subscriberData = array(
+                'email' => $postMeta['_billing_email'][0],
+                'firstname' => $postMeta['_billing_first_name'][0] ?: null,
+                'lastname' => $postMeta['_billing_last_name'][0] ?: null,
+                'visitor_id' => $visitorId->id,
+            );
+
+            if (get_option('sender_customers_list')) {
+                $subscriberData['list_id'] = get_option('sender_customers_list');
+            }
+
+            $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
+        }
     }
 
     public function senderAddProductImportScript()
@@ -149,7 +174,7 @@ class Sender_WooCommerce
                 'description' => $product->post_content,
                 'sku' => $product->sku,
                 'quantity' => $product->stock_quantity,
-                'remote_product_id' => $product->product_id,
+                'remote_productId' => $product->product_id,
                 'image' => [$image],
                 'price' => number_format($product->max_price, 2),
                 'status' => $product->post_status,
@@ -190,16 +215,16 @@ class Sender_WooCommerce
                     'status' => $order->post_status,
                     'updated_at' => $order->post_modified,
                     'created_at' => $order->post_date,
-                    'remote_id' => $remoteId,
+                    'remoteId' => $remoteId,
                     'name' => $order->post_name,
                     'currency' => get_option('woocommerce_currency'),
-                    'order_id' => $order->ID
+                    'orderId' => $order->ID
                 ];
 
                 $productsData = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'wc_order_product_lookup
             INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup on ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
             LEFT JOIN ' . $this->tablePrefix . 'posts on ' . $this->tablePrefix . 'posts.id = ' . $this->tablePrefix . 'wc_order_product_lookup.product_id
-            where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = '.$order->ID);
+            where ' . $this->tablePrefix . 'wc_order_product_lookup.order_id = ' . $order->ID);
 
                 $orderData['products'] = [];
                 $orderPrice = 0;
