@@ -136,7 +136,8 @@ class Sender_API
 
     private function senderBuildResponse($response)
     {
-        if (is_wp_error($response) || $responseCode = wp_remote_retrieve_response_code($response) != 200) {
+        $responseCode = wp_remote_retrieve_response_code($response);
+        if (is_wp_error($response) || $responseCode != 200) {
             if ($responseCode == 429) {
                 return json_decode($this->solveRateLimit($response));
             }
