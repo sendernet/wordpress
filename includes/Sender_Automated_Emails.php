@@ -201,6 +201,18 @@ class Sender_Automated_Emails
 			</script>
 			";
         }
+
+        $this->addSenderPluginVersion();
+    }
+
+    public function addSenderPluginVersion()
+    {
+        $pluginData = get_plugin_data($this->senderBaseFile);
+        if (!empty($pluginData) && isset($pluginData['Version'])) {
+            $pluginVersion = 'Sender.net ' . esc_attr($pluginData['Version']);
+            echo
+                '<meta name="generator" content="' . $pluginVersion . '"/>';
+        }
     }
 
     public function senderRegisterFormsWidget()
