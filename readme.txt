@@ -2,9 +2,9 @@
 Contributors: augustask
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.1
+Tested up to: 6.1.1
 Requires PHP: 5.6
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -171,3 +171,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Support FE builder with sender form widget
 * Handle x-rate limitation
 * Adding subscribe to newsletter checkbox in checkout and account register/edit
+= 2.1.4 - 2022-11-24 =
+* Plugin version meta
+* Fix small bug on user query
