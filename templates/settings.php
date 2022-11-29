@@ -202,7 +202,7 @@
 
     jQuery('#sender-confirmation').click(function(e) {
         e.preventDefault();
-        toggleModal('This would disconnect the store from your Sender account.');
+        toggleModal('This will disconnect the store from your Sender account.');
     });
 
     function toggleModal(text) {
