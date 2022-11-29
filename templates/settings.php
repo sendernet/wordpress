@@ -75,7 +75,7 @@
                                 <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected"
                                        value="true"
                                        class="sender-input sender-text-input sender-br-5">
-                                <input type="submit" name="submit" id="submit"
+                                <input type="submit" name="submit" id="sender-confirmation"
                                        class="sender-cta-button sender-medium sender-br-5"
                                        value="Change user">
                             </form>
@@ -199,4 +199,36 @@
         jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-dropdown-wrap').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'));
     });
+
+    jQuery('#sender-confirmation').click(function(e) {
+        e.preventDefault();
+        toggleModal('This will disconnect the store from your Sender account.');
+    });
+
+    function toggleModal(text) {
+        $wrapper = jQuery('<div class="sender-container"  id="sender-modal-wrapper"></div>').appendTo('body');
+        $modal = jQuery('<div id="sender-modal-confirmation">' +
+            '<div id="sender-modal-header">' +
+            '<h3 class="sender-header">Confirm Delete</h3>' +
+            '<span class="sender-modal-action" id="sender-modal-close">' +
+            'x</span>' +
+            '</div>' +
+            '<div id="sender-modal-content" class="sender-label sender-select-label sender-form-label"><p>' + text + '' +
+            '</p></div>' +
+            '<div id="sender-modal-buttons">' +
+            '<button class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn sender-modal-action">No</button>' +
+            '<form id="" method="post" action="">' +
+            '<input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value="true">' +
+            '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="Yes"></input></form></div></div>').appendTo($wrapper);
+        setTimeout(function() {
+            $wrapper.addClass('active');
+        }, 100);
+
+        $wrapper.find('.sender-modal-action').click(function() {
+            $wrapper.removeClass('active').delay(500).queue(function() {
+                $wrapper.remove();
+            });
+        });
+
+    }
 </script>
