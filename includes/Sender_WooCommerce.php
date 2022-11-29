@@ -13,15 +13,11 @@ class Sender_WooCommerce
     {
         $this->sender = $sender;
 
-        if (!get_option('sender_wocommerce_sync')) {
-            $this->getTablePrefix();
-            $this->exportCustomers();
-            $this->exportProducts();
-            $this->exportOrders();
-        }
-
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
         add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
+
+        //Adding after plugins loaded to avoid error on user_query
+        add_action('plugins_loaded', [&$this, 'senderExportShopData'], 99);
     }
 
     public function senderAddUserAfterManualOrderCreation($orderId)
@@ -263,5 +259,15 @@ class Sender_WooCommerce
     {
         global $wpdb;
         $this->tablePrefix = $wpdb->prefix;
+    }
+
+    public function senderExportShopData()
+    {
+        if (!get_option('sender_wocommerce_sync')) {
+            $this->getTablePrefix();
+            $this->exportCustomers();
+            $this->exportProducts();
+            $this->exportOrders();
+        }
     }
 }

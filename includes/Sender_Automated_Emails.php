@@ -201,6 +201,27 @@ class Sender_Automated_Emails
 			</script>
 			";
         }
+
+        $this->addSenderPluginVersion();
+    }
+
+    private function addSenderPluginVersion()
+    {
+        $version = $this->getVersionPlugin();
+        if ($version) {
+            $pluginVersion = 'Sender.net ' . esc_attr($version);
+            echo
+                '<meta name="generator" content="' . $pluginVersion . '"/>';
+        }
+    }
+
+    private function getVersionPlugin()
+    {
+        $pluginData = get_plugin_data($this->senderBaseFile);
+        if (!empty($pluginData) && isset($pluginData['Version'])) {
+            return $pluginData['Version'];
+        }
+        return false;
     }
 
     public function senderRegisterFormsWidget()
@@ -243,7 +264,8 @@ class Sender_Automated_Emails
 
     public function senderInitStyles()
     {
-        wp_enqueue_style('sender-styles', plugin_dir_url($this->senderBaseFile) . 'styles/settings.css');
+        $version = $this->getVersionPlugin();
+        wp_enqueue_style('sender-styles', plugin_dir_url($this->senderBaseFile) . 'styles/settings.css', [], $version);
     }
 
     public function senderStore()
