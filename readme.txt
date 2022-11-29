@@ -171,6 +171,8 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Support FE builder with sender form widget
 * Handle x-rate limitation
 * Adding subscribe to newsletter checkbox in checkout and account register/edit
-= 2.1.4 - 2022-11-24 =
+= 2.1.4 - 2022-11-29 =
 * Plugin version meta
 * Fix small bug on user query
+* Adding confirmation for removing user
+* Fix bug on x-rate
