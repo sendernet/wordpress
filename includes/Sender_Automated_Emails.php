@@ -54,6 +54,8 @@ class Sender_Automated_Emails
         $storeActive = $this->senderApi->senderGetStore();
         if (!$storeActive && !isset($storeActive->xRate)) {
             update_option('sender_account_disconnected', true);
+            update_option('sender_api_key', false);
+            update_option('sender_resource_key', false);
             return;
         };
 
@@ -97,6 +99,8 @@ class Sender_Automated_Emails
                 if ($name === 'sender_account_disconnected' && !empty($updates[$name])) {
                     update_option('sender_wocommerce_sync', 0);
                     $this->senderApi->senderDeleteStore();
+                    update_option('sender_api_key', false);
+                    update_option('sender_resource_key', false);
                 };
             }
         }
@@ -121,16 +125,16 @@ class Sender_Automated_Emails
         }
 
         $user = $this->senderApi->senderGetAccount();
-
-        if (isset($user->message)) {
-            update_option('sender_api_key', false);
-            update_option('sender_account_message', $user->message);
-            update_option('sender_resource_key', false);
-            return false;
-        }
-
         if (isset($user->xRate)) {
             return true;
+        }
+
+        if (isset($user->account->status) && $user->account->status == 'SUSPENDED' || $user->account->status == 'HARD_SUSPENDED') {
+            $this->senderApi->senderDeleteStore();
+            update_option('sender_api_key', false);
+            update_option('sender_account_message', $user->account->account_message);
+            update_option('sender_resource_key', false);
+            return false;
         }
 
         if ($user) {
