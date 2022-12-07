@@ -139,7 +139,7 @@ class Sender_API
         $responseCode = wp_remote_retrieve_response_code($response);
         if (is_wp_error($response) || $responseCode != 200) {
             if ($responseCode == 429) {
-                return json_decode($this->solveRateLimit($response));
+                return json_decode(json_encode(['xRate' => true]));
             }
             return false;
         }
@@ -157,12 +157,6 @@ class Sender_API
         $response = wp_remote_request($this->senderBaseUrl . 'stores/' . get_option('sender_store_register'), $this->senderBaseRequestArguments());
 
         return $this->senderBuildResponse($response);
-    }
-
-    public function solveRateLimit($response)
-    {
-        $remainingLimitation = wp_remote_retrieve_header($response, 'x-ratelimit-remaining');
-        return json_encode(['xRate' => true, 'remaining' => $remainingLimitation]);
     }
 
     public function senderAddStore()
