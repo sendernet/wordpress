@@ -53,7 +53,7 @@ class Sender_Automated_Emails
 
         $storeActive = $this->senderApi->senderGetStore();
         if (!$storeActive && !isset($storeActive->xRate)) {
-            $this->senderStore();
+            $this->senderHandleAddStore();
         };
 
         if ($this->senderIsWooEnabled()) {
@@ -259,7 +259,7 @@ class Sender_Automated_Emails
         wp_enqueue_style('sender-styles', plugin_dir_url($this->senderBaseFile) . 'styles/settings.css', [], $version);
     }
 
-    public function senderStore()
+    public function senderHandleAddStore()
     {
         $store = $this->senderApi->senderAddStore();
         if (isset($store->data, $store->data->id)) {

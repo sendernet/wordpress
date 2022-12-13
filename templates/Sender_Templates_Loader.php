@@ -57,7 +57,7 @@ class Sender_Templates_Loader
                 update_option('sender_groups_data', $groupsDataSenderOption);
             }
 
-            $this->sender->senderStore();
+            $this->sender->senderHandleAddStore();
         }
 
         require_once('settings.php');
