@@ -47,16 +47,13 @@ class Sender_Automated_Emails
         $this->senderEnqueueStyles();
         $this->senderCreateSettingsTemplates();
 
-        if (!$this->senderApiKey() || get_option('sender_account_disconnected') || !get_option('sender_store_register')) {
+        if (!$this->senderApiKey() || get_option('sender_account_disconnected')) {
             return;
         }
 
         $storeActive = $this->senderApi->senderGetStore();
         if (!$storeActive && !isset($storeActive->xRate)) {
-            update_option('sender_account_disconnected', true);
-            update_option('sender_api_key', false);
-            update_option('sender_resource_key', false);
-            return;
+            $this->senderStore();
         };
 
         if ($this->senderIsWooEnabled()) {
@@ -99,8 +96,6 @@ class Sender_Automated_Emails
                 if ($name === 'sender_account_disconnected' && !empty($updates[$name])) {
                     update_option('sender_wocommerce_sync', 0);
                     $this->senderApi->senderDeleteStore();
-                    update_option('sender_api_key', false);
-                    update_option('sender_resource_key', false);
                 };
             }
         }
@@ -129,15 +124,7 @@ class Sender_Automated_Emails
             return true;
         }
 
-        if (isset($user->account->status) && $user->account->status == 'SUSPENDED' || $user->account->status == 'HARD_SUSPENDED') {
-            $this->senderApi->senderDeleteStore();
-            update_option('sender_api_key', false);
-            update_option('sender_account_message', $user->account->account_message);
-            update_option('sender_resource_key', false);
-            return false;
-        }
-
-        if ($user) {
+        if (isset($user->account)) {
             update_option('sender_account_title', $user->account->title);
             update_option('sender_account_plan_type', $user->account->active_plan->type);
             update_option('sender_resource_key', $user->account->resource_key);
