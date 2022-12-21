@@ -9,15 +9,18 @@ class Sender_WooCommerce
     private $sender;
     private $tablePrefix;
 
-    public function __construct($sender)
+    public function __construct($sender, $update = false)
     {
         $this->sender = $sender;
-
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
         add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
 
         //Adding after plugins loaded to avoid error on user_query
         add_action('plugins_loaded', [&$this, 'senderExportShopData'], 99);
+
+        if ($update){
+            $this->senderExportShopData();
+        }
     }
 
     public function senderAddUserAfterManualOrderCreation($orderId)
@@ -101,6 +104,7 @@ class Sender_WooCommerce
         );
 
         $customersCount = $customer_query->get_total();
+
         $chunkSize = 5000;
         $customersExported = 0;
 
@@ -124,9 +128,7 @@ class Sender_WooCommerce
             $this->sendCustomersToSender($customerList);
         }
 
-        update_option('sender_wocommerce_sync', true);
-
-        return true;
+//        return true;
     }
 
     public function sendCustomersToSender($customers)
@@ -257,8 +259,6 @@ class Sender_WooCommerce
             $this->sender->senderApi->senderExportData(['orders' => $ordersExportData]);
             $ordersExported += $chunkSize;
         }
-
-        return true;
     }
 
     public function getTablePrefix()
@@ -274,16 +274,8 @@ class Sender_WooCommerce
             $this->exportCustomers();
             $this->exportProducts();
             $this->exportOrders();
-            add_action('admin_notices', [&$this, 'senderSyncCompleted']);
+            update_option('sender_wocommerce_sync', true);
+            update_option('sender_synced_data_date', current_time('Y-m-d H:i:s'));
         }
-    }
-
-    public function senderSyncCompleted()
-    {
-        echo '<div class="notice notice-warning is-dismissible">
-            <p>Sender completed synchronization.
-            <a target="_blank" class="sender-link"href="https://app.sender.net/settings/connected-stores">See your store information</a>
-            </p>
-      </div>';
     }
 }

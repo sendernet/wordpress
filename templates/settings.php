@@ -176,6 +176,7 @@
                                         <a target="_blank" class="sender-link"
                                            href="https://app.sender.net/settings/connected-stores">See your store
                                             information</a>
+                                        <span style="display: block">Last time synchronized: <strong style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -206,7 +207,7 @@
     });
 
     jQuery('#sender-submit-sync').click(function(){
-        jQuery(this).val("Working on");
+        jQuery(this).val("Synchronizing");
         jQuery(this).css({"pointer-events":"none"})
     });
 

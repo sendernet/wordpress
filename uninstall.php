@@ -23,6 +23,7 @@ $availableSettings = [
     'sender_groups_data',
     'sender_forms_data',
     'sender_wocommerce_sync',
+    'sender_synced_data_date'
 ];
 
 global $wpdb;

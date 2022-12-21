@@ -20,6 +20,7 @@ class Sender_Automated_Emails
         'sender_account_plan_type' => false,
         'sender_groups_data' => false,
         'sender_forms_data' => false,
+        'sender_synced_data_date' => false
     ];
 
     public $senderBaseFile;
@@ -95,7 +96,15 @@ class Sender_Automated_Emails
                 update_option($name, $updates[$name]);
                 if ($name === 'sender_account_disconnected' && !empty($updates[$name])) {
                     $this->senderApi->senderDeleteStore();
-                };
+                }
+
+                if ($name === 'sender_wocommerce_sync'){
+                    if (!class_exists('Sender_WooCommerce')) {
+                        require_once("Sender_WooCommerce.php");
+                    }
+
+                    new Sender_WooCommerce($this, true);
+                }
             }
         }
     }
