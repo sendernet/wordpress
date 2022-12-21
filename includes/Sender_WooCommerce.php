@@ -135,14 +135,20 @@ class Sender_WooCommerce
         $customersExportData = [];
         foreach ($customers as $customerId) {
             $customer = get_user_meta($customerId);
-            if (isset($customer['billing_email'])) {
-                $customersExportData[] = [
+            if (!empty($customer['billing_email'])) {
+                $data = [
                     'email' => $customer['billing_email'][0],
                     'firstname' => $customer['first_name'][0] ?: null,
                     'lastname' => $customer['last_name'][0] ?: null,
                     'phone' => $customer['billing_phone'][0] ?: null,
                     'tags' => $list
                 ];
+
+                if (isset($customer['sender_newsletter']) && $customer['sender_newsletter']) {
+                    $data['newsletter'] = true;
+                }
+
+                $customersExportData[] = $data;
             }
         }
 
@@ -268,6 +274,16 @@ class Sender_WooCommerce
             $this->exportCustomers();
             $this->exportProducts();
             $this->exportOrders();
+            add_action('admin_notices', [&$this, 'senderSyncCompleted']);
         }
+    }
+
+    public function senderSyncCompleted()
+    {
+        echo '<div class="notice notice-warning is-dismissible">
+            <p>Sender completed synchronization.
+            <a target="_blank" class="sender-link"href="https://app.sender.net/settings/connected-stores">See your store information</a>
+            </p>
+      </div>';
     }
 }
