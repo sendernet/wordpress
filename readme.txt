@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -180,3 +180,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Fix on loosing api_key
 = 2.1.6 - 2022-12-13 =
 * Fix for disconnecting accounts
+= 2.1.7 - 2022-12-21 =
+* Sender newsletter option  can be updated in user details from admin panel. Adding subcriber channel email active when synchronizing.
+* Notification when synchronization would be finished.

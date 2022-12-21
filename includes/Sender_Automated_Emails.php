@@ -94,7 +94,6 @@ class Sender_Automated_Emails
             if (isset($updates[$name])) {
                 update_option($name, $updates[$name]);
                 if ($name === 'sender_account_disconnected' && !empty($updates[$name])) {
-                    update_option('sender_wocommerce_sync', 0);
                     $this->senderApi->senderDeleteStore();
                 };
             }
