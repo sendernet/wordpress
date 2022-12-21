@@ -167,7 +167,7 @@
                                        value="0"
                                        class="sender-input sender-text-input sender-br-5">
                                 <div class="sender-btn-wrap sender-d-flex">
-                                    <input type="submit" name="submit" id="submit"
+                                    <input type="submit" name="submit" id="sender-submit-sync"
                                            class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
                                            value="Sync with Sender">
                                     <div id="sender-import-text" class="sender-default-text">
@@ -204,6 +204,12 @@
         e.preventDefault();
         toggleModal('This will disconnect the store from your Sender account.');
     });
+
+    jQuery('#sender-submit-sync').click(function(){
+        jQuery(this).val("Working on");
+        jQuery(this).css({"pointer-events":"none"})
+    });
+
 
     function toggleModal(text) {
         $wrapper = jQuery('<div class="sender-container"  id="sender-modal-wrapper"></div>').appendTo('body');
