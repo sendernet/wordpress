@@ -167,7 +167,7 @@
                                        value="0"
                                        class="sender-input sender-text-input sender-br-5">
                                 <div class="sender-btn-wrap sender-d-flex">
-                                    <input type="submit" name="submit" id="submit"
+                                    <input type="submit" name="submit" id="sender-submit-sync"
                                            class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
                                            value="Sync with Sender">
                                     <div id="sender-import-text" class="sender-default-text">
@@ -176,6 +176,7 @@
                                         <a target="_blank" class="sender-link"
                                            href="https://app.sender.net/settings/connected-stores">See your store
                                             information</a>
+                                        <span style="display: block">Last time synchronized: <strong style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -204,6 +205,12 @@
         e.preventDefault();
         toggleModal('This will disconnect the store from your Sender account.');
     });
+
+    jQuery('#sender-submit-sync').click(function(){
+        jQuery(this).val("Synchronizing");
+        jQuery(this).css({"pointer-events":"none"})
+    });
+
 
     function toggleModal(text) {
         $wrapper = jQuery('<div class="sender-container"  id="sender-modal-wrapper"></div>').appendTo('body');

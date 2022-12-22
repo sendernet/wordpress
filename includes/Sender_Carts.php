@@ -36,6 +36,9 @@ class Sender_Carts
         add_action('woocommerce_save_account_details', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
         add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
 
+        add_action('edit_user_profile', [&$this, 'senderAddNewsletterOptionToUsersEditView']);
+        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletterUpdateUser']);
+
         return $this;
     }
 
@@ -369,6 +372,26 @@ class Sender_Carts
             'input_class' => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
             'label' => 'Subscriber to our newsletter',
         ), $currentValue);
+    }
+
+    public function senderAddNewsletterOptionToUsersEditView($user)
+    {
+        $currentValue = get_user_meta($user->ID, 'sender_newsletter', true);
+        $checkboxValue = $currentValue ? 'checked=checked' : '';
+        echo '<table class="form-table" role="presentation">
+			<tbody><tr id="sender_newsletter" >
+			<th><label for="sender_newsletter">Sender Newsletter</label></th>
+			<th><input type="checkbox" name="sender_newsletter"' . $checkboxValue . '/></th>
+			<td></td></tr></tbody></table>';
+    }
+
+    public function senderUpdateNewsletterUpdateUser($userId)
+    {
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_user_meta($userId, 'sender_newsletter', 1);
+        } else {
+            update_user_meta($userId, 'sender_newsletter', 0);
+        }
     }
 
 }
