@@ -180,6 +180,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Fix on loosing api_key
 = 2.1.6 - 2022-12-13 =
 * Fix for disconnecting accounts
-= 2.1.7 - 2022-12-21 =
+= 2.1.7 - 2022-12-22 =
 * Sender newsletter option  can be updated in user details from admin panel. Adding subcriber channel email active when synchronizing.
-* Notification when synchronization would be finished.
+* Last date synced added
