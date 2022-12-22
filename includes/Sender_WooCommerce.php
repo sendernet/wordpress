@@ -127,8 +127,6 @@ class Sender_WooCommerce
             $customerList = json_decode(json_encode($customer_query->get_results(), true));
             $this->sendCustomersToSender($customerList);
         }
-
-//        return true;
     }
 
     public function sendCustomersToSender($customers)
