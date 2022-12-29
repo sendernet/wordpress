@@ -268,12 +268,20 @@ class Sender_WooCommerce
     public function senderExportShopData()
     {
         if (!get_option('sender_wocommerce_sync')) {
-            $this->getTablePrefix();
-            $this->exportCustomers();
-            $this->exportProducts();
-            $this->exportOrders();
-            update_option('sender_wocommerce_sync', true);
-            update_option('sender_synced_data_date', current_time('Y-m-d H:i:s'));
+            $storeActive = $this->sender->senderApi->senderGetStore();
+            if (!$storeActive && !isset($storeActive->xRate)) {
+                $this->sender->senderHandleAddStore();
+                $storeActive = true;
+            }
+
+            if ($storeActive && get_option('sender_store_register')) {
+                $this->getTablePrefix();
+                $this->exportCustomers();
+                $this->exportProducts();
+                $this->exportOrders();
+                update_option('sender_wocommerce_sync', true);
+                update_option('sender_synced_data_date', current_time('Y-m-d H:i:s'));
+            }
         }
     }
 }
