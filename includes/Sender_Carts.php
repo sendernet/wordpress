@@ -136,6 +136,10 @@ class Sender_Carts
         $total = $this->senderGetWoo()->cart->total;
         $user = (new Sender_User())->find($cart->user_id);
 
+        if (!$user){
+            return;
+        }
+
         $baseUrl = wc_get_cart_url();
         $lastCharacter = substr($baseUrl, -1);
 
