@@ -112,8 +112,8 @@ class Sender_Carts
 
                 $userData = [
                     'email' => $email,
-                    'first_name' => $firstname,
-                    'last_name' => $lastname,
+                    'firstname' => $firstname,
+                    'lastname' => $lastname,
                     'newsletter' => (boolean)$user->sender_newsletter,
                     'visitor_id' => $this->senderSessionCookie,
                 ];
