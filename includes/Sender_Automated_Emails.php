@@ -52,11 +52,6 @@ class Sender_Automated_Emails
             return;
         }
 
-        $storeActive = $this->senderApi->senderGetStore();
-        if (!$storeActive && !isset($storeActive->xRate)) {
-            $this->senderHandleAddStore();
-        };
-
         if ($this->senderIsWooEnabled()) {
             if (!class_exists('Sender_User')) {
                 require_once 'Model/Sender_User.php';

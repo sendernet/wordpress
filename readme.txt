@@ -1,10 +1,10 @@
 === Sender - Newsletter, SMS and Email Marketing Automation for WooCommerce ===
-Contributors: augustask
+Contributors: sendernet
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 2.1.7
+Stable tag: 2.2.0
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -183,3 +183,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.1.7 - 2022-12-22 =
 * Sender newsletter option  can be updated in user details from admin panel. Adding subcriber channel email active when synchronizing.
 * Last date synced added
+= 2.2.0 - 2022-12-30 =
+* Reducing background requests
+* Warning fixes

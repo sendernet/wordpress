@@ -112,8 +112,8 @@ class Sender_Carts
 
                 $userData = [
                     'email' => $email,
-                    'first_name' => $firstname,
-                    'last_name' => $lastname,
+                    'firstname' => $firstname,
+                    'lastname' => $lastname,
                     'newsletter' => (boolean)$user->sender_newsletter,
                     'visitor_id' => $this->senderSessionCookie,
                 ];
@@ -135,6 +135,10 @@ class Sender_Carts
         $items = $this->senderGetCart();
         $total = $this->senderGetWoo()->cart->total;
         $user = (new Sender_User())->find($cart->user_id);
+
+        if (!$user){
+            return;
+        }
 
         $baseUrl = wc_get_cart_url();
         $lastCharacter = substr($baseUrl, -1);
@@ -261,12 +265,11 @@ class Sender_Carts
 
     public function senderGetVisitor()
     {
-        $visitor = $_COOKIE['sender_site_visitor'];
-        $user = (new Sender_User())->findBy('visitor_id', $visitor);
+        $user = (new Sender_User())->findBy('visitor_id', $this->senderSessionCookie);
 
         if (!$user) {
             $user = new Sender_User();
-            $user->visitor_id = $visitor;
+            $user->visitor_id = $this->senderSessionCookie;
             $user->save();
         }
         return $user;
