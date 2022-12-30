@@ -183,5 +183,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.1.7 - 2022-12-22 =
 * Sender newsletter option  can be updated in user details from admin panel. Adding subcriber channel email active when synchronizing.
 * Last date synced added
-= 2.2.0 - 2022-12-29 =
+= 2.2.0 - 2022-12-30 =
 * Reducing background requests
+* Warning fixes
