@@ -245,7 +245,9 @@ class Sender_Carts
             $cart->cart_data = $cartData;
             $cart->save();
             $cartData = $this->senderPrepareCartData($cart);
-            $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
+            if ($cartData) {
+                $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
+            }
             return;
         }
 
