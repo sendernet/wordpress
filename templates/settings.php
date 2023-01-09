@@ -25,8 +25,6 @@
                     </div>
                     <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
                            class="sender-input sender-text-input sender-mb-20 sender-br-5">
-                    <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value=""
-                           class="sender-input sender-text-input sender-br-5">
                     <input type="submit" name="submit" id="submit"
                            class="sender-cta-button sender-large sender-mb-20 sender-br-5"
                            value="Begin">
