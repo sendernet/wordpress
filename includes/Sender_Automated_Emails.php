@@ -88,9 +88,29 @@ class Sender_Automated_Emails
     {
         foreach ($this->availableSettings as $name => $defaultValue) {
             if (isset($updates[$name])) {
+                //Handle login before all
+                if ($name === 'sender_api_key') {
+                    update_option('sender_api_key', $updates[$name]);
+                    $user = $this->senderApi->senderGetAccount();
+                    if (!$user) {
+                        add_action('admin_notices', [&$this, 'error_account_connected']);
+                        do_action('admin_notices', 'Incorrect API key.');
+                        return false;
+                    }
+
+                    if (isset($user->xRate)){
+                        add_action('admin_notices', [&$this, 'error_account_connected']);
+                        do_action('admin_notices', 'Too many requests. Try again after 1 minute.');
+                        return false;
+                    }
+
+                    update_option('sender_account_disconnected', false);
+                }
+
                 update_option($name, $updates[$name]);
                 if ($name === 'sender_account_disconnected' && !empty($updates[$name])) {
                     $this->senderApi->senderDeleteStore();
+                    update_option('sender_store_register', false);
                 }
 
                 if ($name === 'sender_wocommerce_sync'){
@@ -123,6 +143,7 @@ class Sender_Automated_Emails
         }
 
         $user = $this->senderApi->senderGetAccount();
+
         if (isset($user->xRate)) {
             return true;
         }
@@ -135,6 +156,13 @@ class Sender_Automated_Emails
         }
 
         return true;
+    }
+
+    public function error_account_connected($message)
+    {
+        echo '<div class="notice notice-error is-dismissible sender-notice-error">
+      <p>' . $message . '</p>
+      </div>';
     }
 
     public function senderIsWooEnabled()
