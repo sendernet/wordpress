@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -186,3 +186,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.2.0 - 2022-12-30 =
 * Reducing background requests
 * Warning fixes
+= 2.2.1 - 2023-01-09 =
+* Fix on cart checkout for plugin flows
+* Notifications incorrect login
