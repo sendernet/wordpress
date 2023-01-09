@@ -570,3 +570,7 @@ label.sender-checkbox-label {
 .sender-modal-action-btn {
     padding: 10px 35px!important;
 }
+.sender-notice-error{
+    margin:10px auto;
+    width:25%!important;
+}
