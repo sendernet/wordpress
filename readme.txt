@@ -186,5 +186,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.2.0 - 2022-12-30 =
 * Reducing background requests
 * Warning fixes
-= 2.2.1 - 2023-01-06 =
+= 2.2.1 - 2023-01-09 =
 * Fix on cart checkout for plugin flows
+* Notifications incorrect login
