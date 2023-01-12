@@ -9,6 +9,14 @@ class Sender_Carts
     private $sender;
     private $senderSessionCookie;
 
+    const TRACK_CART = 'sender-track-cart';
+    const UPDATE_CART = 'sender-update-cart';
+
+    const FRAGMENTS_FILTERS = [
+        'woocommerce_add_to_cart_fragments',
+        'woocommerce_update_order_review_fragments'
+    ];
+
     public function __construct($sender)
     {
         $this->sender = $sender;
@@ -26,7 +34,7 @@ class Sender_Carts
     {
         add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
         add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
-        add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+        add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated'], 50);
 
         add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
         add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
@@ -124,7 +132,6 @@ class Sender_Carts
         }
 
         update_post_meta($orderId, 'sender_remote_id', $cart->id);
-
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
     }
@@ -226,7 +233,11 @@ class Sender_Carts
         $cartData = serialize($items);
 
         if (!$this->senderGetWoo()->session->get_session_cookie()) {
-            return;
+            if (empty($items)){
+                return;
+            }
+            //Making the woocommerce cookie active when adding from general view
+            WC()->session->set_customer_session_cookie(true);
         }
 
         $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
@@ -245,9 +256,17 @@ class Sender_Carts
             $cart->cart_data = $cartData;
             $cart->save();
             $cartData = $this->senderPrepareCartData($cart);
-            if ($cartData) {
+
+            if (!$cartData) {
+                return;
+            }
+
+            if (wp_doing_ajax()) {
+                $this->handleCartFragmentsFilters(json_encode($cartData), self::UPDATE_CART);
+            } else {
                 $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
             }
+
             return;
         }
 
@@ -258,11 +277,43 @@ class Sender_Carts
             $newCart->session = $this->senderSessionCookie;
             $newCart->save();
             $cartData = $this->senderPrepareCartData($newCart);
+            if (!$cartData){
+                return;
+            }
 
-            add_action('wp_head', [&$this, 'addTrackCartScript'], 10, 10);
-            do_action('wp_head', json_encode($cartData));
+            if (wp_doing_ajax()) {
+                $this->handleCartFragmentsFilters(json_encode($cartData), self::TRACK_CART);
+            } else {
+                add_action('wp_head', [&$this, 'addTrackCartScript']);
+                do_action('wp_head', json_encode($cartData));
+            }
+        }
+    }
+
+    public function handleCartFragmentsFilters($cartData, $type)
+    {
+        switch ($type) {
+            case self::TRACK_CART:
+                $method = 'trackCart';
+                break;
+            case self::UPDATE_CART:
+                $method = 'updateCart';
+                break;
         }
 
+        if (isset($method)) {
+            foreach (self::FRAGMENTS_FILTERS as $filterName) {
+                add_filter($filterName, function ($fragments) use ($cartData, $type, $method) {
+                    ob_start();
+                    ?>
+                    <script id="<?php echo $type ?>">
+                        sender('<?php echo $method; ?>', <?php echo $cartData; ?>)
+                    </script>
+                    <?php $fragments['script#' . $type] = ob_get_clean();
+                    return $fragments;
+                });
+            }
+        }
     }
 
     public function senderGetVisitor()
@@ -346,15 +397,6 @@ class Sender_Carts
         return $key;
     }
 
-    public function addTrackCartScript($cartData)
-    {
-        echo "
-			<script>
-			sender('trackCart', $cartData)
-            </script>
-		";
-    }
-
     public function addConvertCartScript($cartData)
     {
         echo "
@@ -397,6 +439,15 @@ class Sender_Carts
         } else {
             update_user_meta($userId, 'sender_newsletter', 0);
         }
+    }
+
+    public function addTrackCartScript($cartData)
+    {
+        echo "
+			<script>
+			sender('trackCart', $cartData)
+            </script>
+		";
     }
 
 }

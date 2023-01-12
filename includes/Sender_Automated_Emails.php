@@ -73,11 +73,15 @@ class Sender_Automated_Emails
         if (get_option('sender_allow_tracking') && $this->senderIsWooEnabled()) {
             add_action('user_register', [&$this->senderApi, 'senderTrackRegisterUserCallback'], 10, 1);
             add_action('wp_login', [&$this->senderApi, 'senderTrackRegisterUserCallback']);
+            add_action( 'wp_enqueue_scripts', [&$this, 'sender_cart_track_script'] );
         }
 
         return $this;
     }
 
+    public function sender_cart_track_script() {
+        wp_enqueue_script( 'sender-track-track', plugin_dir_url($this->senderBaseFile) . 'assets/js/sender.js', array(), $this->getVersionPlugin(), true);
+    }
     private function senderAddFilters()
     {
         add_filter('plugin_action_links_' . plugin_basename($this->senderBaseFile), [&$this, 'senderAddPluginLinks']);
@@ -222,6 +226,8 @@ class Sender_Automated_Emails
 			  sender('trackVisitors')
 			</script>
 			";
+            echo '<script id="sender-track-cart"></script>';
+            echo '<script id="sender-update-cart"></script>';
         }
 
         $this->addSenderPluginVersion();
