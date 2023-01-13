@@ -217,4 +217,14 @@ class Sender_API
         return $this->senderBuildStatsResponse($response);
     }
 
+    public function senderTrackCart(array $cartParams)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartParams)]);
+
+        $response = wp_remote_post($this->senderStatsBaseUrl . 'carts', $params);
+
+        return $this->senderBuildResponse($response);
+    }
+
+
 }

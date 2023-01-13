@@ -283,6 +283,13 @@ class Sender_Carts
 
             if (wp_doing_ajax()) {
                 $this->handleCartFragmentsFilters(json_encode($cartData), self::TRACK_CART);
+
+                //Solution for Cart-Flows email checker
+                if ($_POST && isset($_POST['action'])) {
+                    if ($_POST['action'] === 'wcf_check_email_exists') {
+                        $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
+                    }
+                }
             } else {
                 add_action('wp_head', [&$this, 'addTrackCartScript']);
                 do_action('wp_head', json_encode($cartData));
