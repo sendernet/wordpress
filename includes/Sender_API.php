@@ -90,8 +90,12 @@ class Sender_API
                 $data['list_id'] = $list;
             }
 
-            if (get_user_meta($userId, 'sender_newsletter', true)) {
-                $data['newsletter'] = get_user_meta($userId, 'sender_newsletter', true);
+            if ($newsletter = get_user_meta($userId, 'sender_newsletter', true)) {
+                if($newsletter == true){
+                    $data['newsletter'] = true;
+                }else{
+                    $data['newsletter'] = false;
+                }
             }
 
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
