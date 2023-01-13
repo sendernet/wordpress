@@ -41,11 +41,11 @@ class Sender_Carts
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
 
         add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
-        add_action('woocommerce_save_account_details', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
-        add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
+        add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
+        add_action('woocommerce_created_customer', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
         add_action('edit_user_profile', [&$this, 'senderAddNewsletterOptionToUsersEditView']);
-        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletterUpdateUser']);
+        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletter']);
 
         return $this;
     }
@@ -57,7 +57,7 @@ class Sender_Carts
         }
     }
 
-    public function senderAddNewsletterCheckFromAccount($userId)
+    public function senderUpdateNewsletter($userId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'sender_newsletter', 1);
@@ -217,6 +217,10 @@ class Sender_Carts
         $user->visitor_id = $visitorId;
         $user->wp_user_id = $wpId;
         $user->email = $wpUser->user_email;
+
+        if (isset($_POST['sender_newsletter'])){
+            $this->senderUpdateNewsletter($wpId);
+        }
 
         if ($user->isDirty()) {
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
@@ -437,15 +441,6 @@ class Sender_Carts
 			<th><label for="sender_newsletter">Sender Newsletter</label></th>
 			<th><input type="checkbox" name="sender_newsletter"' . $checkboxValue . '/></th>
 			<td></td></tr></tbody></table>';
-    }
-
-    public function senderUpdateNewsletterUpdateUser($userId)
-    {
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_user_meta($userId, 'sender_newsletter', 1);
-        } else {
-            update_user_meta($userId, 'sender_newsletter', 0);
-        }
     }
 
     public function addTrackCartScript($cartData)
