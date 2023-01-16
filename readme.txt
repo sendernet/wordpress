@@ -189,6 +189,6 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.2.1 - 2023-01-09 =
 * Fix on cart checkout for plugin flows
 * Notifications incorrect login
-= 2.3.0 - 2023-01-13 =
+= 2.3.0 - 2023-01-16 =
 * Handle carts depending with woocommerce fragments on ajax enable
 * Compatibility for CartsFlow plugin && plugins using ajax on product indivual
