@@ -9,6 +9,14 @@ class Sender_Carts
     private $sender;
     private $senderSessionCookie;
 
+    const TRACK_CART = 'sender-track-cart';
+    const UPDATE_CART = 'sender-update-cart';
+
+    const FRAGMENTS_FILTERS = [
+        'woocommerce_add_to_cart_fragments',
+        'woocommerce_update_order_review_fragments'
+    ];
+
     public function __construct($sender)
     {
         $this->sender = $sender;
@@ -26,18 +34,18 @@ class Sender_Carts
     {
         add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
         add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
-        add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated']);
+        add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated'], 50);
 
         add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
         add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
 
         add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
-        add_action('woocommerce_save_account_details', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
-        add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletterCheckFromAccount'], 10, 1);
+        add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
+        add_action('woocommerce_created_customer', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
         add_action('edit_user_profile', [&$this, 'senderAddNewsletterOptionToUsersEditView']);
-        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletterUpdateUser']);
+        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletter']);
 
         return $this;
     }
@@ -49,7 +57,7 @@ class Sender_Carts
         }
     }
 
-    public function senderAddNewsletterCheckFromAccount($userId)
+    public function senderUpdateNewsletter($userId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'sender_newsletter', 1);
@@ -124,7 +132,6 @@ class Sender_Carts
         }
 
         update_post_meta($orderId, 'sender_remote_id', $cart->id);
-
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
     }
@@ -211,6 +218,10 @@ class Sender_Carts
         $user->wp_user_id = $wpId;
         $user->email = $wpUser->user_email;
 
+        if (isset($_POST['sender_newsletter'])){
+            $this->senderUpdateNewsletter($wpId);
+        }
+
         if ($user->isDirty()) {
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
         }
@@ -226,7 +237,11 @@ class Sender_Carts
         $cartData = serialize($items);
 
         if (!$this->senderGetWoo()->session->get_session_cookie()) {
-            return;
+            if (empty($items)){
+                return;
+            }
+            //Making the woocommerce cookie active when adding from general view
+            WC()->session->set_customer_session_cookie(true);
         }
 
         $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
@@ -245,9 +260,17 @@ class Sender_Carts
             $cart->cart_data = $cartData;
             $cart->save();
             $cartData = $this->senderPrepareCartData($cart);
-            if ($cartData) {
+
+            if (!$cartData) {
+                return;
+            }
+
+            if (wp_doing_ajax()) {
+                $this->handleCartFragmentsFilters(json_encode($cartData), self::UPDATE_CART);
+            } else {
                 $this->sender->senderApi->senderApiShutdownCallback("senderUpdateCart", $cartData);
             }
+
             return;
         }
 
@@ -258,11 +281,50 @@ class Sender_Carts
             $newCart->session = $this->senderSessionCookie;
             $newCart->save();
             $cartData = $this->senderPrepareCartData($newCart);
+            if (!$cartData){
+                return;
+            }
 
-            add_action('wp_head', [&$this, 'addTrackCartScript'], 10, 10);
-            do_action('wp_head', json_encode($cartData));
+            if (wp_doing_ajax()) {
+                $this->handleCartFragmentsFilters(json_encode($cartData), self::TRACK_CART);
+
+                //Solution for Cart-Flows email checker
+                if ($_POST && isset($_POST['action'])) {
+                    if ($_POST['action'] === 'wcf_check_email_exists') {
+                        $this->sender->senderApi->senderApiShutdownCallback("senderTrackCart", $cartData);
+                    }
+                }
+            } else {
+                add_action('wp_head', [&$this, 'addTrackCartScript']);
+                do_action('wp_head', json_encode($cartData));
+            }
+        }
+    }
+
+    public function handleCartFragmentsFilters($cartData, $type)
+    {
+        switch ($type) {
+            case self::TRACK_CART:
+                $method = 'trackCart';
+                break;
+            case self::UPDATE_CART:
+                $method = 'updateCart';
+                break;
         }
 
+        if (isset($method)) {
+            foreach (self::FRAGMENTS_FILTERS as $filterName) {
+                add_filter($filterName, function ($fragments) use ($cartData, $type, $method) {
+                    ob_start();
+                    ?>
+                    <script id="<?php echo $type ?>">
+                        sender('<?php echo $method; ?>', <?php echo $cartData; ?>)
+                    </script>
+                    <?php $fragments['script#' . $type] = ob_get_clean();
+                    return $fragments;
+                });
+            }
+        }
     }
 
     public function senderGetVisitor()
@@ -346,15 +408,6 @@ class Sender_Carts
         return $key;
     }
 
-    public function addTrackCartScript($cartData)
-    {
-        echo "
-			<script>
-			sender('trackCart', $cartData)
-            </script>
-		";
-    }
-
     public function addConvertCartScript($cartData)
     {
         echo "
@@ -390,13 +443,13 @@ class Sender_Carts
 			<td></td></tr></tbody></table>';
     }
 
-    public function senderUpdateNewsletterUpdateUser($userId)
+    public function addTrackCartScript($cartData)
     {
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_user_meta($userId, 'sender_newsletter', 1);
-        } else {
-            update_user_meta($userId, 'sender_newsletter', 0);
-        }
+        echo "
+			<script>
+			sender('trackCart', $cartData)
+            </script>
+		";
     }
 
 }

@@ -222,6 +222,8 @@ class Sender_Automated_Emails
 			  sender('trackVisitors')
 			</script>
 			";
+            echo '<script id="sender-track-cart"></script>';
+            echo '<script id="sender-update-cart"></script>';
         }
 
         $this->addSenderPluginVersion();
