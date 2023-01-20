@@ -267,7 +267,7 @@ class Sender_WooCommerce
 
     public function senderExportShopData()
     {
-        if (!get_option('sender_wocommerce_sync')) {
+        if (!get_option('sender_wocommerce_sync') && is_admin()) {
             $storeActive = $this->sender->senderApi->senderGetStore();
             if (!$storeActive && !isset($storeActive->xRate)) {
                 $this->sender->senderHandleAddStore();
