@@ -156,7 +156,33 @@
                                 </div>
                             </div>
                         </form>
+
+                        <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20 sender-mt-20">
+                            <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
+                            <div class="sender-default-text sender-mb-20">
+                                <p>Change the default text showing in cart checkouts and user account profile to your custom text.</p>
+                                <strong>Remove text to hide this option</strong>
+                            </div>
+                            <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action='' id="sender-newsletter-string-settings">
+                                <div class="sender-options sender-d-flex sender-flex-dir-column">
+                                    <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                        <label for="sender_subscribe_to_newsletter_string"
+                                               class="sender-label sender-p-relative">
+                                         <textarea rows="3" maxlength="255" name="sender_subscribe_to_newsletter_string"
+                                                   type="text"
+                                                   class="sender-input sender-text-input sender-mb-20 sender-br-5"
+                                                   id="sender_subscribe_to_newsletter_string"><?php echo get_option('sender_subscribe_to_newsletter_string') ?>
+                                        </textarea>
+                                            <input type="submit" name="submit" id="submit"
+                                                   class="sender-cta-button sender-large sender-mb-20 sender-br-5"
+                                                   value="Save text">
+                                        </label>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
+
                     <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between">
                         <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
                               id="sender-export-data">
@@ -168,7 +194,7 @@
                                     <input type="submit" name="submit" id="sender-submit-sync"
                                            class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
                                            value="Sync with Sender">
-                                    <div id="sender-import-text" class="sender-default-text">
+                                    <div class="sender-default-text" id="sender-import-text">
                                         Import all subscribers, orders and products from your WooCommerce store into
                                         your Sender account.
                                         <a target="_blank" class="sender-link"
