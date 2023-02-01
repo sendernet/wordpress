@@ -145,6 +145,13 @@ class Sender_API
             if ($responseCode == 429) {
                 return json_decode(json_encode(['xRate' => true]));
             }
+
+            //Handle 401 unathorized response
+            if ($responseCode === 401) {
+                update_option('sender_api_key', false);
+                update_option('sender_account_disconnected', true);
+            }
+
             return false;
         }
 
