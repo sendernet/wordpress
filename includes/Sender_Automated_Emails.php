@@ -20,7 +20,8 @@ class Sender_Automated_Emails
         'sender_account_plan_type' => false,
         'sender_groups_data' => false,
         'sender_forms_data' => false,
-        'sender_synced_data_date' => false
+        'sender_synced_data_date' => false,
+        'sender_subscribe_to_newsletter_string' => 'Subscribe to our newsletter'
     ];
 
     public $senderBaseFile;
@@ -105,6 +106,19 @@ class Sender_Automated_Emails
                     }
 
                     update_option('sender_account_disconnected', false);
+                    unset($updates[$name]);
+                    continue;
+                }
+
+                if ($name === 'sender_subscribe_to_newsletter_string'){
+                    $sanitizedInput = sanitize_text_field(wp_unslash($updates[$name]));
+                    if (strlen($sanitizedInput) > 255){
+                        $sanitizedInput = substr($sanitizedInput, 0, 254);
+                    }
+
+                    update_option('sender_subscribe_to_newsletter_string', $sanitizedInput);
+                    unset($updates[$name]);
+                    continue;
                 }
 
                 update_option($name, $updates[$name]);

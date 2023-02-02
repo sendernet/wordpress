@@ -44,7 +44,6 @@ class Sender_Carts
         add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
         add_action('woocommerce_created_customer', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
-        add_action('edit_user_profile', [&$this, 'senderAddNewsletterOptionToUsersEditView']);
         add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletter']);
 
         return $this;
@@ -422,25 +421,16 @@ class Sender_Carts
      */
     public function senderAddNewsletterCheck()
     {
-        $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
-        woocommerce_form_field('sender_newsletter', array(
-            'type' => 'checkbox',
-            'class' => array('form-row mycheckbox'),
-            'label_class' => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
-            'input_class' => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
-            'label' => 'Subscriber to our newsletter',
-        ), $currentValue);
-    }
-
-    public function senderAddNewsletterOptionToUsersEditView($user)
-    {
-        $currentValue = get_user_meta($user->ID, 'sender_newsletter', true);
-        $checkboxValue = $currentValue ? 'checked=checked' : '';
-        echo '<table class="form-table" role="presentation">
-			<tbody><tr id="sender_newsletter" >
-			<th><label for="sender_newsletter">Sender Newsletter</label></th>
-			<th><input type="checkbox" name="sender_newsletter"' . $checkboxValue . '/></th>
-			<td></td></tr></tbody></table>';
+        if (!empty(get_option('sender_subscribe_to_newsletter_string'))) {
+            $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+            woocommerce_form_field('sender_newsletter', array(
+                'type' => 'checkbox',
+                'class' => array('form-row mycheckbox'),
+                'label_class' => array('woocommerce-form__label woocommerce-form__label-for-checkbox checkbox'),
+                'input_class' => array('woocommerce-form__input woocommerce-form__input-checkbox input-checkbox'),
+                'label' => get_option('sender_subscribe_to_newsletter_string'),
+            ), $currentValue);
+        }
     }
 
     public function addTrackCartScript($cartData)
