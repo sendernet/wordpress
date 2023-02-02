@@ -157,30 +157,31 @@
                             </div>
                         </form>
 
-                        <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20 sender-mt-20">
-                            <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
-                            <div class="sender-default-text sender-mb-20">
-                                <p>Change the default text showing in cart checkouts and user account profile to your custom text.</p>
-                                <strong>Remove text to hide this option</strong>
-                            </div>
-                            <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action='' id="sender-newsletter-string-settings">
-                                <div class="sender-options sender-d-flex sender-flex-dir-column">
-                                    <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
-                                        <label for="sender_subscribe_to_newsletter_string"
-                                               class="sender-label sender-p-relative">
-                                         <textarea rows="3" maxlength="255" name="sender_subscribe_to_newsletter_string"
-                                                   type="text"
-                                                   class="sender-input sender-text-input sender-mb-20 sender-br-5"
-                                                   id="sender_subscribe_to_newsletter_string"><?php echo get_option('sender_subscribe_to_newsletter_string') ?>
-                                        </textarea>
-                                            <input type="submit" name="submit" id="submit"
-                                                   class="sender-cta-button sender-large sender-mb-20 sender-br-5"
-                                                   value="Save text">
-                                        </label>
-                                    </div>
-                                </div>
-                            </form>
+                    </div>
+                    <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20">
+                        <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
+                        <div class="sender-default-text sender-mb-20">
+                            <p>Change the default text showing in cart checkouts and user account profile to your custom text.</p>
+                            <strong>Remove text to hide this option</strong>
                         </div>
+                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action='' id="sender-newsletter-string-settings">
+                            <div class="sender-options sender-d-flex sender-flex-dir-column">
+                                <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                    <label for="sender_subscribe_to_newsletter_string"
+                                           class="sender-label sender-p-relative">
+                                        <input rows="3" maxlength="255" name="sender_subscribe_to_newsletter_string"
+                                               type="text"
+                                               class="sender-input sender-text-input sender-mb-20 sender-br-5"
+                                               id="sender_subscribe_to_newsletter_string"
+                                               value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
+                                        </input>
+                                        <input type="submit" name="submit" id="submit"
+                                               class="sender-cta-button sender-large sender-mb-20 sender-br-5"
+                                               value="Save text">
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                     <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between">
