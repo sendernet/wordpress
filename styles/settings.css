@@ -234,7 +234,7 @@ input.sender-text-input {
     outline: none !important;
     padding: 7px 12px;
     border-color: #ccc;
-    color: #000;  
+    color: #000;
     height: 40px;
     max-width: 100%;
 }
@@ -257,7 +257,7 @@ input.sender-input:-ms-input-placeholder {
     color: #999;
 }
 
-input.sender-text-input:focus, 
+input.sender-text-input:focus,
 input.sender-text-input:hover {
     border-color: #aaa;
 }
@@ -339,7 +339,7 @@ select.sender-woo-lists:disabled {
     text-shadow: none;
 }
 
-.sender-options .sender-select-wrap .sender-woo-lists:not([disabled]):hover, 
+.sender-options .sender-select-wrap .sender-woo-lists:not([disabled]):hover,
 .sender-options .sender-select-wrap .sender-woo-lists:not([disabled]):focus  {
     border-color: #aaaaaa;
 }
@@ -443,10 +443,10 @@ label.sender-checkbox-label {
 /* widgets */
 
 .sender-widget-container {
-     display: flex;
-     flex-wrap: wrap;
-     align-items: center;
- }
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
 .sender-form-title {
     font-family: 'Roboto', sans-serif !important;
     padding: 10px;
@@ -573,4 +573,16 @@ label.sender-checkbox-label {
 .sender-notice-error{
     margin:10px auto;
     width:25%!important;
+}
+.sender-ml-15{
+    margin-left:15px;
+}
+#sender_subscribe_to_newsletter_string{
+    width:100%;
+}
+.sender-mt-20{
+    margin-top: 20px;
+}
+.sender-submit-label-subscribe:disabled{
+    pointer-events: none;
 }
