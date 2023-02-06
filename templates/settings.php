@@ -162,7 +162,7 @@
                         <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
                         <p>Change the default text showing in cart checkouts and user account profile to your custom
                             text.</p>
-                        <p>Enable tracking must be active</p>
+                        <p><strong>Enable tracking must be active</strong></p>
                         <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
                               id="sender-form-settings">
                             <div class="sender-options sender-d-flex sender-flex-dir-column">
@@ -238,7 +238,7 @@
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
             jQuery('.sender-subscriber-label-input').addClass('sender-disabled');
             jQuery('.sender-submit-label-subscribe').prop('disabled', true);
-
+            jQuery('.sender-label-subscribe').prop('disabled', true);
         }
     });
 
@@ -249,8 +249,8 @@
             .prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
         jQuery('.sender-subscriber-label-input').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
             .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
-        jQuery('.sender-label-subscribe').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
-
+        jQuery('.sender-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
+            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
     });
 
     checkboxLabel.on('change', function (ev) {

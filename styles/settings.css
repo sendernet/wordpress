@@ -583,3 +583,6 @@ label.sender-checkbox-label {
 .sender-mt-20{
     margin-top: 20px;
 }
+.sender-submit-label-subscribe:disabled{
+    pointer-events: none;
+}
