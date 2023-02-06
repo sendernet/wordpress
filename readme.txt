@@ -196,4 +196,4 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Sync on admin panel
 * Handle 401 unathorized
 = 2.3.2 - 2023-02-06 =
-* Subscriber to newsletter accept custom text && enable/disable
+* Subscribe to newsletter accept custom text && enable/disable
