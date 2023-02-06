@@ -421,7 +421,7 @@ class Sender_Carts
      */
     public function senderAddNewsletterCheck()
     {
-        if (!empty(get_option('sender_subscribe_to_newsletter_string'))) {
+        if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
             $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
             woocommerce_form_field('sender_newsletter', array(
                 'type' => 'checkbox',

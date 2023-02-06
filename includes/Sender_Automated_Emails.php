@@ -21,7 +21,8 @@ class Sender_Automated_Emails
         'sender_groups_data' => false,
         'sender_forms_data' => false,
         'sender_synced_data_date' => false,
-        'sender_subscribe_to_newsletter_string' => 'Subscribe to our newsletter'
+        'sender_subscribe_label' => false,
+        'sender_subscribe_to_newsletter_string' => 'Subscribe to our newsletter'//Default
     ];
 
     public $senderBaseFile;
