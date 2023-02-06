@@ -156,8 +156,50 @@
                                 </div>
                             </div>
                         </form>
+
                     </div>
-                    <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between">
+                    <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20">
+                        <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
+                        <p>Change the default text showing in cart checkouts and user account profile to your custom
+                            text.</p>
+                        <p><strong>Enable tracking must be active</strong></p>
+                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
+                              id="sender-form-settings">
+                            <div class="sender-options sender-d-flex sender-flex-dir-column">
+                                <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                    <input type="hidden" value="0" name="sender_subscribe_label_hidden_checkbox">
+                                    <label for="sender_subscribe_label"
+                                           class="sender-label sender-checkbox-label sender-p-relative">
+                                        <input class="sender-checkbox sender-label-subscribe" type="checkbox"
+                                               id="sender_subscribe_label"
+                                               value="sender_subscribe_label"
+                                               name="sender_subscribe_label" <?php if (get_option('sender_subscribe_label')) {
+                                            echo 'checked';
+                                        } ?> >
+                                        <span class="sender-visible-checkbox"
+                                              style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
+                                        <span>Enable</span>
+                                    </label>
+                                </div>
+                                <div class="sender-option sender-mb-20">
+                                    <div class="sender-subscriber-label-input">
+                                        <label>
+                                            <input maxlength="255" name="sender_subscribe_to_newsletter_string"
+                                                   type="text"
+                                                   class="sender-input sender-text-input sender-mb-20 sender-br-5 sender-label-subscribe"
+                                                   id="sender_subscribe_to_newsletter_string"
+                                                   value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
+                                            <input type="submit" name="submit" id="submit"
+                                                   class="sender-cta-button sender-large sender-mb-20 sender-br-5 sender-submit-label-subscribe"
+                                                   value="Save">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between sender-mt-20">
                         <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
                               id="sender-export-data">
                             <div class="sender-mb-20">
@@ -168,18 +210,20 @@
                                     <input type="submit" name="submit" id="sender-submit-sync"
                                            class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
                                            value="Sync with Sender">
-                                    <div id="sender-import-text" class="sender-default-text">
+                                    <div class="sender-default-text" id="sender-import-text">
                                         Import all subscribers, orders and products from your WooCommerce store into
                                         your Sender account.
                                         <a target="_blank" class="sender-link"
                                            href="https://app.sender.net/settings/connected-stores">See your store
                                             information</a>
-                                        <span style="display: block">Last time synchronized: <strong style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
+                                        <span style="display: block">Last time synchronized: <strong
+                                                    style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                    </div>                <?php } ?>
+                    </div>
+                <?php } ?>
             </div>
         <?php } ?>
     </div>
@@ -187,26 +231,40 @@
 
 <script>
     var checkboxEl = jQuery('#sender_allow_tracking');
+    var checkboxLabel = jQuery('#sender_subscribe_label');
 
     jQuery(document).ready(function () {
         if (checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
+            jQuery('.sender-subscriber-label-input').addClass('sender-disabled');
+            jQuery('.sender-submit-label-subscribe').prop('disabled', true);
+            jQuery('.sender-label-subscribe').prop('disabled', true);
         }
     });
 
     checkboxEl.on('change', function (ev) {
         jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-dropdown-wrap').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'));
+        jQuery('.sender-submit-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
+            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
+        jQuery('.sender-subscriber-label-input').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
+            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
+        jQuery('.sender-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
+            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
     });
 
-    jQuery('#sender-confirmation').click(function(e) {
+    checkboxLabel.on('change', function (ev) {
+        jQuery('.sender-subscriber-label-input').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
+    });
+
+    jQuery('#sender-confirmation').click(function (e) {
         e.preventDefault();
         toggleModal('This will disconnect the store from your Sender account.');
     });
 
-    jQuery('#sender-submit-sync').click(function(){
+    jQuery('#sender-submit-sync').click(function () {
         jQuery(this).val("Synchronizing");
-        jQuery(this).css({"pointer-events":"none"})
+        jQuery(this).css({"pointer-events": "none"})
     });
 
 
@@ -225,12 +283,12 @@
             '<form id="" method="post" action="">' +
             '<input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value="true">' +
             '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="Yes"></input></form></div></div>').appendTo($wrapper);
-        setTimeout(function() {
+        setTimeout(function () {
             $wrapper.addClass('active');
         }, 100);
 
-        $wrapper.find('.sender-modal-action').click(function() {
-            $wrapper.removeClass('active').delay(500).queue(function() {
+        $wrapper.find('.sender-modal-action').click(function () {
+            $wrapper.removeClass('active').delay(500).queue(function () {
                 $wrapper.remove();
             });
         });
