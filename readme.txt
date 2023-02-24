@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 2.3.2
+Stable tag: 2.3.3
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -197,3 +197,5 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Handle 401 unathorized
 = 2.3.2 - 2023-02-06 =
 * Subscribe to newsletter accept custom text && enable/disable
+= 2.3.3 - 2023-02-24 =
+* Getting customer id from woocommerce

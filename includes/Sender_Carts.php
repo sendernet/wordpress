@@ -104,9 +104,13 @@ class Sender_Carts
             $cartData['list_id'] = $list;
         }
 
+        $wpUserId = get_current_user_id();
+        if ($wpUserId){
+            $cartData['customer_id'] = $wpUserId;
+        }
+
         $metaOrderNewsletter = get_post_meta($orderId, 'sender_newsletter', true);
         if ($metaOrderNewsletter) {
-            $wpUserId = get_current_user_id();
             if ($wpUserId) {
                 update_user_meta($wpUserId, 'sender_newsletter', 1);
                 $this->trackUser();
