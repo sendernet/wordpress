@@ -109,29 +109,15 @@ class Sender_Carts
             $cartData['customer_id'] = $wpUserId;
         }
 
+        //getting from order post
         $metaOrderNewsletter = get_post_meta($orderId, 'sender_newsletter', true);
-        if ($metaOrderNewsletter) {
-            if ($wpUserId) {
-                update_user_meta($wpUserId, 'sender_newsletter', 1);
+        if ($wpUserId) {
+            if (get_post_meta($orderId, 'sender_newsletter', true) || get_user_meta($wpUserId, 'sender_newsletter', true)) {
                 $this->trackUser();
-            } else {
-                $user = (new Sender_User())->findBy('visitor_id', $this->senderSessionCookie);
-                $user->email = $email;
-                $user->first_name = $firstname;
-                $user->last_name = $lastname;
-                $user->sender_newsletter = 1;
-
-                $userData = [
-                    'email' => $email,
-                    'firstname' => $firstname,
-                    'lastname' => $lastname,
-                    'newsletter' => (boolean)$user->sender_newsletter,
-                    'visitor_id' => $this->senderSessionCookie,
-                ];
-
-                $this->sender->senderApi->senderApiShutdownCallback("senderTrackNotRegisteredUsers", $userData);
-                $user->save();
+                $cartData['newsletter'] = true;
             }
+        }elseif ($metaOrderNewsletter){
+            $cartData['newsletter'] = true;
         }
 
         update_post_meta($orderId, 'sender_remote_id', $cart->id);
