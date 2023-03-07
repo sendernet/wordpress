@@ -135,7 +135,7 @@ class Sender_WooCommerce
         $customersExportData = [];
         foreach ($customers as $customerId) {
             $customer = get_user_meta($customerId);
-            if (!empty($customer['billing_email'])) {
+            if (!empty($customer['billing_email'][0])) {
                 $data = [
                     'email' => $customer['billing_email'][0],
                     'firstname' => $customer['first_name'][0] ?: null,
