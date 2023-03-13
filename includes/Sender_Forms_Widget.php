@@ -43,6 +43,10 @@ class Sender_Forms_Widget extends WP_Widget
         $code = $instance['form'];
         echo "<div class='sender-form-field' data-sender-form-id='$code'></div>";
         echo $args['after_widget'];
+
+        if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+            echo '<img class="sender-form-preview">';
+        }
     }
 
     public function form($instance)
