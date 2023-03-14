@@ -215,7 +215,7 @@ class Sender_WooCommerce
                     'firstname' => $customer['first_name'][0] ?: null,
                     'lastname' => $customer['last_name'][0] ?: null,
                     'phone' => $customer['billing_phone'][0] ?: null,
-                    'tags' => $list
+                    'tags' => [get_option('sender_customers_list')],
                 ];
 
                 if (isset($customer['sender_newsletter']) && $customer['sender_newsletter']) {
@@ -228,7 +228,7 @@ class Sender_WooCommerce
                     'email' => get_userdata($customerId)->user_email,
                     'firstname' => $customer['first_name'][0] ?: null,
                     'lastname' => $customer['last_name'][0] ?: null,
-                    'tags' => $list
+                    'tags' => [get_option('sender_registration_list')],
                 ];
             }
         }
