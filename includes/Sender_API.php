@@ -237,5 +237,13 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
+    public function updateCustomer(array $data, $email)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data), 'method' => 'PATCH']);
+        $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' . $email, $params);
+
+        return $this->senderBuildResponse($response);
+    }
+
 
 }

@@ -15,12 +15,40 @@ class Sender_WooCommerce
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
         add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
 
+        //Update user data from admin panel
+        if (is_admin()) {
+            if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
+                add_action('edit_user_profile', [$this, 'senderNewsletter']);
+            }
+            add_action('edit_user_profile_update', [$this, 'senderUpdateCustomerData'], 10, 1);
+        }
+
         //Adding after plugins loaded to avoid error on user_query
         add_action('plugins_loaded', [&$this, 'senderExportShopData'], 99);
 
         if ($update){
             $this->senderExportShopData();
         }
+    }
+
+    public function senderNewsletter($user)
+    {
+        $currentValue = (int)get_user_meta($user->ID, 'sender_newsletter', true);
+
+        ?>
+        <table class="form-table">
+            <tbody>
+            <tr class="show-admin-bar user-admin-bar-front-wrap">
+                <th scope="row">Subscribed to newsletter</th>
+                <td>
+                    <label for="admin_bar_front">
+                        <input name="sender_newsletter" type="checkbox" id="sender_newsletter"
+                            <?php echo $currentValue === 1 ? 'checked' : '' ?> value="1"></label><br>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <?php
     }
 
     public function senderAddUserAfterManualOrderCreation($orderId)
@@ -44,6 +72,52 @@ class Sender_WooCommerce
             }
 
             $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
+        }
+    }
+
+    public function senderUpdateCustomerData($userId)
+    {
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_user_meta($userId, 'sender_newsletter', 1);
+        } else {
+            update_user_meta($userId, 'sender_newsletter', 0);
+        }
+
+        $oldUserData = get_userdata($userId);
+
+        $oldFirstname = $oldUserData->first_name;
+        $oldLastName = $oldUserData->last_name;
+        $updatedFirstName = $_POST['first_name'] ?: '';
+        $updatedLastName = $_POST['last_name'] ?: '';
+
+        $changedFields = [];
+        if ($oldFirstname !== $updatedFirstName) {
+            $changedFields['firstname'] = $updatedFirstName;
+        }
+
+        if ($oldLastName !== $updatedLastName) {
+            $changedFields['lastname'] = $updatedLastName;
+        }
+
+        $oldUserMetaData = get_user_meta($userId);
+        if (!empty($oldUserMetaData['billing_phone'][0])) {
+            $oldPhone = $oldUserMetaData['billing_phone'][0];
+            $updatedPhone = $_POST['billing_phone'] ?: '';
+
+            if ($oldPhone !== $updatedPhone){
+                $changedFields['phone'] = $updatedPhone;
+            }
+        }
+
+        $emailSubscription = get_user_meta($userId, 'sender_newsletter', true);
+        if((int)$emailSubscription === 1){
+            $changedFields['subscriber_status'] = 'ACTIVE';
+        }else{
+            $changedFields['subscriber_status'] = 'UNSUBSCRIBED';
+        }
+
+        if (!empty($changedFields)) {
+            $this->sender->senderApi->updateCustomer($changedFields, get_userdata($userId)->user_email);
         }
     }
 
@@ -149,6 +223,13 @@ class Sender_WooCommerce
                 }
 
                 $customersExportData[] = $data;
+            } elseif (!empty(get_userdata($customerId)->user_email)) {
+                $customersExportData[] = [
+                    'email' => get_userdata($customerId)->user_email,
+                    'firstname' => $customer['first_name'][0] ?: null,
+                    'lastname' => $customer['last_name'][0] ?: null,
+                    'tags' => $list
+                ];
             }
         }
 

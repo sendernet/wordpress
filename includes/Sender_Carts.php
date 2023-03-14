@@ -32,19 +32,20 @@ class Sender_Carts
 
     private function senderAddCartsActions()
     {
+        //Handle cart changes and convert
         add_action('woocommerce_checkout_order_processed', [&$this, 'prepareConvertCart'], 10, 1);
         add_action('woocommerce_thankyou', [&$this, 'senderConvertCart'], 10, 1);
         add_action('woocommerce_cart_updated', [&$this, 'senderCartUpdated'], 50);
 
+        //Adding subscribe to newsletter checkbox
         add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
         add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
-
         add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
-        add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
-        add_action('woocommerce_created_customer', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
-        add_action('edit_user_profile_update', [&$this, 'senderUpdateNewsletter']);
+        //Handle subscribe to newsletter
+        add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletter'], 10, 1);
+        add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
         return $this;
     }
@@ -56,12 +57,25 @@ class Sender_Carts
         }
     }
 
-    public function senderUpdateNewsletter($userId)
+    //Add for new customers meta value
+    public function senderAddNewsletter($userId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'sender_newsletter', 1);
         } else {
             update_user_meta($userId, 'sender_newsletter', 0);
+        }
+    }
+
+    //Update customer meta value + update subscriber email status
+    public function senderUpdateNewsletter($userId)
+    {
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_user_meta($userId, 'sender_newsletter', 1);
+            $this->sender->senderApi->updateCustomer(['subscriber_status' => 'ACTIVE'], get_userdata($userId)->user_email);
+        } else {
+            update_user_meta($userId, 'sender_newsletter', 0);
+            $this->sender->senderApi->updateCustomer(['subscriber_status' => 'UNSUBSCRIBED'], get_userdata($userId)->user_email);
         }
     }
 
@@ -208,7 +222,7 @@ class Sender_Carts
         $user->email = $wpUser->user_email;
 
         if (isset($_POST['sender_newsletter'])){
-            $this->senderUpdateNewsletter($wpId);
+            $this->senderAddNewsletter($wpId);
         }
 
         if ($user->isDirty()) {
