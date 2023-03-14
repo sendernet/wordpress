@@ -100,19 +100,21 @@ class Sender_WooCommerce
         }
 
         $oldUserMetaData = get_user_meta($userId);
+
         if (!empty($oldUserMetaData['billing_phone'][0])) {
             $oldPhone = $oldUserMetaData['billing_phone'][0];
             $updatedPhone = $_POST['billing_phone'] ?: '';
 
-            if ($oldPhone !== $updatedPhone){
+            if ($oldPhone !== $updatedPhone) {
                 $changedFields['phone'] = $updatedPhone;
             }
         }
 
         $emailSubscription = get_user_meta($userId, 'sender_newsletter', true);
-        if((int)$emailSubscription === 1){
+
+        if ((int)$emailSubscription === 1) {
             $changedFields['subscriber_status'] = 'ACTIVE';
-        }else{
+        } else {
             $changedFields['subscriber_status'] = 'UNSUBSCRIBED';
         }
 
@@ -168,44 +170,118 @@ class Sender_WooCommerce
                     </script>';
     }
 
+    private function getWooClientsOrderCompleted()
+    {
+        global $wpdb;
+        return $wpdb->get_results("SELECT DISTINCT
+            pm1.meta_value AS first_name,
+            pm2.meta_value AS last_name,
+            pm3.meta_value AS phone,
+            pm4.meta_value AS email
+        FROM
+            wp_posts AS o
+            LEFT JOIN wp_postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
+            LEFT JOIN wp_postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
+            LEFT JOIN wp_postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
+            LEFT JOIN wp_postmeta AS pm4 ON o.ID = pm4.post_id AND pm4.meta_key = '_billing_email'
+        WHERE
+            o.post_type = 'shop_order'
+            AND o.post_status IN ('wc-completed', 'wc-on-hold')
+            AND pm4.meta_value IS NOT NULL
+        ");
+    }
+
+    private function getWooClientsOrderNotCompleted()
+    {
+        global $wpdb;
+        return $wpdb->get_results("SELECT DISTINCT
+            pm1.meta_value AS first_name,
+            pm2.meta_value AS last_name,
+            pm3.meta_value AS phone,
+            pm4.meta_value AS email
+        FROM
+            wp_posts AS o
+            LEFT JOIN wp_postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
+            LEFT JOIN wp_postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
+            LEFT JOIN wp_postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
+            LEFT JOIN wp_postmeta AS pm4 ON o.ID = pm4.post_id AND pm4.meta_key = '_billing_email'
+        WHERE
+            o.post_type = 'shop_order'
+            AND o.post_status NOT IN ('wc-completed', 'wc-on-hold')
+            AND pm4.meta_value IS NOT NULL
+        ");
+    }
+
     public function exportCustomers()
     {
-        $customer_query = new WP_User_Query(
-            array(
-                'fields' => 'id',
-                'role' => 'customer',
-            )
-        );
+        $chunkSize = 1000;
 
-        $customersCount = $customer_query->get_total();
-
-        $chunkSize = 5000;
-        $customersExported = 0;
-
-        if ($customersCount > $chunkSize) {
-            $loopTimes = floor($customersCount / $chunkSize);
+        #Extract customers which completed order
+        $woocommerceClientOrdersCompleted = $this->getWooClientsOrderCompleted();
+        $customerList = json_decode(json_encode($woocommerceClientOrdersCompleted), true);
+        if (count($customerList) > $chunkSize) {
+            $loopTimes = floor(count($customerList) / $chunkSize);
             for ($x = 0; $x <= $loopTimes; $x++) {
-                $customer_query = new WP_User_Query(
-                    array(
-                        'fields' => 'id',
-                        'role' => 'customer',
-                        'number' => $chunkSize,
-                        'offset' => $customersExported
-                    )
-                );
-                $customerList = json_decode(json_encode($customer_query->get_results(), true));
-                $this->sendCustomersToSender($customerList);
+                $woocommerceClientOrdersCompleted = $this->getWooClientsOrderCompleted();
+                $customerList = json_decode(json_encode($woocommerceClientOrdersCompleted), true);
+                $this->sendWoocommerceCustomersToSender($customerList, get_option('sender_customers_list'));
                 $customersExported += $chunkSize;
             }
         } else {
-            $customerList = json_decode(json_encode($customer_query->get_results(), true));
-            $this->sendCustomersToSender($customerList);
+            $this->sendWoocommerceCustomersToSender($customerList, get_option('sender_customers_list'));
+        }
+
+        #Extract customers which did not complete order
+        $woocommerceClientOrdersNotCompleted = $this->getWooClientsOrderNotCompleted();
+        $customerList = json_decode(json_encode($woocommerceClientOrdersNotCompleted), true);
+        if (count($customerList) > $chunkSize) {
+            $loopTimes = floor(count($customerList) / $chunkSize);
+            for ($x = 0; $x <= $loopTimes; $x++) {
+                $woocommerceClientOrdersNotCompleted = $this->getWooClientsOrderNotCompleted();
+                $customerList = json_decode(json_encode($woocommerceClientOrdersNotCompleted), true);
+                $this->sendWoocommerceCustomersToSender($customerList);
+                $customersExported += $chunkSize;
+            }
+        } else {
+            $this->sendWoocommerceCustomersToSender($customerList);
+        }
+
+        #Extract WP users with role customer. Registrations
+        $usersQuery = new WP_User_Query(['fields' => 'id', 'role' => 'customer']);
+        $customersCount = $usersQuery->get_total();
+        if ($customersCount > $chunkSize) {
+            $loopTimes = floor($customersCount / $chunkSize);
+            for ($x = 0; $x <= $loopTimes; $x++) {
+                $usersQuery = new WP_User_Query([
+                    'fields' => 'id',
+                    'role' => 'customer',
+                    'number' => $chunkSize,
+                    'offset' => $customersExported
+                ]);
+                $customerList = json_decode(json_encode($usersQuery->get_results(), true));
+                $this->sendUsersToSender($customerList);
+            }
+        } else {
+            $customerList = json_decode(json_encode($usersQuery->get_results(), true));
+            $this->sendUsersToSender($customerList);
         }
     }
 
-    public function sendCustomersToSender($customers)
+    public function sendWoocommerceCustomersToSender($customers, $list = null)
     {
-        $list = [get_option('sender_customers_list')];
+        $customersExportData = [];
+        foreach ($customers as $customer) {
+            if ($list) {
+                $customer['tags'] = [$list];
+            }
+            $customersExportData[] = $customer;
+        }
+
+        $this->sender->senderApi->senderExportData(['customers' => $customersExportData]);
+    }
+
+    public function sendUsersToSender($customers)
+    {
         $customersExportData = [];
         foreach ($customers as $customerId) {
             $customer = get_user_meta($customerId);
@@ -215,7 +291,7 @@ class Sender_WooCommerce
                     'firstname' => $customer['first_name'][0] ?: null,
                     'lastname' => $customer['last_name'][0] ?: null,
                     'phone' => $customer['billing_phone'][0] ?: null,
-                    'tags' => [get_option('sender_customers_list')],
+                    'tags' => [get_option('sender_registration_list')],
                 ];
 
                 if (isset($customer['sender_newsletter']) && $customer['sender_newsletter']) {
@@ -228,7 +304,7 @@ class Sender_WooCommerce
                     'email' => get_userdata($customerId)->user_email,
                     'firstname' => $customer['first_name'][0] ?: null,
                     'lastname' => $customer['last_name'][0] ?: null,
-                    'tags' => [get_option('sender_registration_list')],
+                    'tags' => [get_option('sender_registration_list')]
                 ];
             }
         }
