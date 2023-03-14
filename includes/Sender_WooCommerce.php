@@ -179,7 +179,7 @@ class Sender_WooCommerce
             pm3.meta_value AS phone,
             pm4.meta_value AS email
         FROM
-            wp_posts AS o
+            ". $this->tablePrefix ."posts AS o
             LEFT JOIN wp_postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
             LEFT JOIN wp_postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
             LEFT JOIN wp_postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
@@ -200,7 +200,7 @@ class Sender_WooCommerce
             pm3.meta_value AS phone,
             pm4.meta_value AS email
         FROM
-            wp_posts AS o
+            ". $this->tablePrefix ."posts AS o
             LEFT JOIN wp_postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
             LEFT JOIN wp_postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
             LEFT JOIN wp_postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
