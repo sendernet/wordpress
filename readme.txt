@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 2.3.4
+Stable tag: 2.3.5
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -202,3 +202,7 @@ Our customer support team is always ready to help you with your day-to-day tasks
 = 2.3.4 - 2023-03-07 =
 * Get subscriber email from woocommerce
 * Add newsletter on cart convert
+= 2.3.5 - 2023-03-15 =
+* Image preview in wordpress appearance widgets
+* Update user details admin panel, will update sender subscriber
+* Fix on newsletter subscription for user details changes
