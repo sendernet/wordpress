@@ -47,6 +47,9 @@ class Sender_Carts
         add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletter'], 10, 1);
         add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
+        //Handle admin order edit subscribe to newsletter
+        add_action('woocommerce_admin_order_data_after_shipping_address', [$this, 'senderAddNewsletterCheck']);
+
         return $this;
     }
 
@@ -423,10 +426,16 @@ class Sender_Carts
     /**
      * @return void
      */
-    public function senderAddNewsletterCheck()
+    public function senderAddNewsletterCheck($order)
     {
         if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
-            $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+            if (is_admin()) {
+                #No user we check from order created from admin side
+                $currentValue = $order->get_meta('sender_newsletter');
+            } else {
+                $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+            }
+
             woocommerce_form_field('sender_newsletter', array(
                 'type' => 'checkbox',
                 'class' => array('form-row mycheckbox'),
