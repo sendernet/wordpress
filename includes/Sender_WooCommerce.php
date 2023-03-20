@@ -13,7 +13,6 @@ class Sender_WooCommerce
     {
         $this->sender = $sender;
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
-        add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
 
         //Update user data from admin panel
         if (is_admin()) {
@@ -21,6 +20,8 @@ class Sender_WooCommerce
                 add_action('edit_user_profile', [$this, 'senderNewsletter']);
             }
             add_action('edit_user_profile_update', [$this, 'senderUpdateCustomerData'], 10, 1);
+            add_action('woocommerce_saved_address', [$this, 'senderUpdateCustomerData2'], 10, 1);
+            add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
         }
 
         //Adding after plugins loaded to avoid error on user_query
@@ -72,6 +73,28 @@ class Sender_WooCommerce
             }
 
             $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
+
+            if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+                update_post_meta($orderId, 'sender_newsletter', 1);
+                $updateFields['subscriber_status']= 'ACTIVE';
+            } else {
+                update_post_meta($orderId, 'sender_newsletter', 0);
+                $updateFields['subscriber_status']= 'UNSUBSCRIBED';
+            }
+
+            if (!empty($postMeta['_billing_phone'][0])){
+                if (isset($_POST['_billing_phone'])) {
+                    $requestPhone = sanitize_text_field($_POST['_billing_phone']);
+                    if ($requestPhone !== $postMeta['_billing_phone'][0]) {
+                        $updateFields['phone'] = $requestPhone;
+                    }
+                }
+            }
+
+            if(!empty($updateFields)) {
+                $this->sender->senderApi->updateCustomer($updateFields, $subscriberData['email']);
+            }
+
         }
     }
 
