@@ -148,7 +148,6 @@ class Sender_WooCommerce
     public function senderRemoveSubscriber($postId)
     {
         if (get_post_type($postId) === 'shop_order') {
-            // Your code to execute when an order is moved to trash
             $billingEmail = get_post_meta($postId, '_billing_email', true);
             if (!empty($billingEmail)){
                 $this->sender->senderApi->deleteSubscribers(['subscribers' => [$billingEmail]]);
