@@ -22,6 +22,7 @@ class Sender_WooCommerce
             add_action('edit_user_profile_update', [$this, 'senderUpdateCustomerData'], 10, 1);
             add_action('woocommerce_saved_address', [$this, 'senderUpdateCustomerData2'], 10, 1);
             add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
+            add_action('before_delete_post', [$this, 'senderRemoveSubscriber']);
         }
 
         //Adding after plugins loaded to avoid error on user_query
@@ -141,6 +142,17 @@ class Sender_WooCommerce
 
         if (!empty($changedFields)) {
             $this->sender->senderApi->updateCustomer($changedFields, get_userdata($userId)->user_email);
+        }
+    }
+
+    public function senderRemoveSubscriber($postId)
+    {
+        if (get_post_type($postId) === 'shop_order') {
+            // Your code to execute when an order is moved to trash
+            $billingEmail = get_post_meta($postId, '_billing_email', true);
+            if (!empty($billingEmail)){
+                $this->sender->senderApi->deleteSubscribers(['subscribers' => [$billingEmail]]);
+            }
         }
     }
 

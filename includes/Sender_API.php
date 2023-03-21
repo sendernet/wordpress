@@ -245,5 +245,11 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
+    public function deleteSubscribers(array $subscribers)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($subscribers)]);
+        $response = wp_remote_request($this->senderBaseUrl . 'subscribers/', $params);
 
+        return $this->senderBuildResponse($response);
+    }
 }
