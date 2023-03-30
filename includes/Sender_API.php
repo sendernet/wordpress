@@ -83,7 +83,8 @@ class Sender_API
                 'email' => $user->user_email,
                 'firstname' => $user->first_name,
                 'lastname' => $user->last_name,
-                'visitor_id' => $_COOKIE['sender_site_visitor']
+                'visitor_id' => $_COOKIE['sender_site_visitor'],
+                'store_id' => get_option('sender_store_register') ?: '',
             ];
 
             if ($list) {
@@ -108,6 +109,7 @@ class Sender_API
     public function senderTrackNotRegisteredUsers($userData)
     {
         if (isset($userData['email']) && isset($userData['visitor_id'])) {
+            $userData['store_id'] = get_option('sender_store_register') ?: '';
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($userData)]);
             $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
@@ -160,6 +162,10 @@ class Sender_API
 
     private function senderBuildStatsResponse($response)
     {
+        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
+            return false;
+        }
+
         return json_decode($response['body']);
     }
 
@@ -221,10 +227,6 @@ class Sender_API
 
         $response = wp_remote_post($this->senderStatsBaseUrl . 'get_visitor_id/', $params);
 
-        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-            return false;
-        }
-
         return $this->senderBuildStatsResponse($response);
     }
 
@@ -245,5 +247,11 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
+    public function deleteSubscribers(array $data)
+    {
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data), 'method' => 'DELETE']);
+        $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' , $params);
 
+        return $this->senderBuildResponse($response);
+    }
 }

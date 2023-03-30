@@ -47,6 +47,14 @@ class Sender_Carts
         add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletter'], 10, 1);
         add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
 
+        //Handle admin order edit subscribe to newsletter
+        add_action('woocommerce_admin_order_data_after_shipping_address', [$this, 'senderAddNewsletterCheck']);
+
+        //Capture email when filling checkout details
+        add_action('wp_enqueue_scripts', [$this, 'enqueueSenderCheckoutEmailTriggerScript']);
+        add_action('wp_ajax_trigger_backend_hook', [$this,'triggerEmailCheckout']);
+        add_action('wp_ajax_nopriv_trigger_backend_hook', [$this,'triggerEmailCheckout']);
+
         return $this;
     }
 
@@ -88,14 +96,26 @@ class Sender_Carts
 
     public function prepareConvertCart($orderId)
     {
-        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
+        $cart = (new Sender_Cart())->findByAttributes(
+            [
+                'session' => $this->senderSessionCookie,
+                'cart_status' => 0
+            ],
+            'created DESC'
+        );
         $cart->cart_status = '2';
         $cart->save();
     }
 
     public function senderConvertCart($orderId)
     {
-        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
+        $cart = (new Sender_Cart())->findByAttributes(
+            [
+                'session' => $this->senderSessionCookie,
+                'cart_status' => 2
+            ],
+            'created DESC'
+        );
 
         $list = get_option('sender_customers_list');
         $wcOrder = wc_get_order($orderId);
@@ -141,7 +161,6 @@ class Sender_Carts
 
     public function senderPrepareCartData($cart)
     {
-
         $items = $this->senderGetCart();
         $total = $this->senderGetWoo()->cart->total;
         $user = (new Sender_User())->find($cart->user_id);
@@ -164,9 +183,10 @@ class Sender_Carts
             "external_id" => $cart->id,
             "url" => $cartUrl,
             "currency" => 'EUR',
-            "order_total" => $total,
+            "order_total" => (string)$total,
             "products" => [],
-            'resource_key' => $this->senderGetResourceKey()
+            'resource_key' => $this->senderGetResourceKey(),
+            'store_id' => get_option('sender_store_register') ?: '',
         ];
 
         foreach ($items as $item => $values) {
@@ -189,6 +209,7 @@ class Sender_Carts
                 'discount' => (string)$discount,
                 'qty' => $values['quantity'],
                 'image' => get_the_post_thumbnail_url($values['data']->get_id()),
+                'product_id' => $values['product_id']
             ];
 
             $data['products'][] = $prod;
@@ -234,31 +255,74 @@ class Sender_Carts
 
     public function senderCartUpdated()
     {
+        if (isset($_GET['hash']) || empty($this->senderSessionCookie)){
+            return;
+        }
+
         $this->trackUser();
         $items = $this->senderGetCart();
 
         $cartData = serialize($items);
 
         if (!$this->senderGetWoo()->session->get_session_cookie()) {
-            if (empty($items)){
-                return;
-            }
-            //Making the woocommerce cookie active when adding from general view
-            WC()->session->set_customer_session_cookie(true);
+            return;
         }
 
-        $cart = (new Sender_Cart())->findBy('session', $this->senderSessionCookie);
+        if(isset($_COOKIE['sender_recovered_cart'])){
+            $cart = (new Sender_Cart())->find($_COOKIE['sender_recovered_cart']);
+            $cart->session = $this->senderSessionCookie;
+            $cart->save();
+        }
+
+        if (!isset($cart)) {
+            $cart = (new Sender_Cart())->findByAttributes(
+                [
+                    'session' => $this->senderSessionCookie,
+                    'cart_status' => 0
+                ],
+                'created DESC'
+            );
+        }
 
         if (empty($items) && $cart) {
+            #Keep converted carts
             if ($cart->cart_status == "2") {
                 return;
             }
+
             $cart->delete();
             $this->sender->senderApi->senderApiShutdownCallback("senderDeleteCart", $cart->id);
 
             return;
         }
 
+        //Look for possible cart in a connected user
+        if (is_user_logged_in() && !$cart){
+            $currentUser = wp_get_current_user();
+            $user = (new Sender_User())->findBy('email', $currentUser->user_email);
+            #find if current user has any abandoned carts
+            if ($user){
+                $cart = (new Sender_Cart())->findByAttributes(
+                    [
+                        'user_id' => $user->id,
+                        'cart_status' => 0
+                    ],
+                    'created DESC'
+                );
+
+                if ($cart){
+                    $cart->session = $this->senderSessionCookie;
+                    $cart->save();
+                }
+            }
+        }
+
+        //If cart converted, start a new cart
+        if ($cart && $cart->cart_status == '2'){
+            $cart = false;
+        }
+
+        //Update cart
         if ($cart && !empty($items)) {
             $cart->cart_data = $cartData;
             $cart->save();
@@ -278,11 +342,16 @@ class Sender_Carts
         }
 
         if (!empty($items)) {
+            if (!$senderUser = $this->senderGetVisitor()){
+                return;
+            }
+
             $newCart = new Sender_Cart();
             $newCart->cart_data = $cartData;
-            $newCart->user_id = $this->senderGetVisitor()->id;
+            $newCart->user_id = $senderUser->id;
             $newCart->session = $this->senderSessionCookie;
             $newCart->save();
+
             $cartData = $this->senderPrepareCartData($newCart);
             if (!$cartData){
                 return;
@@ -332,6 +401,10 @@ class Sender_Carts
 
     public function senderGetVisitor()
     {
+        if (empty($this->senderSessionCookie)) {
+            return false;
+        }
+
         $user = (new Sender_User())->findBy('visitor_id', $this->senderSessionCookie);
 
         if (!$user) {
@@ -360,7 +433,6 @@ class Sender_Carts
 
     public function senderRecoverCart($template)
     {
-
         if (!isset($_GET['hash'])) {
             return $template;
         }
@@ -368,9 +440,8 @@ class Sender_Carts
         $cartId = sanitize_text_field($_GET['hash']);
 
         $cart = (new Sender_Cart())->find($cartId);
-
-        if (!$cart || $cart->cart_recovered) {
-            return $template;
+        if (!$cart || $cart->cart_recovered || $cart->cart_status == '2') {
+            return wp_redirect(wc_get_cart_url());
         }
 
         $cart->cart_recovered = '1';
@@ -393,9 +464,9 @@ class Sender_Carts
             );
         }
 
+        setcookie( 'sender_recovered_cart', $cartId, time() + 3600, COOKIEPATH, COOKIE_DOMAIN );
         new WC_Cart_Session($wooCart);
-
-        return $template;
+        return wp_redirect(wc_get_cart_url());
     }
 
     public function senderGetResourceKey()
@@ -423,10 +494,16 @@ class Sender_Carts
     /**
      * @return void
      */
-    public function senderAddNewsletterCheck()
+    public function senderAddNewsletterCheck($order)
     {
         if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
-            $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+            if (is_admin()) {
+                #No user we check from order created from admin side
+                $currentValue = $order->get_meta('sender_newsletter');
+            } else {
+                $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+            }
+
             woocommerce_form_field('sender_newsletter', array(
                 'type' => 'checkbox',
                 'class' => array('form-row mycheckbox'),
@@ -439,11 +516,28 @@ class Sender_Carts
 
     public function addTrackCartScript($cartData)
     {
-        echo "
-			<script>
-			sender('trackCart', $cartData)
-            </script>
-		";
+        ob_start();
+        ?>
+        <script>
+            sender('trackCart', <?php echo $cartData; ?>);
+        </script>
+        <?php
     }
 
+    public function triggerEmailCheckout()
+    {
+        if (isset($_POST['email']) && !empty($_POST['email'])) {
+            $response = $this->sender->senderApi->senderTrackNotRegisteredUsers(['email' => sanitize_text_field($_POST['email']), 'visitor_id' => $this->senderSessionCookie], true);
+            if($response) {
+                return wp_send_json_success($response);
+            }
+            return wp_send_json_error('Subscriber not created');
+        }
+    }
+
+    public function enqueueSenderCheckoutEmailTriggerScript()
+    {
+        wp_enqueue_script('checkout-email-trigger', plugins_url('assets/js/checkout-email-trigger.js', dirname(__FILE__)));
+        wp_localize_script('checkout-email-trigger', 'senderAjax', array('ajaxUrl' => admin_url('admin-ajax.php')));
+    }
 }
