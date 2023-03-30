@@ -213,7 +213,7 @@ class Sender_Automated_Emails
     public function insertSdkScript()
     {
         $key = $this->senderApi->senderGetResourceKey();
-
+        ob_start();
         echo "
 			<script>
 			  (function (s, e, n, d, er) {
@@ -249,6 +249,7 @@ class Sender_Automated_Emails
         $version = $this->getVersionPlugin();
         if ($version) {
             $pluginVersion = 'Sender.net ' . esc_attr($version);
+            ob_start();
             echo
                 '<meta name="generator" content="' . $pluginVersion . '"/>';
         }

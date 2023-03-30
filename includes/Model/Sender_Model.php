@@ -164,4 +164,31 @@ class Sender_Model
 		}
 
 	}
+
+    public function findByAttributes($attributes, $orderBy = null)
+    {
+        global $wpdb;
+
+        $sqlQuery = "SELECT * FROM `{$this->getTableName()}` WHERE ";
+
+        $whereClause = [];
+        foreach ($attributes as $attribute => $value) {
+            $whereClause[] = "$attribute = %s";
+        }
+        $sqlQuery .= implode(' AND ', $whereClause);
+
+        if($orderBy){
+            $sqlQuery .= " ORDER BY $orderBy";
+        }
+
+        $result = $wpdb->get_results($wpdb->prepare($sqlQuery, array_values($attributes)));
+
+        if (!count($result)) {
+            return false;
+        }
+
+        $this->parseResult($result[0]);
+
+        return $this;
+    }
 }
