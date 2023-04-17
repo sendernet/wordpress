@@ -240,6 +240,10 @@
             jQuery('.sender-submit-label-subscribe').prop('disabled', true);
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
+
+        jQuery("#sender-export-data").submit(function() {
+            jQuery("#sender-submit-sync").prop("disabled", true);
+        });
     });
 
     checkboxEl.on('change', function (ev) {
