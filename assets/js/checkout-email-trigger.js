@@ -2,7 +2,7 @@ jQuery(document).ready(function () {
     var emailField = jQuery('input#billing_email');
     emailField.on('change', function () {
         var emailValue = emailField.val();
-        console.log(emailValue);
+        
         jQuery.ajax({
             type: 'POST',
             url: senderAjax.ajaxUrl,
