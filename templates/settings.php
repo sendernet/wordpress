@@ -189,7 +189,7 @@
                                                    class="sender-input sender-text-input sender-mb-20 sender-br-5 sender-label-subscribe"
                                                    id="sender_subscribe_to_newsletter_string"
                                                    value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
-                                            <input type="submit" name="submit" id="submit"
+                                            <input type="submit" name="submit" id="submit-label-newsletter"
                                                    class="sender-cta-button sender-large sender-mb-20 sender-br-5 sender-submit-label-subscribe"
                                                    value="Save">
                                         </label>
@@ -237,9 +237,22 @@
         if (checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
             jQuery('.sender-subscriber-label-input').addClass('sender-disabled');
-            jQuery('.sender-submit-label-subscribe').prop('disabled', true);
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
+
+        var checkbox = jQuery('#sender_subscribe_label');
+        var submitBtn = jQuery('#submit-label-newsletter');
+        var originalValue = checkbox.prop('checked');
+        submitBtn.prop('disabled', true);
+
+        checkbox.change(function() {
+            if (checkbox.prop('checked') !== originalValue) {
+                submitBtn.prop('disabled', false);
+            } else {
+                submitBtn.prop('disabled', true);
+            }
+        });
+
 
         jQuery("#sender-export-data").submit(function() {
             jQuery("#sender-submit-sync").prop("disabled", true);
@@ -249,8 +262,6 @@
     checkboxEl.on('change', function (ev) {
         jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-dropdown-wrap').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'));
-        jQuery('.sender-submit-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
-            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
         jQuery('.sender-subscriber-label-input').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
             .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
