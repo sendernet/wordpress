@@ -115,7 +115,7 @@
                                                 <option value="0">Select a list</option>
                                                 <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
                                                     <option <?= get_option('sender_customers_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -135,7 +135,7 @@
                                                 <option value="0">Select a list</option>
                                                 <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
                                                     <option <?= get_option('sender_registration_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -217,7 +217,7 @@
                                            href="https://app.sender.net/settings/connected-stores">See your store
                                             information</a>
                                         <span style="display: block">Last time synchronized: <strong
-                                                    style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
+                                                style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -233,6 +233,7 @@
     var checkboxEl = jQuery('#sender_allow_tracking');
     var checkboxLabel = jQuery('#sender_subscribe_label');
 
+
     jQuery(document).ready(function () {
         if (checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
@@ -240,23 +241,43 @@
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
 
+        jQuery("#sender-export-data").submit(function() {
+            jQuery("#sender-submit-sync").prop("disabled", true);
+        });
+
         var checkbox = jQuery('#sender_subscribe_label');
+        var textField = jQuery('#sender_subscribe_to_newsletter_string');
         var submitBtn = jQuery('#submit-label-newsletter');
-        var originalValue = checkbox.prop('checked');
+        var originalCheckedValue = checkbox.prop('checked');
+        var originalTextValue = textField.val();
         submitBtn.prop('disabled', true);
 
-        checkbox.change(function() {
-            if (checkbox.prop('checked') !== originalValue) {
+        function checkSubmitBtn() {
+            if (checkbox.prop('checked') && (checkbox.prop('checked') !== originalCheckedValue || textField.val() !== originalTextValue)) {
                 submitBtn.prop('disabled', false);
             } else {
                 submitBtn.prop('disabled', true);
             }
+        }
+
+        checkbox.change(function() {
+            checkSubmitBtn();
         });
 
-
-        jQuery("#sender-export-data").submit(function() {
-            jQuery("#sender-submit-sync").prop("disabled", true);
+        textField.on('input', function() {
+            if (jQuery.trim(textField.val()) === '') {
+                submitBtn.prop('disabled', true);
+                textField.addClass('sender-input-error');
+                textField.after('<div class="sender-error-message" style="color:#b41d1d!important;">This field cannot be empty.</div>');
+            } else {
+                textField.removeClass('sender-input-error');
+                textField.next('.sender-error-message').remove();
+                checkSubmitBtn();
+            }
         });
+
+        checkbox.add(input).on('input change', checkChanges);
+
     });
 
     checkboxEl.on('change', function (ev) {
