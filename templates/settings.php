@@ -253,7 +253,7 @@
         submitBtn.prop('disabled', true);
 
         function checkSubmitBtn() {
-            if (checkbox.prop('checked') && (checkbox.prop('checked') !== originalCheckedValue || textField.val() !== originalTextValue)) {
+            if (checkbox.prop('checked') && (checkbox.prop('checked') !== originalCheckedValue || jQuery.trim(textField.val()) !== originalTextValue)) {
                 submitBtn.prop('disabled', false);
             } else {
                 submitBtn.prop('disabled', true);
@@ -265,19 +265,17 @@
         });
 
         textField.on('input', function() {
-            if (jQuery.trim(textField.val()) === '') {
+            if (textField.val().trim() === '') {
                 submitBtn.prop('disabled', true);
-                textField.addClass('sender-input-error');
-                textField.after('<div class="sender-error-message" style="color:#b41d1d!important;">This field cannot be empty.</div>');
+                if (!textField.next('.sender-error-message').length) {
+                    textField.after('<div class="sender-error-message" style="color:#b41d1d!important;margin-bottom:10px;">This field cannot be empty.</div>');
+                }
             } else {
-                textField.removeClass('sender-input-error');
                 textField.next('.sender-error-message').remove();
                 checkSubmitBtn();
             }
         });
-
-        checkbox.add(input).on('input change', checkChanges);
-
+        checkbox.add(textField).on('input change', checkSubmitBtn);
     });
 
     checkboxEl.on('change', function (ev) {
