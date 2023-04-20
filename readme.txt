@@ -2,9 +2,9 @@
 Contributors: sendernet
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.1.1
+Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -206,8 +206,13 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Image preview in wordpress appearance widgets
 * Update user details admin panel, will update sender subscriber
 * Fix on newsletter subscription for user details changes
-= 2.4.0 - 2023-03-30
+= 2.4.0 - 2023-03-30 =
 * Export customers/users improved
 * Supporting creation of orders and customers from woocommerce admin
 * Capture email on checkout
 * Restore cart fix
+= 2.4.1 - 2023-04-20 =
+* Export orders changes
+* Changing behaviour of buttons for admin side
+* Track cart updates
+

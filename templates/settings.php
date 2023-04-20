@@ -115,7 +115,7 @@
                                                 <option value="0">Select a list</option>
                                                 <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
                                                     <option <?= get_option('sender_customers_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -135,7 +135,7 @@
                                                 <option value="0">Select a list</option>
                                                 <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
                                                     <option <?= get_option('sender_registration_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -189,7 +189,7 @@
                                                    class="sender-input sender-text-input sender-mb-20 sender-br-5 sender-label-subscribe"
                                                    id="sender_subscribe_to_newsletter_string"
                                                    value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
-                                            <input type="submit" name="submit" id="submit"
+                                            <input type="submit" name="submit" id="submit-label-newsletter"
                                                    class="sender-cta-button sender-large sender-mb-20 sender-br-5 sender-submit-label-subscribe"
                                                    value="Save">
                                         </label>
@@ -217,7 +217,7 @@
                                            href="https://app.sender.net/settings/connected-stores">See your store
                                             information</a>
                                         <span style="display: block">Last time synchronized: <strong
-                                                    style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
+                                                style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
                                     </div>
                                 </div>
                             </div>
@@ -233,20 +233,54 @@
     var checkboxEl = jQuery('#sender_allow_tracking');
     var checkboxLabel = jQuery('#sender_subscribe_label');
 
+
     jQuery(document).ready(function () {
         if (checkboxEl[0] && !checkboxEl[0].checked) {
             jQuery('.sender-dropdown-wrap').addClass('sender-disabled');
             jQuery('.sender-subscriber-label-input').addClass('sender-disabled');
-            jQuery('.sender-submit-label-subscribe').prop('disabled', true);
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
+
+        jQuery("#sender-export-data").submit(function() {
+            jQuery("#sender-submit-sync").prop("disabled", true);
+        });
+
+        var checkbox = jQuery('#sender_subscribe_label');
+        var textField = jQuery('#sender_subscribe_to_newsletter_string');
+        var submitBtn = jQuery('#submit-label-newsletter');
+        var originalCheckedValue = checkbox.prop('checked');
+        var originalTextValue = textField.val();
+        submitBtn.prop('disabled', true);
+
+        function checkSubmitBtn() {
+            if (checkbox.prop('checked') && (checkbox.prop('checked') !== originalCheckedValue || jQuery.trim(textField.val()) !== originalTextValue)) {
+                submitBtn.prop('disabled', false);
+            } else {
+                submitBtn.prop('disabled', true);
+            }
+        }
+
+        checkbox.change(function() {
+            checkSubmitBtn();
+        });
+
+        textField.on('input', function() {
+            if (textField.val().trim() === '') {
+                submitBtn.prop('disabled', true);
+                if (!textField.next('.sender-error-message').length) {
+                    textField.after('<div class="sender-error-message" style="color:#b41d1d!important;margin-bottom:10px;">This field cannot be empty.</div>');
+                }
+            } else {
+                textField.next('.sender-error-message').remove();
+                checkSubmitBtn();
+            }
+        });
+        checkbox.add(textField).on('input change', checkSubmitBtn);
     });
 
     checkboxEl.on('change', function (ev) {
         jQuery('.sender-woo-lists').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-dropdown-wrap').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'));
-        jQuery('.sender-submit-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
-            .prop('disabled', !jQuery(ev.currentTarget).is(':checked'))
         jQuery('.sender-subscriber-label-input').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))
             .prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
         jQuery('.sender-label-subscribe').toggleClass('sender-disabled', !jQuery(ev.currentTarget).is(':checked'))

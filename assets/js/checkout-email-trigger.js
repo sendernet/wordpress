@@ -1,9 +1,9 @@
-jQuery(document).ready(function ($) {
-    var emailField = $('input#billing_email');
+jQuery(document).ready(function () {
+    var emailField = jQuery('input#billing_email');
     emailField.on('change', function () {
         var emailValue = emailField.val();
-        console.log(emailValue);
-        $.ajax({
+        
+        jQuery.ajax({
             type: 'POST',
             url: senderAjax.ajaxUrl,
             data: {

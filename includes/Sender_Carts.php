@@ -51,7 +51,7 @@ class Sender_Carts
         add_action('woocommerce_admin_order_data_after_shipping_address', [$this, 'senderAddNewsletterCheck']);
 
         //Capture email when filling checkout details
-        add_action('wp_enqueue_scripts', [$this, 'enqueueSenderCheckoutEmailTriggerScript']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueSenderCheckoutEmailTriggerScript'], 99);
         add_action('wp_ajax_trigger_backend_hook', [$this,'triggerEmailCheckout']);
         add_action('wp_ajax_nopriv_trigger_backend_hook', [$this,'triggerEmailCheckout']);
 
@@ -255,7 +255,7 @@ class Sender_Carts
 
     public function senderCartUpdated()
     {
-        if (isset($_GET['hash']) || empty($this->senderSessionCookie)){
+        if (isset($_GET['hash'])){
             return;
         }
 
@@ -265,7 +265,12 @@ class Sender_Carts
         $cartData = serialize($items);
 
         if (!$this->senderGetWoo()->session->get_session_cookie()) {
-            return;
+            if (empty($items)){
+                return;
+            }
+            
+            //Making the woocommerce cookie active when adding from general view
+            WC()->session->set_customer_session_cookie(true);
         }
 
         if(isset($_COOKIE['sender_recovered_cart'])){
