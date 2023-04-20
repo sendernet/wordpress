@@ -422,7 +422,7 @@ class Sender_WooCommerce
         $orders = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order"');
 
         $ordersCount = count($orders);
-        $chunkSize = 1000;
+        $chunkSize = 100;
         $ordersExported = 0;
         $loopTimes = floor($ordersCount / $chunkSize);
 
