@@ -12,6 +12,8 @@ class Sender_Carts
     const TRACK_CART = 'sender-track-cart';
     const UPDATE_CART = 'sender-update-cart';
 
+    const CONVERTED_CART = '2';
+
     const FRAGMENTS_FILTERS = [
         'woocommerce_add_to_cart_fragments',
         'woocommerce_update_order_review_fragments'
@@ -103,8 +105,11 @@ class Sender_Carts
             ],
             'created DESC'
         );
-        $cart->cart_status = '2';
-        $cart->save();
+
+        if ($cart) {
+            $cart->cart_status = self::CONVERTED_CART;
+            $cart->save();
+        }
     }
 
     public function senderConvertCart($orderId)
@@ -112,10 +117,14 @@ class Sender_Carts
         $cart = (new Sender_Cart())->findByAttributes(
             [
                 'session' => $this->senderSessionCookie,
-                'cart_status' => 2
+                'cart_status' => self::CONVERTED_CART
             ],
             'created DESC'
         );
+
+        if (!$cart){
+            return false;
+        }
 
         $list = get_option('sender_customers_list');
         $wcOrder = wc_get_order($orderId);
@@ -291,7 +300,7 @@ class Sender_Carts
 
         if (empty($items) && $cart) {
             #Keep converted carts
-            if ($cart->cart_status == "2") {
+            if ($cart->cart_status == self::CONVERTED_CART) {
                 return;
             }
 
@@ -323,7 +332,7 @@ class Sender_Carts
         }
 
         //If cart converted, start a new cart
-        if ($cart && $cart->cart_status == '2'){
+        if ($cart && $cart->cart_status == self::CONVERTED_CART){
             $cart = false;
         }
 
@@ -445,7 +454,7 @@ class Sender_Carts
         $cartId = sanitize_text_field($_GET['hash']);
 
         $cart = (new Sender_Cart())->find($cartId);
-        if (!$cart || $cart->cart_recovered || $cart->cart_status == '2') {
+        if (!$cart || $cart->cart_recovered || $cart->cart_status == self::CONVERTED_CART) {
             return wp_redirect(wc_get_cart_url());
         }
 
