@@ -9,6 +9,10 @@ class Sender_WooCommerce
     private $sender;
     private $tablePrefix;
 
+    const SUBSCRIBED = 'subscribed';
+    const UNSUBSCRIBED = 'unsubscribed';
+    const NON_SUBSCRIBED = 'not_subscribed';
+
     public function __construct($sender, $update = false)
     {
         $this->sender = $sender;
@@ -206,37 +210,13 @@ class Sender_WooCommerce
         global $wpdb;
         return $wpdb->get_results("
             SELECT DISTINCT
-                    pm1.meta_value AS first_name,
-                    pm2.meta_value AS last_name,
-                    pm3.meta_value AS phone,
-                    pm4.meta_value AS email,
-                    pm5.meta_value AS newsletter
-                FROM
-                    " . $this->tablePrefix . "posts AS o
-                    LEFT JOIN " . $this->tablePrefix . "postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
-                    LEFT JOIN " . $this->tablePrefix . "postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
-                    LEFT JOIN " . $this->tablePrefix . "postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
-                    LEFT JOIN " . $this->tablePrefix . "postmeta AS pm4 ON o.ID = pm4.post_id AND pm4.meta_key = '_billing_email'
-                    LEFT JOIN " . $this->tablePrefix . "postmeta AS pm5 ON o.ID = pm5.post_id AND pm5.meta_key = 'sender_newsletter'
-                WHERE
-                    o.post_type = 'shop_order'
-                    AND o.post_status IN ('wc-completed', 'wc-on-hold')
-                    AND pm4.meta_value IS NOT NULL
-                LIMIT $chunkSize
-                OFFSET $offset
-        ");
-    }
-
-    private function getWooClientsOrderNotCompleted($chunkSize = null, $offset = 0)
-    {
-        global $wpdb;
-        return $wpdb->get_results("
-            SELECT DISTINCT
+                o.ID,
                 pm1.meta_value AS first_name,
                 pm2.meta_value AS last_name,
                 pm3.meta_value AS phone,
                 pm4.meta_value AS email,
-                pm5.meta_value AS newsletter
+                pm5.meta_value AS newsletter,
+                pm6.meta_value AS email_marketing_consent
             FROM
                 " . $this->tablePrefix . "posts AS o
                 LEFT JOIN " . $this->tablePrefix . "postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
@@ -244,6 +224,36 @@ class Sender_WooCommerce
                 LEFT JOIN " . $this->tablePrefix . "postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
                 LEFT JOIN " . $this->tablePrefix . "postmeta AS pm4 ON o.ID = pm4.post_id AND pm4.meta_key = '_billing_email'
                 LEFT JOIN " . $this->tablePrefix . "postmeta AS pm5 ON o.ID = pm5.post_id AND pm5.meta_key = 'sender_newsletter'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm6 ON o.ID = pm6.post_id AND pm6.meta_key = 'email_marketing_consent'
+            WHERE
+                o.post_type = 'shop_order'
+                AND o.post_status IN ('wc-completed', 'wc-on-hold')
+                AND pm4.meta_value IS NOT NULL
+            LIMIT $chunkSize
+            OFFSET $offset
+        ");
+    }
+
+    private function getWooClientsOrderNotCompleted($chunkSize = null, $offset = 0)
+    {
+        global $wpdb;
+        return $wpdb->get_results("
+             SELECT DISTINCT
+                o.ID,
+                pm1.meta_value AS first_name,
+                pm2.meta_value AS last_name,
+                pm3.meta_value AS phone,
+                pm4.meta_value AS email,
+                pm5.meta_value AS newsletter,
+                pm6.meta_value AS email_marketing_consent
+            FROM
+                " . $this->tablePrefix . "posts AS o
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm1 ON o.ID = pm1.post_id AND pm1.meta_key = '_billing_first_name'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm2 ON o.ID = pm2.post_id AND pm2.meta_key = '_billing_last_name'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm3 ON o.ID = pm3.post_id AND pm3.meta_key = '_billing_phone'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm4 ON o.ID = pm4.post_id AND pm4.meta_key = '_billing_email'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm5 ON o.ID = pm5.post_id AND pm5.meta_key = 'sender_newsletter'
+                LEFT JOIN " . $this->tablePrefix . "postmeta AS pm6 ON o.ID = pm6.post_id AND pm6.meta_key = 'email_marketing_consent'
             WHERE
                 o.post_type = 'shop_order'
                 AND o.post_status NOT IN ('wc-completed', 'wc-on-hold')
@@ -256,7 +266,7 @@ class Sender_WooCommerce
     public function exportCustomers()
     {
         global $wpdb;
-        $chunkSize = 1000;
+        $chunkSize = 300;
 
         #Extract customers which completed order
         $totalCompleted = $wpdb->get_var("SELECT COUNT(DISTINCT pm.meta_value)
@@ -335,9 +345,34 @@ class Sender_WooCommerce
     {
         $customersExportData = [];
         foreach ($customers as $customer) {
+            var_dump($customer['newsletter']);
+            var_dump($customer['email']);
+            var_dump($customer['ID']);
             if ($list) {
                 $customer['tags'] = [$list];
             }
+
+            if (isset($customer['newsletter'])){
+                $status = $this->handleChannelStatus($customer['newsletter']);
+                unset($customer['newsletter']);
+            }else{
+                $status = self::NON_SUBSCRIBED;
+            }
+
+            if (empty($customer['email_marketing_consent'])) {
+                $email_marketing_consent = [
+                    'state' => $status,
+                    'opt_in_level' => 'single_opt_in',
+                    'consent_updated_at' => current_time('Y-m-d H:i:s'),
+                ];
+
+                $customer['email_marketing_consent'] = $email_marketing_consent;
+                update_post_meta($customer['ID'], 'email_marketing_consent', $email_marketing_consent);
+            }else{
+                $customer['email_marketing_consent'] = unserialize($customer['email_marketing_consent']);
+            }
+
+            unset($customer['ID']);
             $customersExportData[] = $customer;
         }
 
@@ -353,31 +388,49 @@ class Sender_WooCommerce
                 $email = $customer['billing_email'][0];
             } elseif (!empty(get_userdata($customerId)->user_email)) {
                 $email = get_userdata($customerId)->user_email;
-            }else{
+            } else {
                 continue;
             }
 
             $data = [
+                'id' => $customerId,
                 'email' => $email,
                 'firstname' => $customer['first_name'][0] ?: null,
                 'lastname' => $customer['last_name'][0] ?: null,
                 'tags' => [get_option('sender_registration_list')],
             ];
 
-            if(isset($customer['billing_phone'][0])){
+            if (isset($customer['billing_phone'][0])) {
                 $data['phone'] = $customer['billing_phone'][0];
             }
 
-            if (isset($customer['sender_newsletter'][0]) && $customer['sender_newsletter'][0] == 1) {
-                $data['newsletter'] = true;
-            }else{
-                $data['newsletter'] = false;
+            if (empty($customer['email_marketing_consent'])) {
+                $state = isset($customer['sender_newsletter'][0])
+                    ? $this->handleChannelStatus($customer['sender_newsletter'][0])
+                    : self::NON_SUBSCRIBED;
+
+                $email_marketing_consent = [
+                    'state' => $state,
+                    'opt_in_level' => 'single_opt_in',
+                    'consent_updated_at' => current_time('Y-m-d H:i:s'),
+                ];
+
+                $data['email_marketing_consent'] = $email_marketing_consent;
+                update_user_meta($customerId, 'email_marketing_consent', $email_marketing_consent);
+            } else {
+                $data['email_marketing_consent'] = unserialize($customer['email_marketing_consent'][0]);
             }
 
             $customersExportData[] = $data;
         }
 
         $this->sender->senderApi->senderExportData(['customers' => $customersExportData]);
+    }
+
+    private function handleChannelStatus($sender_newsletter = null)
+    {
+        $status = $sender_newsletter === '1' ? self::SUBSCRIBED : ($sender_newsletter === '0' ? self::UNSUBSCRIBED : self::NON_SUBSCRIBED);
+        return $status;
     }
 
     public function exportProducts()
@@ -503,7 +556,7 @@ class Sender_WooCommerce
 
     public function senderExportShopData()
     {
-        if (!get_option('sender_wocommerce_sync') && is_admin()) {
+        if (!get_option('sender_wocommerce_sync')) {
             $storeActive = $this->sender->senderApi->senderGetStore();
             if (!$storeActive && !isset($storeActive->xRate)) {
                 $this->sender->senderHandleAddStore();
