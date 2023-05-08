@@ -345,9 +345,6 @@ class Sender_WooCommerce
     {
         $customersExportData = [];
         foreach ($customers as $customer) {
-            var_dump($customer['newsletter']);
-            var_dump($customer['email']);
-            var_dump($customer['ID']);
             if ($list) {
                 $customer['tags'] = [$list];
             }
