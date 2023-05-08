@@ -383,36 +383,47 @@ class Sender_WooCommerce
     public function exportProducts()
     {
         global $wpdb;
-        $products = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts 
+        $productsCount = $wpdb->get_var('SELECT COUNT(*) FROM ' . $this->tablePrefix . 'posts 
                       INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup ON ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'posts.id
                       WHERE post_type = "product"');
 
-        $productExportData = [];
+        $chunkSize = 100;
+        $productsExported = 0;
+        $loopTimes = floor($productsCount / $chunkSize);
         $currency = get_option('woocommerce_currency');
-        foreach ($products as $product) {
 
-            $image = null;
-            if (get_post_thumbnail_id($product->ID)) {
-                $image = wp_get_attachment_image_src(get_post_thumbnail_id($product->ID))[0];
+        for ($x = 0; $x <= $loopTimes; $x++) {
+            $productExportData = [];
+            $products = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts 
+                      INNER JOIN ' . $this->tablePrefix . 'wc_product_meta_lookup ON ' . $this->tablePrefix . 'wc_product_meta_lookup.product_id = ' . $this->tablePrefix . 'posts.id
+                      WHERE post_type = "product" LIMIT ' . $chunkSize . '
+             OFFSET ' . $productsExported);
+
+            foreach ($products as $product) {
+                $image = null;
+                if (get_post_thumbnail_id($product->ID)) {
+                    $image = wp_get_attachment_image_src(get_post_thumbnail_id($product->ID))[0];
+                }
+
+                $productExportData[] = [
+                    'title' => $product->post_name,
+                    'description' => $product->post_content,
+                    'sku' => $product->sku,
+                    'quantity' => $product->stock_quantity,
+                    'remote_productId' => $product->product_id,
+                    'image' => [$image],
+                    'price' => number_format($product->max_price, 2),
+                    'status' => $product->post_status,
+                    'created_at' => $product->post_date,
+                    'updated_at' => $product->post_modified,
+                    'currency' => $currency,
+                ];
             }
 
-            $productExportData[] = [
-                'title' => $product->post_name,
-                'description' => $product->post_content,
-                'sku' => $product->sku,
-                'quantity' => $product->stock_quantity,
-                'remote_productId' => $product->product_id,
-                'image' => [$image],
-                'price' => number_format($product->max_price, 2),
-                'status' => $product->post_status,
-                'created_at' => $product->post_date,
-                'updated_at' => $product->post_modified,
-                'currency' => $currency,
-            ];
+            $productsExported += $chunkSize;
+
+            $this->sender->senderApi->senderExportData(['products' => $productExportData]);
         }
-
-        $this->sender->senderApi->senderExportData(['products' => $productExportData]);
-
         return true;
     }
 
