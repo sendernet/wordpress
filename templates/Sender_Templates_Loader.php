@@ -64,4 +64,29 @@ class Sender_Templates_Loader
 
         require_once('settings.php');
     }
+
+    public function sender_is_cron_job_running()
+    {
+        $nextTimestamp = wp_next_scheduled('sender_export_shop_data_cron');
+
+        if ($nextTimestamp) {
+            // Calculate the remaining time until the next scheduled event
+            $remainingTime = $nextTimestamp - time();
+
+            // If the remaining time is greater than 0, there is a scheduled cron job
+            if ($remainingTime > 0) {
+                return true;
+            }
+        }
+
+        // Check if there are any running cron events
+        $runningEvents = _get_cron_array();
+
+        // If there are any running events, check if the specified cron hook is present
+        if (!empty($runningEvents) && isset($runningEvents['sender_export_shop_data_cron'])) {
+            return true;
+        }
+
+        return false;
+    }
 }

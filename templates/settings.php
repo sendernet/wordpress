@@ -4,6 +4,15 @@
     echo 'sender-single-column sender-d-flex';
 } ?>">
     <div class="sender-flex-column">
+        <?php
+        // Check if the sync has finished
+        $syncFinished = get_transient('sender_sync_finished');
+        if ($syncFinished) {
+            echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible"><p>Synced data completed</p></div>';
+            echo '<br>';
+            delete_transient('sender_sync_finished');
+        }
+        ?>
         <?php if (!$apiKey || get_option('sender_account_disconnected')) { ?>
             <form method="post" action=''
                   class="sender-box sender-br-5 sender-api-key sender-d-flex sender-flex-dir-column"
@@ -199,25 +208,27 @@
                         </form>
 
                     </div>
+
                     <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between sender-mt-20">
-                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
-                              id="sender-export-data">
+                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action='' id="sender-export-data">
                             <div class="sender-mb-20">
-                                <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync"
-                                       value="0"
-                                       class="sender-input sender-text-input sender-br-5">
+                                <?php
+                                // Check if there is a running or scheduled cron job
+                                if (isset($isCronJobRunning) && $isCronJobRunning) {
+                                    $disableSubmit = 'disabled';
+                                    $noticeMessage = 'A job is running to sync data with Sender application.';
+                                } else {
+                                    $disableSubmit = '';
+                                    $noticeMessage = 'Import all subscribers, orders, and products from your WooCommerce store into your Sender account.';
+                                }
+                                ?>
+                                <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync" value="0" class="sender-input sender-text-input sender-br-5">
                                 <div class="sender-btn-wrap sender-d-flex">
-                                    <input type="submit" name="submit" id="sender-submit-sync"
-                                           class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
-                                           value="Sync with Sender">
+                                    <input type="submit" name="submit" id="sender-submit-sync" class="sender-cta-button sender-medium sender-br-5 sender-height-fit" value="Sync with Sender" <?php echo $disableSubmit; ?>>
                                     <div class="sender-default-text" id="sender-import-text">
-                                        Import all subscribers, orders and products from your WooCommerce store into
-                                        your Sender account.
-                                        <a target="_blank" class="sender-link"
-                                           href="https://app.sender.net/settings/connected-stores">See your store
-                                            information</a>
-                                        <span style="display: block">Last time synchronized: <strong
-                                                style="display: block"><?php echo get_option('sender_synced_data_date') ?></strong></span>
+                                        <?php echo $noticeMessage; ?>
+                                        <a target="_blank" class="sender-link" href="https://app.sender.net/settings/connected-stores">See your store information</a>
+                                        <span style="display: block">Last time synchronized: <strong style="display: block"><?php echo get_option('sender_synced_data_date'); ?></strong></span>
                                     </div>
                                 </div>
                             </div>
