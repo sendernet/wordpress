@@ -62,6 +62,8 @@ class Sender_Templates_Loader
             }
         }
 
+        $isCronJobRunning = $this->sender_is_cron_job_running();
+
         require_once('settings.php');
     }
 
@@ -79,12 +81,15 @@ class Sender_Templates_Loader
             }
         }
 
-        // Check if there are any running cron events
+        // Check if there are any running cron events and sender cron is running
         $runningEvents = _get_cron_array();
-
-        // If there are any running events, check if the specified cron hook is present
-        if (!empty($runningEvents) && isset($runningEvents['sender_export_shop_data_cron'])) {
-            return true;
+        if(!empty($runningEvents)) {
+            foreach ($runningEvents as $timestamp => $event) {
+                if (isset($event['sender_export_shop_data_cron'])) {
+                    var_dump($event);
+                    return true;
+                }
+            }
         }
 
         return false;

@@ -8,7 +8,7 @@
         // Check if the sync has finished
         $syncFinished = get_transient('sender_sync_finished');
         if ($syncFinished) {
-            echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible"><p>Synced data completed</p></div>';
+            echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible"><p>Synced data completed.</p></div>';
             echo '<br>';
             delete_transient('sender_sync_finished');
         }
@@ -214,7 +214,7 @@
                             <div class="sender-mb-20">
                                 <?php
                                 // Check if there is a running or scheduled cron job
-                                if (isset($isCronJobRunning) && $isCronJobRunning) {
+                                if (isset($isCronJobRunning) && $isCronJobRunning && !isset($syncFinished)) {
                                     $disableSubmit = 'disabled';
                                     $noticeMessage = 'A job is running to sync data with Sender application.';
                                 } else {
@@ -251,10 +251,6 @@
             jQuery('.sender-subscriber-label-input').addClass('sender-disabled');
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
-
-        jQuery("#sender-export-data").submit(function() {
-            jQuery("#sender-submit-sync").prop("disabled", true);
-        });
 
         var checkbox = jQuery('#sender_subscribe_label');
         var textField = jQuery('#sender_subscribe_to_newsletter_string');
@@ -305,11 +301,6 @@
     jQuery('#sender-confirmation').click(function (e) {
         e.preventDefault();
         toggleModal('This will disconnect the store from your Sender account.');
-    });
-
-    jQuery('#sender-submit-sync').click(function () {
-        jQuery(this).val("Synchronizing");
-        jQuery(this).css({"pointer-events": "none"})
     });
 
 
