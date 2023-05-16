@@ -214,7 +214,7 @@
                             <div class="sender-mb-20">
                                 <?php
                                 // Check if there is a running or scheduled cron job
-                                if (isset($isCronJobRunning) && $isCronJobRunning && !isset($syncFinished)) {
+                                if ((isset($isCronJobRunning) && $isCronJobRunning) && (isset($syncFinished) && !$syncFinished)) {
                                     $disableSubmit = 'disabled';
                                     $noticeMessage = 'A job is running to sync data with Sender application.';
                                 } else {
