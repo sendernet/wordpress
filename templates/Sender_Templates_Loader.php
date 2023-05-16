@@ -86,7 +86,6 @@ class Sender_Templates_Loader
         if(!empty($runningEvents)) {
             foreach ($runningEvents as $timestamp => $event) {
                 if (isset($event['sender_export_shop_data_cron'])) {
-                    var_dump($event);
                     return true;
                 }
             }
