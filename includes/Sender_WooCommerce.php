@@ -53,11 +53,11 @@ class Sender_WooCommerce
         if (!wp_next_scheduled('sender_export_shop_data_cron')) {
             wp_schedule_single_event(time() + $delay, 'sender_export_shop_data_cron');
             add_action('admin_notices', [&$this, 'sender_cron_job_status']);
-            do_action('admin_notices', 'Started syncing your shop data with Sender. You would receive a notification when it would be completed');
+            do_action('admin_notices', 'Started syncing your shop data with Sender.');
             return true;
         } else {
             add_action('admin_notices', [&$this, 'sender_cron_job_status']);
-            do_action('admin_notices', 'Syncing in progress, you would receive a notification when it would be completed');
+            do_action('admin_notices', 'Syncing in progress.');
             return false;
         }
     }
