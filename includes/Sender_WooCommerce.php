@@ -14,24 +14,74 @@ class Sender_WooCommerce
         $this->sender = $sender;
         add_action('woocommerce_single_product_summary', [&$this, 'senderAddProductImportScript'], 10, 2);
 
+        //Declare action for cron job to sync data from interface
+        add_action('sender_export_shop_data_cron', [$this, 'senderExportShopDataCronJob']);
+
         if (is_admin()) {
             if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
                 add_action('edit_user_profile', [$this, 'senderNewsletter']);
             }
             //From wp edit users admin side
             add_action('edit_user_profile_update', [$this, 'senderUpdateCustomerData'], 10, 1);
+
             //From woocommerce admin side
             add_action('woocommerce_process_shop_order_meta', [$this, 'senderAddUserAfterManualOrderCreation'], 51);
 
             add_action('before_delete_post', [$this, 'senderRemoveSubscriber']);
         }
 
-        //Adding after plugins loaded to avoid error on user_query
-        add_action('plugins_loaded', [&$this, 'senderExportShopData'], 99);
+        if ($update) {
+            if (!get_option('sender_wocommerce_sync')) {
+                $storeActive = $this->sender->senderApi->senderGetStore();
+                if (!$storeActive && !isset($storeActive->xRate)) {
+                    $this->sender->senderHandleAddStore();
+                    $storeActive = true;
+                }
 
-        if ($update){
-            $this->senderExportShopData();
+                if ($storeActive && get_option('sender_store_register')) {
+                    add_action('admin_enqueue_scripts', [$this, 'enqueue_dashboard_notices_script']);
+                    $this->scheduleSenderExportShopDataCronJob();
+                }
+            }
         }
+
+    }
+
+    //Adding delay of 5 seconds to avoid making more jobs
+    public function scheduleSenderExportShopDataCronJob($delay = 5)
+    {
+        if (!wp_next_scheduled('sender_export_shop_data_cron')) {
+            wp_schedule_single_event(time() + $delay, 'sender_export_shop_data_cron');
+            add_action('admin_notices', [&$this, 'sender_cron_job_status']);
+            do_action('admin_notices', 'Started syncing your shop data with Sender.');
+            return true;
+        } else {
+            add_action('admin_notices', [&$this, 'sender_cron_job_status']);
+            do_action('admin_notices', 'Syncing in progress.');
+            return false;
+        }
+    }
+
+    public function sender_cron_job_status($message)
+    {
+        echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible">
+         <p>' . $message . '</p>
+        </div>';
+    }
+
+    public function senderExportShopDataCronJob()
+    {
+        $this->getTablePrefix();
+        $this->exportCustomers();
+        $this->exportProducts();
+        $this->exportOrders();
+        update_option('sender_wocommerce_sync', true);
+        update_option('sender_synced_data_date', current_time('Y-m-d H:i:s'));
+
+        // Set a transient to indicate that the sync has finished
+        set_transient('sender_sync_finished', true, 60);
+
+        return true;
     }
 
     public function senderRemoveSubscriber($postId)
@@ -256,7 +306,7 @@ class Sender_WooCommerce
     public function exportCustomers()
     {
         global $wpdb;
-        $chunkSize = 1000;
+        $chunkSize = 300;
 
         #Extract customers which completed order
         $totalCompleted = $wpdb->get_var("SELECT COUNT(DISTINCT pm.meta_value)
@@ -430,18 +480,18 @@ class Sender_WooCommerce
     public function exportOrders()
     {
         global $wpdb;
-        $orders = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order"');
+        $totalOrders = $wpdb->get_var(
+            'SELECT COUNT(*) FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" AND post_status != "trash" AND post_status != "auto-draft"'
+        );
 
-        $ordersCount = count($orders);
-        $chunkSize = 100;
+        $chunkSize = 50;
         $ordersExported = 0;
-        $loopTimes = floor($ordersCount / $chunkSize);
-
-        $ordersExportData = [];
+        $loopTimes = floor($totalOrders / $chunkSize);
 
         for ($x = 0; $x <= $loopTimes; $x++) {
-            $chunkedOrders = $wpdb->get_results('SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" LIMIT ' . $chunkSize . '
-             OFFSET ' . $ordersExported);
+            $ordersExportData = [];
+            $chunkedOrders = $wpdb->get_results(
+                'SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" AND post_status != "trash" AND post_status != "auto-draft" LIMIT ' . $chunkSize . ' OFFSET ' . $ordersExported);
 
             foreach ($chunkedOrders as $order) {
                 $remoteId = get_post_meta($order->ID, 'sender_remote_id', true);
@@ -501,23 +551,4 @@ class Sender_WooCommerce
         $this->tablePrefix = $wpdb->prefix;
     }
 
-    public function senderExportShopData()
-    {
-        if (!get_option('sender_wocommerce_sync') && is_admin()) {
-            $storeActive = $this->sender->senderApi->senderGetStore();
-            if (!$storeActive && !isset($storeActive->xRate)) {
-                $this->sender->senderHandleAddStore();
-                $storeActive = true;
-            }
-
-            if ($storeActive && get_option('sender_store_register')) {
-                $this->getTablePrefix();
-                $this->exportCustomers();
-                $this->exportProducts();
-                $this->exportOrders();
-                update_option('sender_wocommerce_sync', true);
-                update_option('sender_synced_data_date', current_time('Y-m-d H:i:s'));
-            }
-        }
-    }
 }

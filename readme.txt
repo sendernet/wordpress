@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.4.3
+Stable tag: 2.4.4
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -219,6 +219,8 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Fix on no cart
 = 2.4.3 - 2023-05-10 =
 * Chunk products while syncing
+= 2.4.4 - 2023-05-10 =
+* Sync with sender as background task
 
 
 
