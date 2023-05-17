@@ -480,9 +480,9 @@ class Sender_WooCommerce
     public function exportOrders()
     {
         global $wpdb;
-        $ordersQuery = $wpdb->get_results(
-            'SELECT * FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" AND post_status != "trash" AND post_status != "auto-draft"');
-        $totalOrders = count($ordersQuery);
+        $totalOrders = $wpdb->get_var(
+            'SELECT COUNT(*) FROM ' . $this->tablePrefix . 'posts WHERE post_type = "shop_order" AND post_status != "trash" AND post_status != "auto-draft"'
+        );
 
         $chunkSize = 50;
         $ordersExported = 0;
