@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once plugin_dir_path(__FILE__) . 'Sender_Helper.php';
+
 class Sender_API
 {
     private $senderBaseUrl = 'https://api.sender.net/v2/';
@@ -97,6 +99,8 @@ class Sender_API
                 }else{
                     $data['newsletter'] = false;
                 }
+
+                update_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent($data['newsletter']));
             }
 
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);

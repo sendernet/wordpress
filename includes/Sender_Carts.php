@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once plugin_dir_path(__FILE__) . 'Sender_Helper.php';
+
 class Sender_Carts
 {
     private $sender;
@@ -45,9 +47,9 @@ class Sender_Carts
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
         add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
 
-        //Handle subscribe to newsletter
-        add_action('woocommerce_created_customer', [&$this, 'senderAddNewsletter'], 10, 1);
-        add_action('woocommerce_save_account_details', [&$this, 'senderUpdateNewsletter'], 10, 1);
+        //Handle sender_newsletter on create/update account
+        add_action('woocommerce_created_customer', [&$this, 'senderNewsletterHandle'], 10, 1);
+        add_action('woocommerce_save_account_details', [&$this, 'senderNewsletterHandle'], 10, 1);
 
         //Handle admin order edit subscribe to newsletter
         add_action('woocommerce_admin_order_data_after_shipping_address', [$this, 'senderAddNewsletterCheck']);
@@ -63,29 +65,36 @@ class Sender_Carts
     public function senderAddNewsletterFromOrder($orderId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_post_meta($orderId, 'sender_newsletter', sanitize_text_field($_POST['sender_newsletter']));
+            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(true));
+        } else {
+            if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
+                update_post_meta(
+                    $orderId,
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+                $wcOrder = wc_get_order($orderId);
+                if ($wcOrder){
+                    $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], $wcOrder->get_billing_email());
+                }
+            }
         }
     }
 
-    //Add for new customers meta value
-    public function senderAddNewsletter($userId)
+    public function senderNewsletterHandle($userId)
     {
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_user_meta($userId, 'sender_newsletter', 1);
+        if (!empty($_POST['sender_newsletter'])) {
+            update_user_meta($userId, 'email_marketing_consent', Sender_Helper::generateEmailMarketingConsent(true));
+            $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], get_userdata($userId)->user_email);
         } else {
-            update_user_meta($userId, 'sender_newsletter', 0);
-        }
-    }
-
-    //Update customer meta value + update subscriber email status
-    public function senderUpdateNewsletter($userId)
-    {
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_user_meta($userId, 'sender_newsletter', 1);
-            $this->sender->senderApi->updateCustomer(['subscriber_status' => 'ACTIVE'], get_userdata($userId)->user_email);
-        } else {
-            update_user_meta($userId, 'sender_newsletter', 0);
-            $this->sender->senderApi->updateCustomer(['subscriber_status' => 'UNSUBSCRIBED'], get_userdata($userId)->user_email);
+            if (Sender_Helper::shouldChangeChannelStatus($userId, 'user')) {
+                update_user_meta(
+                    $userId,
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], get_userdata($userId)->user_email);
+            }
         }
     }
 
@@ -152,15 +161,11 @@ class Sender_Carts
             $cartData['customer_id'] = $wpUserId;
         }
 
-        //getting from order post
-        $metaOrderNewsletter = get_post_meta($orderId, 'sender_newsletter', true);
-        if ($wpUserId) {
-            if (get_post_meta($orderId, 'sender_newsletter', true) || get_user_meta($wpUserId, 'sender_newsletter', true)) {
-                $this->trackUser();
+        $metaOrderEmailMarketingConsent = get_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+        if (!empty($metaOrderEmailMarketingConsent)) {
+            if (Sender_Helper::handleChannelStatus($metaOrderEmailMarketingConsent)) {
                 $cartData['newsletter'] = true;
             }
-        }elseif ($metaOrderNewsletter){
-            $cartData['newsletter'] = true;
         }
 
         update_post_meta($orderId, 'sender_remote_id', $cart->id);
@@ -252,7 +257,7 @@ class Sender_Carts
         $user->email = $wpUser->user_email;
 
         if (isset($_POST['sender_newsletter'])){
-            $this->senderAddNewsletter($wpId);
+            $this->senderNewsletterHandle($wpId);
         }
 
         if ($user->isDirty()) {
@@ -498,6 +503,7 @@ class Sender_Carts
 
     public function addConvertCartScript($cartData)
     {
+        ob_start();
         echo "
 			<script>
 			sender('convertCart', $cartData)
@@ -505,17 +511,23 @@ class Sender_Carts
 		";
     }
 
-    /**
-     * @return void
-     */
     public function senderAddNewsletterCheck($order)
     {
         if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
             if (is_admin()) {
-                #No user we check from order created from admin side
-                $currentValue = $order->get_meta('sender_newsletter');
+                $emailMarketingConset = $order->get_meta(Sender_Helper::EMAIL_MARKETING_META_KEY);
+                if (!empty($emailMarketingConset)) {
+                    $currentValue = Sender_Helper::handleChannelStatus($emailMarketingConset);
+                } else {
+                    $currentValue = $order->get_meta('sender_newsletter');
+                }
             } else {
-                $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+                $emailMarketingConset = get_user_meta(get_current_user_id(), Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+                if (!empty($emailMarketingConset)) {
+                    $currentValue = Sender_Helper::handleChannelStatus($emailMarketingConset);
+                } else {
+                    $currentValue = get_user_meta(get_current_user_id(), 'sender_newsletter', true);
+                }
             }
 
             woocommerce_form_field('sender_newsletter', array(
