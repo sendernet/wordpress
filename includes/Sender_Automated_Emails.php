@@ -65,6 +65,8 @@ class Sender_Automated_Emails
 
         $this->senderAddActions()
             ->senderSetupWooCommerce();
+
+        $this->senderAddWebhooks();
     }
 
     private function senderAddActions()
@@ -311,9 +313,24 @@ class Sender_Automated_Emails
     public function senderHandleAddStore()
     {
         $store = $this->senderApi->senderAddStore();
+
         if (isset($store->data, $store->data->id)) {
             update_option('sender_store_register', $store->data->id);
+            update_option('sender_wocommerce_sync', false);
+            if (!class_exists('Sender_WooCommerce')) {
+                require_once("Sender_WooCommerce.php");
+            }
+
+            new Sender_WooCommerce($this, true);
         }
     }
 
+    public function senderAddWebhooks()
+    {
+        if (!class_exists("Sender_Webhooks")) {
+            require_once("Sender_Webhooks.php");
+        }
+
+        new Sender_Webhooks($this);
+    }
 }
