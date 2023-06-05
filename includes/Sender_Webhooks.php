@@ -141,7 +141,7 @@ class Sender_Webhooks
             update_user_meta($customer->ID, 'first_name', sanitize_text_field($data['first_name'] ?? ''));
             update_user_meta($customer->ID, 'last_name', sanitize_text_field($data['last_name'] ?? ''));
             update_user_meta($customer->ID, 'phone', sanitize_text_field($data['phone'] ?? ''));
-            update_user_meta($customer->ID, Sender_Helper::EMAIL_MARKETING_META_KEY, rest_sanitize_array($data[Sender_Helper::EMAIL_MARKETING_META_KEY] ?? ''));
+            update_user_meta($customer->ID, Sender_Helper::EMAIL_MARKETING_META_KEY, $data[Sender_Helper::EMAIL_MARKETING_META_KEY] ?? '');
         }
 
         $response = ['message' => __('Customer information updated.')];
