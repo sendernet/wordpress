@@ -93,14 +93,10 @@ class Sender_API
                 $data['list_id'] = $list;
             }
 
-            if ($newsletter = get_user_meta($userId, 'sender_newsletter', true)) {
-                if($newsletter == true){
+            if ($emailConsent = get_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, true)) {
+                if (isset($emailConsent['state']) && $emailConsent['state'] === Sender_Helper::SUBSCRIBED) {
                     $data['newsletter'] = true;
-                }else{
-                    $data['newsletter'] = false;
                 }
-
-                update_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent($data['newsletter']));
             }
 
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
