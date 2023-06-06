@@ -243,7 +243,6 @@ class Sender_WooCommerce
         $id = $product->get_id();
 
         $pImage = get_the_post_thumbnail_url($id);
-
         if (!$pImage) {
             $gallery = $product->get_gallery_image_ids();
             if (!empty($gallery)) {
@@ -251,35 +250,44 @@ class Sender_WooCommerce
             }
         }
 
+        if ($product->is_type('grouped')) {
+            $pPriceHtml = $product->get_price_html();
+            preg_match_all('/[\d,]+/', $pPriceHtml, $matches);
+            $pPrice = implode(' - ', $matches[0]);
+        } else {
+            $pPrice = (float) $product->get_regular_price();
+        }
+
         $pName = str_replace("\"", '\\"', $product->get_name());
         $pDescription = str_replace("\"", '\\"', $product->get_description());
-        $pPrice = $product->get_regular_price();
         $pCurrency = get_option('woocommerce_currency');
         $pQty = $product->get_stock_quantity() ? $product->get_stock_quantity() : 1;
         $pRating = $product->get_average_rating();
         $pOnSale = $product->is_on_sale();
-        $pSalePrice = $pPrice;
         $pDiscount = 0;
 
-        if ($product->is_on_sale() && !empty($product->get_sale_price())) {
+        if ($pOnSale && !empty($product->get_sale_price())) {
             $pSalePrice = $product->get_sale_price();
             $pDiscount = round((string)100 - ($pSalePrice / $pPrice * 100));
         }
 
-        echo '<script type="application/sender+json">
-                        {
-                          "name": "' . $pName . '",
-                          "image": "' . $pImage . '",
-                          "description": "' . $pDescription . '",
-                          "price": "' . (float)$pPrice . '",
-                          "discount": "-' . $pDiscount . '%",
-                          "special_price": "' . (float)$pSalePrice . '",
-                          "currency": "' . $pCurrency . '",
-                          "quantity": "' . $pQty . '",
-                          "is_on_sale": "' . $pOnSale . '",
-                          "rating": "' . $pRating . '"
-                        }
-                    </script>';
+        $jsonData = [
+            "name" => $pName,
+            "image" => $pImage,
+            "description" => $pDescription,
+            "price" => $pPrice,
+            "currency" => $pCurrency,
+            "quantity" => $pQty,
+            "rating" => $pRating,
+        ];
+
+        if (isset($pSalePrice)) {
+            $jsonData['is_on_sale'] = $pOnSale;
+            $jsonData["special_price"] = (float)$pSalePrice;
+            $jsonData["discount"] = "-" . $pDiscount . "%";
+        }
+
+        echo '<script type="application/sender+json">' . json_encode($jsonData) . '</script>';
     }
 
     private function getWooClientsOrderCompleted($chunkSize, $offset = 0)
