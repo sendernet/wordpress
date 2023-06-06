@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.2
 Requires PHP: 7.1
-Stable tag: 2.4.4
+Stable tag: 2.5.0
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -221,6 +221,11 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Chunk products while syncing
 = 2.4.4 - 2023-05-10 =
 * Sync with sender as background task
+= 2.5.0 - 2023-06-06 =
+* Use webhooks for updating email consent
+* Adding support to sync store from sender application
+* Block product from email campaign, fix for grouped products
+
 
 
 
