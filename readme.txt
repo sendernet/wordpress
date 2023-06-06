@@ -2,7 +2,7 @@
 Contributors: sendernet
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.2
+Tested up to: 6.2.2
 Requires PHP: 7.1
 Stable tag: 2.5.0
 License: GPLv3 or later License
