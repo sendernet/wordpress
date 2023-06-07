@@ -257,19 +257,6 @@
         var submitBtn = jQuery('#submit-label-newsletter');
         var originalCheckedValue = checkbox.prop('checked');
         var originalTextValue = textField.val();
-        submitBtn.prop('disabled', true);
-
-        function checkSubmitBtn() {
-            if (checkbox.prop('checked') && (checkbox.prop('checked') !== originalCheckedValue || jQuery.trim(textField.val()) !== originalTextValue)) {
-                submitBtn.prop('disabled', false);
-            } else {
-                submitBtn.prop('disabled', true);
-            }
-        }
-
-        checkbox.change(function() {
-            checkSubmitBtn();
-        });
 
         textField.on('input', function() {
             if (textField.val().trim() === '') {
