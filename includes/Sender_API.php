@@ -80,11 +80,13 @@ class Sender_API
         $list = get_option('sender_registration_list');
 
         if (isset($user->user_email)) {
+            $firstname = !empty($user->first_name) ? $user->first_name : get_user_meta($userId, 'billing_first_name', true);
+            $lastname = !empty($user->last_name) ? $user->last_name : get_user_meta($userId, 'billing_last_name', true);
 
             $data = [
                 'email' => $user->user_email,
-                'firstname' => $user->first_name,
-                'lastname' => $user->last_name,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
                 'visitor_id' => $_COOKIE['sender_site_visitor'],
                 'store_id' => get_option('sender_store_register') ?: '',
             ];
