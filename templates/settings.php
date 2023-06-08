@@ -292,20 +292,32 @@
 
 
     function toggleModal(text) {
-        $wrapper = jQuery('<div class="sender-container"  id="sender-modal-wrapper"></div>').appendTo('body');
+        $wrapper = jQuery('<div class="sender-container" id="sender-modal-wrapper"></div>').appendTo('body');
         $modal = jQuery('<div id="sender-modal-confirmation">' +
             '<div id="sender-modal-header">' +
             '<h3 class="sender-header">Confirm Delete</h3>' +
             '<span class="sender-modal-action" id="sender-modal-close">' +
             'x</span>' +
             '</div>' +
-            '<div id="sender-modal-content" class="sender-label sender-select-label sender-form-label"><p>' + text + '' +
-            '</p></div>' +
+            '<div id="sender-modal-content" class="sender-label sender-select-label sender-form-label">' +
+            '<p>' + text + '</p>' +
+            '<form id="sender-modal-form" method="post" action="">' +
+            '<div style="margin: 15px 0 25px;">' +
+            '<label class="sender-label" for="delete-subscribers-checkbox">' +
+            '<input class="sender-checkbox" type="checkbox" id="delete-subscribers-checkbox" name="delete-subscribers">' +
+            '<span class="sender-visible-checkbox sender-visible-checkbox-modal" style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>' +
+            '<span> Delete subscribers associated with this store </span>' +
+            '</label>' +
+            '</div>' +
             '<div id="sender-modal-buttons">' +
-            '<button class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn sender-modal-action">No</button>' +
-            '<form id="" method="post" action="">' +
+            '<button id="no-disconnected" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn sender-modal-action">No</button>' +
             '<input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value="true">' +
-            '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="Yes"></input></form></div></div>').appendTo($wrapper);
+            '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="Yes"></input>' +
+            '</div>' +
+            '</form>' +
+            '</div>' +
+            '</div>').appendTo($wrapper);
+
         setTimeout(function () {
             $wrapper.addClass('active');
         }, 100);
@@ -316,5 +328,11 @@
             });
         });
 
+        $wrapper.find('#no-disconnected').click(function (e) {
+            e.preventDefault();
+            $wrapper.removeClass('active').delay(500).queue(function () {
+                $wrapper.remove();
+            });
+        });
     }
 </script>

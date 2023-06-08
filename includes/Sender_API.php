@@ -191,22 +191,14 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
-    public function senderDeleteStore()
+    public function senderDeleteStore($deleteSubscribers = false)
     {
-        $removingStoreParams = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . get_option('sender_api_key'),
-            ],
-            'method' => 'DELETE'
+        $bodyParams = [
+            'delete_subscribers' => $deleteSubscribers
         ];
 
+        $removingStoreParams = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($bodyParams)]);
         $response = wp_remote_request($this->senderBaseUrl . 'stores/' . get_option('sender_store_register'), $removingStoreParams);
-
-        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-            return false;
-        }
 
         return $this->senderBuildResponse($response);
     }
