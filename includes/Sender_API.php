@@ -97,6 +97,8 @@ class Sender_API
                 if (isset($emailConsent['state']) && $emailConsent['state'] === Sender_Helper::SUBSCRIBED) {
                     $data['newsletter'] = true;
                 }
+
+                update_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent($data['newsletter']));
             }
 
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
