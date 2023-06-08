@@ -252,11 +252,8 @@
             jQuery('.sender-label-subscribe').prop('disabled', true);
         }
 
-        var checkbox = jQuery('#sender_subscribe_label');
         var textField = jQuery('#sender_subscribe_to_newsletter_string');
         var submitBtn = jQuery('#submit-label-newsletter');
-        var originalCheckedValue = checkbox.prop('checked');
-        var originalTextValue = textField.val();
 
         textField.on('input', function() {
             if (textField.val().trim() === '') {
@@ -266,10 +263,9 @@
                 }
             } else {
                 textField.next('.sender-error-message').remove();
-                checkSubmitBtn();
+                submitBtn.prop('disabled', false);
             }
         });
-        checkbox.add(textField).on('input change', checkSubmitBtn);
     });
 
     checkboxEl.on('change', function (ev) {
