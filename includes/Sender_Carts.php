@@ -65,7 +65,7 @@ class Sender_Carts
     public function senderAddNewsletterFromOrder($orderId)
     {
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(true));
+            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
         } else {
             if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
                 update_post_meta(
@@ -84,7 +84,7 @@ class Sender_Carts
     public function senderNewsletterHandle($userId)
     {
         if (!empty($_POST['sender_newsletter'])) {
-            update_user_meta($userId, 'email_marketing_consent', Sender_Helper::generateEmailMarketingConsent(true));
+            update_user_meta($userId, 'email_marketing_consent', Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
             $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], get_userdata($userId)->user_email);
         } else {
             if (Sender_Helper::shouldChangeChannelStatus($userId, 'user')) {
