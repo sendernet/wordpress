@@ -402,7 +402,7 @@ label.sender-checkbox-label {
 /* Checkbox un-checked style */
 .sender-visible-checkbox {
     content: '';
-    border: 1px solid #ddd;
+    border: 1px solid #a2a0a0;
     border-radius: 5px;
     display: inline-block;
     width: 20px;
@@ -410,6 +410,11 @@ label.sender-checkbox-label {
     position: absolute;
     left: 0;
     top: -1px;
+}
+.sender-visible-checkbox-modal{
+    margin-right:5px!important;
+    position: relative;
+    top: 4px;
 }
 
 /* Adding a dotted border around the active tabbed-into checkbox */
@@ -550,7 +555,7 @@ label.sender-checkbox-label {
 }
 
 #sender-modal-content {
-    padding: 25px 15px;
+    padding: 15px 15px 5px;
 }
 #sender-modal-content p {
     margin: 0;

@@ -80,11 +80,13 @@ class Sender_API
         $list = get_option('sender_registration_list');
 
         if (isset($user->user_email)) {
+            $firstname = !empty($user->first_name) ? $user->first_name : get_user_meta($userId, 'billing_first_name', true);
+            $lastname = !empty($user->last_name) ? $user->last_name : get_user_meta($userId, 'billing_last_name', true);
 
             $data = [
                 'email' => $user->user_email,
-                'firstname' => $user->first_name,
-                'lastname' => $user->last_name,
+                'firstname' => $firstname,
+                'lastname' => $lastname,
                 'visitor_id' => $_COOKIE['sender_site_visitor'],
                 'store_id' => get_option('sender_store_register') ?: '',
             ];
@@ -93,11 +95,9 @@ class Sender_API
                 $data['list_id'] = $list;
             }
 
-            if ($newsletter = get_user_meta($userId, 'sender_newsletter', true)) {
-                if($newsletter == true){
+            if ($emailConsent = get_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, true)) {
+                if (isset($emailConsent['state']) && $emailConsent['state'] === Sender_Helper::SUBSCRIBED) {
                     $data['newsletter'] = true;
-                }else{
-                    $data['newsletter'] = false;
                 }
 
                 update_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent($data['newsletter']));
@@ -195,22 +195,14 @@ class Sender_API
         return $this->senderBuildResponse($response);
     }
 
-    public function senderDeleteStore()
+    public function senderDeleteStore($deleteSubscribers = false)
     {
-        $removingStoreParams = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'Authorization' => 'Bearer ' . get_option('sender_api_key'),
-            ],
-            'method' => 'DELETE'
+        $bodyParams = [
+            'delete_subscribers' => $deleteSubscribers
         ];
 
+        $removingStoreParams = array_merge($this->senderBaseRequestArguments(true), ['body' => json_encode($bodyParams)]);
         $response = wp_remote_request($this->senderBaseUrl . 'stores/' . get_option('sender_store_register'), $removingStoreParams);
-
-        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-            return false;
-        }
 
         return $this->senderBuildResponse($response);
     }
