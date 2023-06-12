@@ -250,4 +250,13 @@ class Sender_API
 
         return $this->senderBuildResponse($response);
     }
+
+    public function senderConvertCart($cartId, $cartData)
+    {
+        $url = $this->senderStatsBaseUrl . 'carts/' . $cartId . '/convert';
+
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartData)]);
+        $response = wp_remote_post($url, $params);
+        return $this->senderBuildStatsResponse($response);
+    }
 }
