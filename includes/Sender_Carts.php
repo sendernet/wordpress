@@ -177,7 +177,7 @@ class Sender_Carts
         }
 
         //If order not completed don't convert cart in sender
-        if ($wcOrder->get_status() === Sender_Helper::ORDER_NOT_PAID) {
+        if (in_array($wcOrder->get_status(), Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
             $cart->cart_status = self::UNPAID_CART;
             $cart->save();
 
@@ -597,7 +597,7 @@ class Sender_Carts
         $senderRemoteCartId = get_post_meta($orderId, 'sender_remote_id', true);
         if (!empty($senderRemoteCartId) &&
             $newOrderStatus === Sender_Helper::ORDER_COMPLETED &&
-            $newOrderStatus != $currentOrderStatus
+            in_array($currentOrderStatus, Sender_Helper::ORDER_NOT_PAID_STATUSES)
         ) {
             $cart = (new Sender_Cart())->findByAttributes(
                 [
