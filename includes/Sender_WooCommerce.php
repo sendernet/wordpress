@@ -212,6 +212,7 @@ class Sender_WooCommerce
                     Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED)
                 );
                 $updateFields['subscriber_status'] = Sender_Helper::UPDATE_STATUS_ACTIVE;
+                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], $subscriberData['email']);
             } else {
                 if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
                     update_post_meta(
@@ -220,6 +221,7 @@ class Sender_WooCommerce
                         Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
                     );
                     $updateFields['subscriber_status'] = Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED;
+                    $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], $subscriberData['email']);
                 }
             }
 

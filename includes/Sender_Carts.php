@@ -74,9 +74,16 @@ class Sender_Carts
                     Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
                 );
                 $wcOrder = wc_get_order($orderId);
-                if ($wcOrder){
+                if ($wcOrder) {
                     $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], $wcOrder->get_billing_email());
                 }
+            } elseif (is_user_logged_in() && Sender_Helper::shouldChangeChannelStatus(get_current_user_id(), 'user')) {
+                update_user_meta(
+                    get_current_user_id(),
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], get_userdata(get_current_user_id())->user_email);
             }
         }
     }
