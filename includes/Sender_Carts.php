@@ -33,7 +33,7 @@ class Sender_Carts
         }
 
         if (is_admin()) {
-            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus'], 10, 3);
+            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus'], 10, 2);
         }
 
         $this->senderSessionCookie = $_COOKIE['sender_site_visitor'];
@@ -177,7 +177,8 @@ class Sender_Carts
         }
 
         //If order not completed don't convert cart in sender
-        if (in_array($wcOrder->get_status(), Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
+        $orderPost = get_post($orderId);
+        if (in_array($orderPost->post_status, Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
             $cart->cart_status = self::UNPAID_CART;
             $cart->save();
 
@@ -188,7 +189,14 @@ class Sender_Carts
             ];
 
             $this->sender->senderApi->updateCustomer($updateCustomerData, $cartData['email']);
+            $cartStatus = [
+                'order_id' => (string)$orderId,
+                'cart_status' => $orderPost->post_status
+            ];
+
             update_post_meta($orderId, 'sender_remote_id', $cart->id);
+            add_action('wp_head', [$this, 'addStatusCartUpdateScript'], 10, 1);
+            do_action('wp_head', json_encode($cartStatus));
             return;
         }
 
@@ -574,6 +582,16 @@ class Sender_Carts
         <?php
     }
 
+    public function addStatusCartUpdateScript($cartData)
+    {
+        ob_start();
+        echo "
+			<script>
+			sender('statusCartUpdate', $cartData)
+            </script>
+		";
+    }
+
     public function triggerEmailCheckout()
     {
         if (isset($_POST['email']) && !empty($_POST['email'])) {
@@ -592,10 +610,16 @@ class Sender_Carts
     }
 
     //Use to convert carts which got confirmed payment
-    public function senderUpdateOrderStatus($orderId, $currentOrderStatus, $newOrderStatus)
+    public function senderUpdateOrderStatus($orderId, $currentOrderStatus)
     {
+        if (isset($_POST['order_status'])) {
+            $newOrderStatus = $_POST['order_status'];
+        }
+
+        $currentOrderStatus = 'wc-' . $currentOrderStatus;
         $senderRemoteCartId = get_post_meta($orderId, 'sender_remote_id', true);
-        if (!empty($senderRemoteCartId) &&
+
+        if (!empty($senderRemoteCartId) && isset($newOrderStatus) &&
             $newOrderStatus === Sender_Helper::ORDER_COMPLETED &&
             in_array($currentOrderStatus, Sender_Helper::ORDER_NOT_PAID_STATUSES)
         ) {
