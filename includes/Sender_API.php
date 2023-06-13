@@ -82,6 +82,7 @@ class Sender_API
         if (isset($user->user_email)) {
             $firstname = !empty($user->first_name) ? $user->first_name : get_user_meta($userId, 'billing_first_name', true);
             $lastname = !empty($user->last_name) ? $user->last_name : get_user_meta($userId, 'billing_last_name', true);
+            $phone = get_user_meta($userId, 'billing_phone', true);
 
             $data = [
                 'email' => $user->user_email,
@@ -90,6 +91,10 @@ class Sender_API
                 'visitor_id' => $_COOKIE['sender_site_visitor'],
                 'store_id' => get_option('sender_store_register') ?: '',
             ];
+
+            if (!empty($phone)){
+                $data['phone'] = $phone;
+            }
 
             if ($list) {
                 $data['list_id'] = $list;
