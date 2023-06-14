@@ -191,7 +191,8 @@ class Sender_Carts
             $this->sender->senderApi->updateCustomer($updateCustomerData, $cartData['email']);
             $cartStatus = [
                 'order_id' => (string)$orderId,
-                'cart_status' => $orderPost->post_status
+                'cart_status' => $orderPost->post_status,
+                'resource_key' => $this->senderGetResourceKey(),
             ];
 
             update_post_meta($orderId, 'sender_remote_id', $cart->id);
