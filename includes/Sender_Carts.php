@@ -190,6 +190,7 @@ class Sender_Carts
 
             $this->sender->senderApi->updateCustomer($updateCustomerData, $cartData['email']);
             $cartStatus = [
+                "external_id" => $cart->id,
                 'order_id' => (string)$orderId,
                 'cart_status' => $orderPost->post_status,
                 'resource_key' => $this->senderGetResourceKey(),
