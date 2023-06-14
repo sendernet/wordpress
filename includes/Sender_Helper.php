@@ -16,8 +16,14 @@ class Sender_Helper
     const UPDATE_STATUS_ACTIVE = 'ACTIVE';
     const UPDATE_STATUS_UNSUBSCRIBED = 'UNSUBSCRIBED';
 
-    const ORDER_NOT_PAID = 'on-hold';
-    const ORDER_COMPLETED = 'completed';
+    const ORDER_ON_HOLD = 'wc-on-hold';
+    const ORDER_PENDING_PAYMENT = 'wc-pending';
+    const ORDER_COMPLETED = 'wc-completed';
+
+    const ORDER_NOT_PAID_STATUSES = [
+        self::ORDER_ON_HOLD,
+        self::ORDER_PENDING_PAYMENT
+    ];
 
     public static function handleChannelStatus($sender_newsletter = null)
     {
