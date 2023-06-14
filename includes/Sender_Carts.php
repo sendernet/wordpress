@@ -195,7 +195,7 @@ class Sender_Carts
             ];
 
             update_post_meta($orderId, 'sender_remote_id', $cart->id);
-            add_action('wp_head', [$this, 'addStatusCartUpdateScript'], 10, 1);
+            add_action('wp_head', [$this, 'addStatusCartUpdateScript']);
             do_action('wp_head', json_encode($cartStatus));
             return;
         }
