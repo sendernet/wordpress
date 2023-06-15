@@ -32,10 +32,6 @@ class Sender_Carts
             return false;
         }
 
-        if (is_admin()) {
-            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus'], 10, 2);
-        }
-
         $this->senderSessionCookie = $_COOKIE['sender_site_visitor'];
     }
 
@@ -63,6 +59,10 @@ class Sender_Carts
         add_action('wp_enqueue_scripts', [$this, 'enqueueSenderCheckoutEmailTriggerScript'], 99);
         add_action('wp_ajax_trigger_backend_hook', [$this,'triggerEmailCheckout']);
         add_action('wp_ajax_nopriv_trigger_backend_hook', [$this,'triggerEmailCheckout']);
+
+        if (is_admin()) {
+            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus'], 10, 2);
+        }
 
         return $this;
     }
@@ -597,7 +597,7 @@ class Sender_Carts
     public function triggerEmailCheckout()
     {
         if (isset($_POST['email']) && !empty($_POST['email'])) {
-            $response = $this->sender->senderApi->senderTrackNotRegisteredUsers(['email' => sanitize_text_field($_POST['email']), 'visitor_id' => $this->senderSessionCookie], true);
+            $response = $this->sender->senderApi->senderTrackNotRegisteredUsers(['email' => sanitize_text_field($_POST['email']), 'visitor_id' => $this->senderSessionCookie]);
             if($response) {
                 return wp_send_json_success($response);
             }
@@ -649,9 +649,9 @@ class Sender_Carts
                     $cartData['list_id'] = $list;
                 }
 
-                $wpUserId = get_current_user_id();
-                if ($wpUserId) {
-                    $cartData['customer_id'] = $wpUserId;
+                $user = get_user_by('email', $cartData['email']);
+                if ($user) {
+                    $cartData['customer_id'] = $user->ID;
                 }
 
                 if ($this->sender->senderApi->senderConvertCart($cart->id, $cartData)) {
