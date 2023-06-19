@@ -46,7 +46,6 @@ class Sender_Carts
         add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
         add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
-        add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
 
         //Handle sender_newsletter on create/update account
         add_action('woocommerce_created_customer', [&$this, 'senderNewsletterHandle'], 10, 1);
@@ -67,40 +66,14 @@ class Sender_Carts
         return $this;
     }
 
-    public function senderAddNewsletterFromOrder($orderId)
-    {
-        $wcOrder = wc_get_order($orderId);
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
-            if ($wcOrder) {
-                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], $wcOrder->get_billing_email());
-            }
-        } else {
-            if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
-                update_post_meta(
-                    $orderId,
-                    Sender_Helper::EMAIL_MARKETING_META_KEY,
-                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
-                );
-                if ($wcOrder) {
-                    $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], $wcOrder->get_billing_email());
-                }
-            } elseif (is_user_logged_in() && Sender_Helper::shouldChangeChannelStatus(get_current_user_id(), 'user')) {
-                update_user_meta(
-                    get_current_user_id(),
-                    Sender_Helper::EMAIL_MARKETING_META_KEY,
-                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
-                );
-                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], get_userdata(get_current_user_id())->user_email);
-            }
-        }
-    }
-
     public function senderNewsletterHandle($userId)
     {
         if (!empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'email_marketing_consent', Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
-            $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], get_userdata($userId)->user_email);
+            $this->sender->senderApi->updateCustomer([
+                'subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE,
+                'sms_status' => Sender_Helper::UPDATE_STATUS_ACTIVE
+            ], get_userdata($userId)->user_email);
         } else {
             if (Sender_Helper::shouldChangeChannelStatus($userId, 'user')) {
                 update_user_meta(
@@ -108,7 +81,10 @@ class Sender_Carts
                     Sender_Helper::EMAIL_MARKETING_META_KEY,
                     Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
                 );
-                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], get_userdata($userId)->user_email);
+                $this->sender->senderApi->updateCustomer([
+                    'subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED,
+                    'sms_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED
+                ], get_userdata($userId)->user_email);
             }
         }
     }
@@ -133,6 +109,46 @@ class Sender_Carts
         if ($cart) {
             $cart->cart_status = self::CONVERTED_CART;
             $cart->save();
+        }
+
+        $wcOrder = wc_get_order($orderId);
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
+            $newsletter = true;
+        } else {
+            if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
+                update_post_meta(
+                    $orderId,
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+            } elseif (is_user_logged_in() && Sender_Helper::shouldChangeChannelStatus(get_current_user_id(), 'user')) {
+                update_user_meta(
+                    get_current_user_id(),
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+                $newsletter = true;
+            }
+        }
+
+
+        if (get_current_user_id()){
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", get_current_user_id());
+        }else{
+            $visitorData = [
+                'email' => $wcOrder->get_billing_email(),
+                'firstname' => $wcOrder->get_billing_first_name(),
+                'lastname' => $wcOrder->get_billing_last_name(),
+                'phone' => $wcOrder->get_billing_phone(),
+                'visitor_id' => $this->senderSessionCookie,
+            ];
+
+            if(isset($newsletter)){
+                $visitorData['newsletter'] = $newsletter;
+            }
+
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackNotRegisteredUsers", $visitorData);
         }
     }
 
@@ -181,14 +197,6 @@ class Sender_Carts
         if (in_array($orderPost->post_status, Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
             $cart->cart_status = self::UNPAID_CART;
             $cart->save();
-
-            $updateCustomerData = [
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'phone' => $phone
-            ];
-
-            $this->sender->senderApi->updateCustomer($updateCustomerData, $cartData['email']);
             $cartStatus = [
                 "external_id" => $cart->id,
                 'order_id' => (string)$orderId,
