@@ -111,7 +111,6 @@ class Sender_Carts
             $cart->save();
         }
 
-        $wcOrder = wc_get_order($orderId);
         if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
             update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
             $newsletter = true;
@@ -132,7 +131,7 @@ class Sender_Carts
             }
         }
 
-
+        $wcOrder = wc_get_order($orderId);
         if (get_current_user_id()){
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", get_current_user_id());
         }else{
