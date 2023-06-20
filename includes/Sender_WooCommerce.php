@@ -22,6 +22,9 @@ class Sender_WooCommerce
         //Declare action for cron job to sync from webhook
         add_action('sender_schedule_sync_cron_job', [$this, 'scheduleSenderExportShopDataCronJob']);
 
+        //Get order counts data
+        add_action('sender_get_customer_data', [$this, 'senderGetCustomerData'], 10, 2);
+
         if (is_admin()) {
             if (get_option('sender_subscribe_label') && !empty(get_option('sender_subscribe_to_newsletter_string'))) {
                 add_action('edit_user_profile', [$this, 'senderNewsletter']);
@@ -353,7 +356,7 @@ class Sender_WooCommerce
     public function exportCustomers()
     {
         global $wpdb;
-        $chunkSize = 300;
+        $chunkSize = 200;
 
         #Extract customers which completed order
         $totalCompleted = $wpdb->get_var("SELECT COUNT(DISTINCT pm.meta_value)
@@ -362,7 +365,7 @@ class Sender_WooCommerce
             LEFT JOIN " . $this->tablePrefix . "postmeta AS pm ON o.ID = pm.post_id AND pm.meta_key = '_billing_email'
         WHERE
             o.post_type = 'shop_order'
-            AND o.post_status IN ('wc-completed', 'wc-on-hold')
+            AND o.post_status IN ('wc-completed', 'wc-on-hold', 'wc-processing')
             AND pm.meta_value IS NOT NULL");
 
         $clientCompleted = 0;
@@ -387,7 +390,7 @@ class Sender_WooCommerce
             LEFT JOIN " . $this->tablePrefix . "postmeta AS pm ON o.ID = pm.post_id AND pm.meta_key = '_billing_email'
         WHERE
             o.post_type = 'shop_order'
-            AND o.post_status NOT IN ('wc-completed', 'wc-on-hold')
+            AND o.post_status NOT IN ('wc-completed', 'wc-on-hold', 'wc-processing')
             AND pm.meta_value IS NOT NULL");
 
         $clientNotCompleted = 0;
@@ -450,10 +453,55 @@ class Sender_WooCommerce
                 unset($customer['newsletter']);
             }
 
+            $customFields = $this->senderGetCustomerData($customer['email']);
+            $customer['fields'] = $customFields;
             $customersExportData[] = $customer;
         }
 
         $this->sender->senderApi->senderExportData(['customers' => $customersExportData]);
+    }
+
+    public function senderGetCustomerData($email, $update = false)
+    {
+        if (empty($email)) {
+            return;
+        }
+
+        global $wpdb;
+        $orders = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT DISTINCT pm.post_id
+        FROM {$wpdb->postmeta} AS pm
+        WHERE pm.meta_key = '_billing_email'
+        AND pm.meta_value = %s",
+                $email
+            )
+        );
+
+        $totalSpent = 0;
+        $ordersCount = count($orders);
+        foreach ($orders as $key => $orderId) {
+            $totalSpent += get_post_meta($orderId, '_order_total', true);
+            $isLastIteration = ($key === ($ordersCount - 1));
+            if ($isLastIteration) {
+                $last_order_name = '#' . $orderId;
+                $last_order_currency = get_post_meta($orderId, '_order_currency', true);
+            }
+        }
+
+        $ordersData = [
+            'orders_count' => $ordersCount,
+            'total_spent' => $totalSpent,
+            'last_order_name' => $last_order_name,
+            'currency' => $last_order_currency,
+        ];
+
+        if($update){
+            $this->sender->senderApi->updateCustomer(['fields' => $ordersData], $email);
+            return true;
+        }
+
+        return $ordersData;
     }
 
     public function sendUsersToSender($customers)
@@ -492,6 +540,9 @@ class Sender_WooCommerce
             if (isset($customer[Sender_Helper::EMAIL_MARKETING_META_KEY][0])) {
                 $data[Sender_Helper::EMAIL_MARKETING_META_KEY] = unserialize($customer[Sender_Helper::EMAIL_MARKETING_META_KEY][0]);
             }
+
+            $customFields = $this->senderGetCustomerData($email);
+            $data['fields'] = $customFields;
 
             $customersExportData[] = $data;
         }
