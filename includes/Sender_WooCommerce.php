@@ -197,9 +197,10 @@ class Sender_WooCommerce
         }
 
         $email = $postMeta['_billing_email'][0];
+        $senderUser = (new Sender_User())->findBy('email', $email);
 
         #Order update, created from interface
-        if (isset($postMeta[Sender_Helper::SENDER_CART_META])) {
+        if (isset($postMeta[Sender_Helper::SENDER_CART_META]) || $senderUser) {
             $subscriberData = [
                 'firstname' => $postMeta['_billing_first_name'][0] ?: null,
                 'lastname' => $postMeta['_billing_last_name'][0] ?: null,
@@ -212,6 +213,22 @@ class Sender_WooCommerce
             $channelStatusData = $this->handleSenderNewsletterFromDashboard($orderId, $subscriberData, true);
             $subscriberData = array_merge($subscriberData, $channelStatusData);
             $this->sender->senderApi->updateCustomer($subscriberData, $email);
+
+            if($senderUser) {
+                #Check if has any order
+                $cart = (new Sender_Cart())->findByAttributes(
+                    [
+                        'user_id' => $senderUser->id,
+                        'cart_status' => Sender_Helper::UNPAID_CART
+                    ]
+                );
+
+                if (!$cart) {
+                    $this->senderProcessOrderFromWoocommerceDashboard($orderId, $senderUser->visitor_id, $email);
+                }
+                #Handle status of cart
+                do_action('sender_update_order_status', $orderId);
+            }
         } else {
             #New order created from woocomerce dashboard
             $visitorId = $this->sender->senderApi->generateVisitorId();
@@ -725,6 +742,10 @@ class Sender_WooCommerce
         #Process order
         $order = wc_get_order($orderId);
         $items = $order->get_items();
+        if (empty($items)){
+            return;
+        }
+
         $serializedItems = array();
         foreach ($items as $item_id => $item) {
             $product = $item->get_product();
