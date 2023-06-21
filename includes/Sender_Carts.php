@@ -212,6 +212,7 @@ class Sender_Carts
         update_post_meta($orderId, 'sender_remote_id', $cart->id);
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
+        do_action('sender_get_customer_data', $email, true);
     }
 
     public function senderPrepareCartData($cart)
@@ -664,6 +665,7 @@ class Sender_Carts
                 if ($this->sender->senderApi->senderConvertCart($cart->id, $cartData)) {
                     $cart->cart_status = self::CONVERTED_CART;
                     $cart->save();
+                    do_action('sender_get_customer_data', $cartData['email'], true);
                 }
             }
         }
