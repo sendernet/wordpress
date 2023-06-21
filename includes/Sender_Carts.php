@@ -14,9 +14,6 @@ class Sender_Carts
     const TRACK_CART = 'sender-track-cart';
     const UPDATE_CART = 'sender-update-cart';
 
-    const CONVERTED_CART = '2';
-    const UNPAID_CART = '3';
-
     const FRAGMENTS_FILTERS = [
         'woocommerce_add_to_cart_fragments',
         'woocommerce_update_order_review_fragments'
@@ -60,7 +57,8 @@ class Sender_Carts
         add_action('wp_ajax_nopriv_trigger_backend_hook', [$this,'triggerEmailCheckout']);
 
         if (is_admin()) {
-            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus'], 10, 2);
+            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus']);
+            add_action('sender_update_order_status',[$this, 'senderUpdateOrderStatus']);
         }
 
         return $this;
@@ -107,7 +105,7 @@ class Sender_Carts
         );
 
         if ($cart) {
-            $cart->cart_status = self::CONVERTED_CART;
+            $cart->cart_status = Sender_Helper::CONVERTED_CART;
             $cart->save();
         }
 
@@ -131,10 +129,16 @@ class Sender_Carts
             }
         }
 
-        $wcOrder = wc_get_order($orderId);
         if (get_current_user_id()){
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", get_current_user_id());
         }else{
+            $wcOrder = wc_get_order($orderId);
+            $senderUser = (new Sender_User())->find($cart->user_id);
+            if ($senderUser){
+                $senderUser->email = $wcOrder->get_billing_email();
+                $senderUser->save();
+            }
+
             $visitorData = [
                 'email' => $wcOrder->get_billing_email(),
                 'firstname' => $wcOrder->get_billing_first_name(),
@@ -156,7 +160,7 @@ class Sender_Carts
         $cart = (new Sender_Cart())->findByAttributes(
             [
                 'session' => $this->senderSessionCookie,
-                'cart_status' => self::CONVERTED_CART
+                'cart_status' => Sender_Helper::CONVERTED_CART
             ],
             'created DESC'
         );
@@ -194,7 +198,7 @@ class Sender_Carts
         //If order not completed don't convert cart in sender
         $orderPost = get_post($orderId);
         if (in_array($orderPost->post_status, Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
-            $cart->cart_status = self::UNPAID_CART;
+            $cart->cart_status = Sender_Helper::UNPAID_CART;
             $cart->save();
             $cartStatus = [
                 "external_id" => $cart->id,
@@ -203,13 +207,13 @@ class Sender_Carts
                 'resource_key' => $this->senderGetResourceKey(),
             ];
 
-            update_post_meta($orderId, 'sender_remote_id', $cart->id);
+            update_post_meta($orderId, Sender_Helper::SENDER_CART_META, $cart->id);
             add_action('wp_head', [$this, 'addStatusCartUpdateScript']);
             do_action('wp_head', json_encode($cartStatus));
             return;
         }
 
-        update_post_meta($orderId, 'sender_remote_id', $cart->id);
+        update_post_meta($orderId, Sender_Helper::SENDER_CART_META, $cart->id);
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
         do_action('sender_get_customer_data', $email, true);
@@ -347,7 +351,7 @@ class Sender_Carts
 
         if (empty($items) && $cart) {
             #Keep converted carts and unpaid carts
-            if ($cart->cart_status == self::CONVERTED_CART || $cart->status === self::UNPAID_CART) {
+            if ($cart->cart_status == Sender_Helper::CONVERTED_CART || $cart->status === Sender_Helper::UNPAID_CART) {
                 return;
             }
 
@@ -379,7 +383,7 @@ class Sender_Carts
         }
 
         //If cart converted, start a new cart
-        if ($cart && $cart->cart_status == self::CONVERTED_CART){
+        if ($cart && $cart->cart_status == Sender_Helper::CONVERTED_CART) {
             $cart = false;
         }
 
@@ -403,7 +407,7 @@ class Sender_Carts
         }
 
         if (!empty($items)) {
-            if (!$senderUser = $this->senderGetVisitor()){
+            if (!$senderUser = $this->senderGetVisitor()) {
                 return;
             }
 
@@ -414,7 +418,7 @@ class Sender_Carts
             $newCart->save();
 
             $cartData = $this->senderPrepareCartData($newCart);
-            if (!$cartData){
+            if (!$cartData) {
                 return;
             }
 
@@ -620,54 +624,56 @@ class Sender_Carts
     }
 
     //Use to convert carts which got confirmed payment
-    public function senderUpdateOrderStatus($orderId, $currentOrderStatus)
+    public function senderUpdateOrderStatus($orderId)
     {
-        if (isset($_POST['order_status'])) {
-            $newOrderStatus = $_POST['order_status'];
+        if (!isset($_POST['order_status'])) {
+            return;
         }
 
-        $currentOrderStatus = 'wc-' . $currentOrderStatus;
-        $senderRemoteCartId = get_post_meta($orderId, 'sender_remote_id', true);
+        $newOrderStatus = $_POST['order_status'];
+        $senderRemoteCartId = get_post_meta($orderId, Sender_Helper::SENDER_CART_META, true);
 
-        if (!empty($senderRemoteCartId) && isset($newOrderStatus) &&
-            $newOrderStatus === Sender_Helper::ORDER_COMPLETED &&
-            in_array($currentOrderStatus, Sender_Helper::ORDER_NOT_PAID_STATUSES)
-        ) {
+        if (!empty($senderRemoteCartId) && $newOrderStatus === Sender_Helper::ORDER_COMPLETED) {
+            #Check if cart exists
             $cart = (new Sender_Cart())->findByAttributes(
                 [
                     'id' => $senderRemoteCartId,
-                    'cart_status' => self::UNPAID_CART
+                    'cart_status' => Sender_Helper::UNPAID_CART
                 ]
             );
 
-            if ($cart) {
-                $wcOrder = wc_get_order($orderId);
-                $list = get_option('sender_customers_list');
-                $cartData = [
-                    'external_id' => $cart->id,
-                    'email' => $wcOrder->get_billing_email(),
-                    'firstname' => $wcOrder->get_billing_first_name(),
-                    'lastname' => $wcOrder->get_billing_last_name(),
-                    'resource_key' => $this->senderGetResourceKey(),
-                    'phone' => $wcOrder->get_billing_phone(),
-                    'order_id' => (string)$orderId
-                ];
+            if (!$cart){
+                return;
+            }
 
-                if ($list) {
-                    $cartData['list_id'] = $list;
-                }
+            $wcOrder = wc_get_order($orderId);
+            $list = get_option('sender_customers_list');
+            $cartData = [
+                'external_id' => $cart->id,
+                'email' => $wcOrder->get_billing_email(),
+                'firstname' => $wcOrder->get_billing_first_name(),
+                'lastname' => $wcOrder->get_billing_last_name(),
+                'resource_key' => $this->senderGetResourceKey(),
+                'phone' => $wcOrder->get_billing_phone(),
+                'order_id' => (string)$orderId
+            ];
 
-                $user = get_user_by('email', $cartData['email']);
-                if ($user) {
-                    $cartData['customer_id'] = $user->ID;
-                }
+            if ($list) {
+                $cartData['list_id'] = $list;
+            }
 
-                if ($this->sender->senderApi->senderConvertCart($cart->id, $cartData)) {
-                    $cart->cart_status = self::CONVERTED_CART;
-                    $cart->save();
-                    do_action('sender_get_customer_data', $cartData['email'], true);
-                }
+            $user = get_user_by('email', $cartData['email']);
+
+            if ($user) {
+                $cartData['customer_id'] = $user->ID;
+            }
+
+            if ($this->sender->senderApi->senderConvertCart($cart->id, $cartData)) {
+                $cart->cart_status = Sender_Helper::CONVERTED_CART;
+                $cart->save();
+                do_action('sender_get_customer_data', $cartData['email'], true);
             }
         }
     }
+
 }
