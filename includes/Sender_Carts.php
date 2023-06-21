@@ -505,7 +505,7 @@ class Sender_Carts
         $cartId = sanitize_text_field($_GET['hash']);
 
         $cart = (new Sender_Cart())->find($cartId);
-        if (!$cart || $cart->cart_recovered || $cart->cart_status == self::CONVERTED_CART) {
+        if (!$cart || $cart->cart_recovered || $cart->cart_status == Sender_Helper::CONVERTED_CART) {
             return wp_redirect(wc_get_cart_url());
         }
 
