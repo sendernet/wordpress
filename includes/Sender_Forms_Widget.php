@@ -29,6 +29,7 @@ class Sender_Forms_Widget extends WP_Widget
 
         $instance['form'] = (!empty($newInstance['form'])) ? strip_tags($newInstance['form']) : '';
 
+        do_action('sender_sdk_insert');
         return $instance;
     }
 
