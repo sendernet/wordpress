@@ -201,10 +201,14 @@ class Sender_WooCommerce
 
         #Order update, created from interface
         if (isset($postMeta[Sender_Helper::SENDER_CART_META]) || $senderUser) {
-            $subscriberData = [
-                'firstname' => $postMeta['_billing_first_name'][0] ?: null,
-                'lastname' => $postMeta['_billing_last_name'][0] ?: null,
-            ];
+            $subscriberData = [];
+            if (isset($_POST['_billing_first_name'])) {
+                $subscriberData['firstname'] = $_POST['_billing_first_name'];
+            }
+
+            if (isset($_POST['_billing_last_name'])) {
+                $subscriberData['lastname'] = $_POST['_billing_last_name'];
+            }
 
             if (isset($_POST['_billing_phone'])) {
                 $subscriberData['phone'] = $_POST['_billing_phone'];
@@ -212,22 +216,27 @@ class Sender_WooCommerce
 
             $channelStatusData = $this->handleSenderNewsletterFromDashboard($orderId, $subscriberData, true);
             $subscriberData = array_merge($subscriberData, $channelStatusData);
-            $this->sender->senderApi->updateCustomer($subscriberData, $email);
 
-            if($senderUser) {
-                #Check if has any order
+            $this->sender->senderApi->updateCustomer($subscriberData, $email);
+            $emailMarketingConset = get_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+            if (empty($emailMarketingConset)) {
+                $this->updateEmailMarketingConsent($email, $orderId);
+            }
+
+            if ($postMeta[Sender_Helper::SENDER_CART_META]) {
+                #Check if has any order with sender_remote_id
                 $cart = (new Sender_Cart())->findByAttributes(
                     [
-                        'user_id' => $senderUser->id,
+                        'id' => $postMeta[Sender_Helper::SENDER_CART_META],
                         'cart_status' => Sender_Helper::UNPAID_CART
                     ]
                 );
 
-                if (!$cart) {
-                    $this->senderProcessOrderFromWoocommerceDashboard($orderId, $senderUser->visitor_id, $email);
+                if ($cart) {
+                    do_action('sender_update_order_status', $orderId);
+                } else {
+                    $this->senderProcessOrderFromWoocommerceDashboard($orderId, $senderUser->visitor_id, $senderUser);
                 }
-                #Handle status of cart
-                do_action('sender_update_order_status', $orderId);
             }
         } else {
             #New order created from woocomerce dashboard
@@ -236,10 +245,16 @@ class Sender_WooCommerce
                 return;
             }
 
+            if (isset($_POST['_billing_first_name'])) {
+                $subscriberData['firstname'] = $_POST['_billing_first_name'];
+            }
+
+            if (isset($_POST['_billing_last_name'])) {
+                $subscriberData['lastname'] = $_POST['_billing_last_name'];
+            }
+
             $subscriberData = [
                 'email' => $email,
-                'firstname' => $postMeta['_billing_first_name'][0] ?: null,
-                'lastname' => $postMeta['_billing_last_name'][0] ?: null,
                 'visitor_id' => $visitorId->id,
             ];
 
@@ -254,7 +269,52 @@ class Sender_WooCommerce
             $channelStatusData = $this->handleSenderNewsletterFromDashboard($orderId, $subscriberData, false);
             $subscriberData = array_merge($subscriberData, $channelStatusData);
             $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
-            $this->senderProcessOrderFromWoocommerceDashboard($orderId, $visitorId->id, $email);
+
+            $senderUser = new Sender_User();
+            $senderUser->visitor_id = $visitorId;
+            $senderUser->email = $email;
+            if (isset($subscriberData['firstname'])) {
+                $senderUser->first_name = $subscriberData['firstname'];
+            }
+
+            if (isset($subscriberData['lastname'])) {
+                $senderUser->last_name = $subscriberData['lastname'];
+            }
+
+            $senderUser->save();
+
+            $emailMarketingConset = get_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+            if (empty($emailMarketingConset)) {
+                $this->updateEmailMarketingConsent($email, $orderId);
+            }
+
+            $this->senderProcessOrderFromWoocommerceDashboard($orderId, $visitorId->id, $senderUser);
+        }
+    }
+
+    public function updateEmailMarketingConsent($email, $id)
+    {
+        $subscriber = $this->sender->senderApi->getSubscriber($email);
+        if ($subscriber) {
+            if (isset($subscriber->data->status->email)) {
+                $emailStatusFromSender = strtoupper($subscriber->data->status->email);
+                switch ($emailStatusFromSender) {
+                    case Sender_Helper::UPDATE_STATUS_ACTIVE:
+                        $status = Sender_Helper::SUBSCRIBED;
+                        break;
+                    case Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED:
+                        $status = Sender_Helper::UNSUBSCRIBED;
+                        break;
+                }
+
+                if (isset($status)) {
+                    update_post_meta(
+                        $id,
+                        Sender_Helper::EMAIL_MARKETING_META_KEY,
+                        Sender_Helper::generateEmailMarketingConsent($status)
+                    );
+                }
+            }
         }
     }
 
@@ -515,7 +575,9 @@ class Sender_WooCommerce
             }
 
             $customFields = $this->senderGetCustomerData($customer['email']);
-            $customer['fields'] = $customFields;
+            if (!empty($customFields)) {
+                $customer['fields'] = $customFields;
+            }
             $customersExportData[] = $customer;
         }
 
@@ -541,28 +603,31 @@ class Sender_WooCommerce
 
         $totalSpent = 0;
         $ordersCount = count($orders);
-        foreach ($orders as $key => $orderId) {
-            $totalSpent += get_post_meta($orderId, '_order_total', true);
-            $isLastIteration = ($key === ($ordersCount - 1));
-            if ($isLastIteration) {
-                $last_order_name = '#' . $orderId;
-                $last_order_currency = get_post_meta($orderId, '_order_currency', true);
+        if ($ordersCount > 0) {
+            foreach ($orders as $key => $orderId) {
+                $totalSpent += get_post_meta($orderId, '_order_total', true);
+                $isLastIteration = ($key === ($ordersCount - 1));
+                if ($isLastIteration) {
+                    $last_order_name = '#' . $orderId;
+                    $last_order_currency = get_post_meta($orderId, '_order_currency', true);
+                }
             }
+            $ordersData = [
+                'orders_count' => $ordersCount,
+                'total_spent' => $totalSpent,
+                'last_order_name' => $last_order_name,
+                'currency' => $last_order_currency,
+            ];
         }
 
-        $ordersData = [
-            'orders_count' => $ordersCount,
-            'total_spent' => $totalSpent,
-            'last_order_name' => $last_order_name,
-            'currency' => $last_order_currency,
-        ];
-
-        if($update){
+        if($update && isset($ordersData)){
             $this->sender->senderApi->updateCustomer(['fields' => $ordersData], $email);
             return true;
         }
 
-        return $ordersData;
+        if (isset($ordersData)) {
+            return $ordersData;
+        }
     }
 
     public function sendUsersToSender($customers)
@@ -603,7 +668,9 @@ class Sender_WooCommerce
             }
 
             $customFields = $this->senderGetCustomerData($email);
-            $data['fields'] = $customFields;
+            if (!empty($customFields)) {
+                $data['fields'] = $customFields;
+            }
 
             $customersExportData[] = $data;
         }
@@ -732,13 +799,8 @@ class Sender_WooCommerce
         $this->tablePrefix = $wpdb->prefix;
     }
 
-    public function senderProcessOrderFromWoocommerceDashboard($orderId, $visitorId, $email)
+    public function senderProcessOrderFromWoocommerceDashboard($orderId, $visitorId, $senderUser)
     {
-        $senderUser = new Sender_User();
-        $senderUser->visitor_id = $visitorId;
-        $senderUser->email = $email;
-        $senderUser->save();
-
         #Process order
         $order = wc_get_order($orderId);
         $items = $order->get_items();

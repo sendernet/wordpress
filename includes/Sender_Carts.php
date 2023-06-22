@@ -310,6 +310,11 @@ class Sender_Carts
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
         }
 
+        $emailMarketingConset = get_user_meta($wpId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+        if (empty($emailMarketingConset)) {
+            $this->updateUserEmailMarketingConsent($user->email, $wpId);
+        }
+
         $user->save();
     }
 
@@ -672,6 +677,32 @@ class Sender_Carts
                 $cart->cart_status = Sender_Helper::CONVERTED_CART;
                 $cart->save();
                 do_action('sender_get_customer_data', $cartData['email'], true);
+            }
+        }
+    }
+
+    public function updateUserEmailMarketingConsent($email, $userId)
+    {
+        $subscriber = $this->sender->senderApi->getSubscriber($email);
+        if ($subscriber) {
+            if (isset($subscriber->data->status->email)) {
+                $emailStatusFromSender = strtoupper($subscriber->data->status->email);
+                switch ($emailStatusFromSender) {
+                    case Sender_Helper::UPDATE_STATUS_ACTIVE:
+                        $status = Sender_Helper::SUBSCRIBED;
+                        break;
+                    case Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED:
+                        $status = Sender_Helper::UNSUBSCRIBED;
+                        break;
+                }
+
+                if (isset($status)) {
+                    update_user_meta(
+                        $userId,
+                        Sender_Helper::EMAIL_MARKETING_META_KEY,
+                        Sender_Helper::generateEmailMarketingConsent($status)
+                    );
+                }
             }
         }
     }
