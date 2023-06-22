@@ -222,22 +222,6 @@ class Sender_WooCommerce
             if (empty($emailMarketingConset)) {
                 $this->updateEmailMarketingConsent($email, $orderId);
             }
-
-            if ($postMeta[Sender_Helper::SENDER_CART_META]) {
-                #Check if has any order with sender_remote_id
-                $cart = (new Sender_Cart())->findByAttributes(
-                    [
-                        'id' => $postMeta[Sender_Helper::SENDER_CART_META],
-                        'cart_status' => Sender_Helper::UNPAID_CART
-                    ]
-                );
-
-                if ($cart) {
-                    do_action('sender_update_order_status', $orderId);
-                } else {
-                    $this->senderProcessOrderFromWoocommerceDashboard($orderId, $senderUser->visitor_id, $senderUser);
-                }
-            }
         } else {
             #New order created from woocomerce dashboard
             $visitorId = $this->sender->senderApi->generateVisitorId();
