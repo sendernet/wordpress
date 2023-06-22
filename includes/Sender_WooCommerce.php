@@ -271,7 +271,7 @@ class Sender_WooCommerce
             $this->sender->senderApi->senderTrackNotRegisteredUsers($subscriberData);
 
             $senderUser = new Sender_User();
-            $senderUser->visitor_id = $visitorId;
+            $senderUser->visitor_id = $subscriberData['visitor_id'];
             $senderUser->email = $email;
             if (isset($subscriberData['firstname'])) {
                 $senderUser->first_name = $subscriberData['firstname'];
@@ -853,7 +853,7 @@ class Sender_WooCommerce
         }
 
         $data = [
-            "visitor_id" => $senderUser->visitor_id,
+            "visitor_id" => $visitorId,
             "external_id" => $cart->id,
             "url" => $cartUrl,
             "currency" => 'EUR',
