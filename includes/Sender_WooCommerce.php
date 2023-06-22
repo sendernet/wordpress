@@ -599,7 +599,7 @@ class Sender_WooCommerce
             $ordersData = [
                 'orders_count' => $ordersCount,
                 'total_spent' => $totalSpent,
-                'last_order_name' => $last_order_name,
+                'last_order_number' => $last_order_name,
                 'currency' => $last_order_currency,
             ];
         }
