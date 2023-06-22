@@ -262,4 +262,14 @@ class Sender_API
         $response = wp_remote_post($url, $params);
         return $this->senderBuildStatsResponse($response);
     }
+
+    public function getSubscriber($email = false)
+    {
+        if (!$email || empty($email)){
+            return;
+        }
+
+        $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' . $email, $this->senderBaseRequestArguments());
+        return $this->senderBuildResponse($response);
+    }
 }
