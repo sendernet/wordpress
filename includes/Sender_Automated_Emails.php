@@ -71,6 +71,10 @@ class Sender_Automated_Emails
 
     private function senderAddActions()
     {
+        if (is_admin()){
+            add_action('sender_sdk_insert', [$this, 'insertSdkScript']);
+        }
+
         add_action('wp_head', [&$this, 'insertSdkScript']);
         add_action('widgets_init', [&$this, 'senderRegisterFormsWidget']);
 
