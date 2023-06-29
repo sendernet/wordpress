@@ -82,6 +82,7 @@ class Sender_API
         if (isset($user->user_email)) {
             $firstname = !empty($user->first_name) ? $user->first_name : get_user_meta($userId, 'billing_first_name', true);
             $lastname = !empty($user->last_name) ? $user->last_name : get_user_meta($userId, 'billing_last_name', true);
+            $phone = get_user_meta($userId, 'billing_phone', true);
 
             $data = [
                 'email' => $user->user_email,
@@ -91,6 +92,10 @@ class Sender_API
                 'store_id' => get_option('sender_store_register') ?: '',
             ];
 
+            if (!empty($phone)){
+                $data['phone'] = $phone;
+            }
+
             if ($list) {
                 $data['list_id'] = $list;
             }
@@ -99,8 +104,6 @@ class Sender_API
                 if (isset($emailConsent['state']) && $emailConsent['state'] === Sender_Helper::SUBSCRIBED) {
                     $data['newsletter'] = true;
                 }
-
-                update_user_meta($userId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent($data['newsletter']));
             }
 
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
@@ -248,6 +251,25 @@ class Sender_API
         $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data), 'method' => 'DELETE']);
         $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' , $params);
 
+        return $this->senderBuildResponse($response);
+    }
+
+    public function senderConvertCart($cartId, $cartData)
+    {
+        $url = $this->senderStatsBaseUrl . 'carts/' . $cartId . '/convert';
+
+        $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($cartData)]);
+        $response = wp_remote_post($url, $params);
+        return $this->senderBuildStatsResponse($response);
+    }
+
+    public function getSubscriber($email = false)
+    {
+        if (!$email || empty($email)){
+            return;
+        }
+
+        $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' . $email, $this->senderBaseRequestArguments());
         return $this->senderBuildResponse($response);
     }
 }
