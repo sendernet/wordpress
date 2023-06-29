@@ -15,6 +15,24 @@ class Sender_Helper
     #Used for updating channel status directly
     const UPDATE_STATUS_ACTIVE = 'ACTIVE';
     const UPDATE_STATUS_UNSUBSCRIBED = 'UNSUBSCRIBED';
+    const UPDATE_STATUS_NON_SUBSCRIBED = 'NON-SUBSCRIBED';
+
+    #Wocoomerce order statuses
+    const ORDER_ON_HOLD = 'wc-on-hold';
+    const ORDER_PENDING_PAYMENT = 'wc-pending';
+    const ORDER_COMPLETED = 'wc-completed';
+
+    #Used for updating sender carts
+    const CONVERTED_CART = '2';
+    const UNPAID_CART = '3';
+
+    #POST_META
+    CONST SENDER_CART_META = 'sender_remote_id';
+
+    const ORDER_NOT_PAID_STATUSES = [
+        self::ORDER_ON_HOLD,
+        self::ORDER_PENDING_PAYMENT
+    ];
 
     public static function handleChannelStatus($sender_newsletter = null)
     {

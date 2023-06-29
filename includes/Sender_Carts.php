@@ -14,8 +14,6 @@ class Sender_Carts
     const TRACK_CART = 'sender-track-cart';
     const UPDATE_CART = 'sender-update-cart';
 
-    const CONVERTED_CART = '2';
-
     const FRAGMENTS_FILTERS = [
         'woocommerce_add_to_cart_fragments',
         'woocommerce_update_order_review_fragments'
@@ -45,7 +43,6 @@ class Sender_Carts
         add_action('woocommerce_review_order_before_submit', [&$this, 'senderAddNewsletterCheck'], 10);
         add_action('woocommerce_edit_account_form', [&$this, 'senderAddNewsletterCheck']);
         add_action('woocommerce_register_form', [&$this, 'senderAddNewsletterCheck']);
-        add_action('woocommerce_checkout_update_order_meta', [&$this, 'senderAddNewsletterFromOrder']);
 
         //Handle sender_newsletter on create/update account
         add_action('woocommerce_created_customer', [&$this, 'senderNewsletterHandle'], 10, 1);
@@ -59,33 +56,22 @@ class Sender_Carts
         add_action('wp_ajax_trigger_backend_hook', [$this,'triggerEmailCheckout']);
         add_action('wp_ajax_nopriv_trigger_backend_hook', [$this,'triggerEmailCheckout']);
 
-        return $this;
-    }
-
-    public function senderAddNewsletterFromOrder($orderId)
-    {
-        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
-            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
-        } else {
-            if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
-                update_post_meta(
-                    $orderId,
-                    Sender_Helper::EMAIL_MARKETING_META_KEY,
-                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
-                );
-                $wcOrder = wc_get_order($orderId);
-                if ($wcOrder){
-                    $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], $wcOrder->get_billing_email());
-                }
-            }
+        if (is_admin()) {
+            add_action('woocommerce_order_status_changed', [$this, 'senderUpdateOrderStatus']);
+            add_action('sender_update_order_status',[$this, 'senderUpdateOrderStatus']);
         }
+
+        return $this;
     }
 
     public function senderNewsletterHandle($userId)
     {
         if (!empty($_POST['sender_newsletter'])) {
             update_user_meta($userId, 'email_marketing_consent', Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
-            $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE], get_userdata($userId)->user_email);
+            $this->sender->senderApi->updateCustomer([
+                'subscriber_status' => Sender_Helper::UPDATE_STATUS_ACTIVE,
+                'sms_status' => Sender_Helper::UPDATE_STATUS_ACTIVE
+            ], get_userdata($userId)->user_email);
         } else {
             if (Sender_Helper::shouldChangeChannelStatus($userId, 'user')) {
                 update_user_meta(
@@ -93,7 +79,10 @@ class Sender_Carts
                     Sender_Helper::EMAIL_MARKETING_META_KEY,
                     Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
                 );
-                $this->sender->senderApi->updateCustomer(['subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED], get_userdata($userId)->user_email);
+                $this->sender->senderApi->updateCustomer([
+                    'subscriber_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED,
+                    'sms_status' => Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED
+                ], get_userdata($userId)->user_email);
             }
         }
     }
@@ -116,8 +105,53 @@ class Sender_Carts
         );
 
         if ($cart) {
-            $cart->cart_status = self::CONVERTED_CART;
+            $cart->cart_status = Sender_Helper::CONVERTED_CART;
             $cart->save();
+        }
+
+        if (isset($_POST['sender_newsletter']) && !empty($_POST['sender_newsletter'])) {
+            update_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, Sender_Helper::generateEmailMarketingConsent(Sender_Helper::SUBSCRIBED));
+            $newsletter = true;
+        } else {
+            if (Sender_Helper::shouldChangeChannelStatus($orderId, 'order')) {
+                update_post_meta(
+                    $orderId,
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+            } elseif (is_user_logged_in() && Sender_Helper::shouldChangeChannelStatus(get_current_user_id(), 'user')) {
+                update_user_meta(
+                    get_current_user_id(),
+                    Sender_Helper::EMAIL_MARKETING_META_KEY,
+                    Sender_Helper::generateEmailMarketingConsent(Sender_Helper::UNSUBSCRIBED)
+                );
+                $newsletter = true;
+            }
+        }
+
+        if (get_current_user_id()){
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", get_current_user_id());
+        }else{
+            $wcOrder = wc_get_order($orderId);
+            $senderUser = (new Sender_User())->find($cart->user_id);
+            if ($senderUser){
+                $senderUser->email = $wcOrder->get_billing_email();
+                $senderUser->save();
+            }
+
+            $visitorData = [
+                'email' => $wcOrder->get_billing_email(),
+                'firstname' => $wcOrder->get_billing_first_name(),
+                'lastname' => $wcOrder->get_billing_last_name(),
+                'phone' => $wcOrder->get_billing_phone(),
+                'visitor_id' => $this->senderSessionCookie,
+            ];
+
+            if(isset($newsletter)){
+                $visitorData['newsletter'] = $newsletter;
+            }
+
+            $this->sender->senderApi->senderApiShutdownCallback("senderTrackNotRegisteredUsers", $visitorData);
         }
     }
 
@@ -126,7 +160,7 @@ class Sender_Carts
         $cart = (new Sender_Cart())->findByAttributes(
             [
                 'session' => $this->senderSessionCookie,
-                'cart_status' => self::CONVERTED_CART
+                'cart_status' => Sender_Helper::CONVERTED_CART
             ],
             'created DESC'
         );
@@ -161,16 +195,28 @@ class Sender_Carts
             $cartData['customer_id'] = $wpUserId;
         }
 
-        $metaOrderEmailMarketingConsent = get_post_meta($orderId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
-        if (!empty($metaOrderEmailMarketingConsent)) {
-            if (Sender_Helper::handleChannelStatus($metaOrderEmailMarketingConsent)) {
-                $cartData['newsletter'] = true;
-            }
+        //If order not completed don't convert cart in sender
+        $orderPost = get_post($orderId);
+        if (in_array($orderPost->post_status, Sender_Helper::ORDER_NOT_PAID_STATUSES)) {
+            $cart->cart_status = Sender_Helper::UNPAID_CART;
+            $cart->save();
+            $cartStatus = [
+                "external_id" => $cart->id,
+                'order_id' => (string)$orderId,
+                'cart_status' => $orderPost->post_status,
+                'resource_key' => $this->senderGetResourceKey(),
+            ];
+
+            update_post_meta($orderId, Sender_Helper::SENDER_CART_META, $cart->id);
+            add_action('wp_head', [$this, 'addStatusCartUpdateScript']);
+            do_action('wp_head', json_encode($cartStatus));
+            return;
         }
 
-        update_post_meta($orderId, 'sender_remote_id', $cart->id);
+        update_post_meta($orderId, Sender_Helper::SENDER_CART_META, $cart->id);
         add_action('wp_head', [&$this, 'addConvertCartScript'], 10, 1);
         do_action('wp_head', json_encode($cartData));
+        do_action('sender_get_customer_data', $email, true);
     }
 
     public function senderPrepareCartData($cart)
@@ -264,6 +310,11 @@ class Sender_Carts
             $this->sender->senderApi->senderApiShutdownCallback("senderTrackRegisteredUsers", $wpId);
         }
 
+        $emailMarketingConset = get_user_meta($wpId, Sender_Helper::EMAIL_MARKETING_META_KEY, true);
+        if (empty($emailMarketingConset)) {
+            $this->updateUserEmailMarketingConsent($user->email, $wpId);
+        }
+
         $user->save();
     }
 
@@ -304,8 +355,8 @@ class Sender_Carts
         }
 
         if (empty($items) && $cart) {
-            #Keep converted carts
-            if ($cart->cart_status == self::CONVERTED_CART) {
+            #Keep converted carts and unpaid carts
+            if ($cart->cart_status == Sender_Helper::CONVERTED_CART || $cart->status === Sender_Helper::UNPAID_CART) {
                 return;
             }
 
@@ -337,7 +388,7 @@ class Sender_Carts
         }
 
         //If cart converted, start a new cart
-        if ($cart && $cart->cart_status == self::CONVERTED_CART){
+        if ($cart && $cart->cart_status == Sender_Helper::CONVERTED_CART) {
             $cart = false;
         }
 
@@ -361,7 +412,7 @@ class Sender_Carts
         }
 
         if (!empty($items)) {
-            if (!$senderUser = $this->senderGetVisitor()){
+            if (!$senderUser = $this->senderGetVisitor()) {
                 return;
             }
 
@@ -372,7 +423,7 @@ class Sender_Carts
             $newCart->save();
 
             $cartData = $this->senderPrepareCartData($newCart);
-            if (!$cartData){
+            if (!$cartData) {
                 return;
             }
 
@@ -459,7 +510,7 @@ class Sender_Carts
         $cartId = sanitize_text_field($_GET['hash']);
 
         $cart = (new Sender_Cart())->find($cartId);
-        if (!$cart || $cart->cart_recovered || $cart->cart_status == self::CONVERTED_CART) {
+        if (!$cart || $cart->cart_recovered || $cart->cart_status == Sender_Helper::CONVERTED_CART) {
             return wp_redirect(wc_get_cart_url());
         }
 
@@ -550,10 +601,20 @@ class Sender_Carts
         <?php
     }
 
+    public function addStatusCartUpdateScript($cartData)
+    {
+        ob_start();
+        echo "
+			<script>
+			sender('statusCartUpdate', $cartData)
+            </script>
+		";
+    }
+
     public function triggerEmailCheckout()
     {
         if (isset($_POST['email']) && !empty($_POST['email'])) {
-            $response = $this->sender->senderApi->senderTrackNotRegisteredUsers(['email' => sanitize_text_field($_POST['email']), 'visitor_id' => $this->senderSessionCookie], true);
+            $response = $this->sender->senderApi->senderTrackNotRegisteredUsers(['email' => sanitize_text_field($_POST['email']), 'visitor_id' => $this->senderSessionCookie]);
             if($response) {
                 return wp_send_json_success($response);
             }
@@ -566,4 +627,84 @@ class Sender_Carts
         wp_enqueue_script('checkout-email-trigger', plugins_url('assets/js/checkout-email-trigger.js', dirname(__FILE__)));
         wp_localize_script('checkout-email-trigger', 'senderAjax', array('ajaxUrl' => admin_url('admin-ajax.php')));
     }
+
+    //Use to convert carts which got confirmed payment
+    public function senderUpdateOrderStatus($orderId)
+    {
+        if (!isset($_POST['order_status'])) {
+            return;
+        }
+
+        $newOrderStatus = $_POST['order_status'];
+        $senderRemoteCartId = get_post_meta($orderId, Sender_Helper::SENDER_CART_META, true);
+
+        if (!empty($senderRemoteCartId) && $newOrderStatus === Sender_Helper::ORDER_COMPLETED) {
+            #Check if cart exists
+            $cart = (new Sender_Cart())->findByAttributes(
+                [
+                    'id' => $senderRemoteCartId,
+                    'cart_status' => Sender_Helper::UNPAID_CART
+                ]
+            );
+
+            if (!$cart){
+                return;
+            }
+
+            $wcOrder = wc_get_order($orderId);
+            $list = get_option('sender_customers_list');
+            $cartData = [
+                'external_id' => $cart->id,
+                'email' => $wcOrder->get_billing_email(),
+                'firstname' => $wcOrder->get_billing_first_name(),
+                'lastname' => $wcOrder->get_billing_last_name(),
+                'resource_key' => $this->senderGetResourceKey(),
+                'phone' => $wcOrder->get_billing_phone(),
+                'order_id' => (string)$orderId
+            ];
+
+            if ($list) {
+                $cartData['list_id'] = $list;
+            }
+
+            $user = get_user_by('email', $cartData['email']);
+
+            if ($user) {
+                $cartData['customer_id'] = $user->ID;
+            }
+
+            if ($this->sender->senderApi->senderConvertCart($cart->id, $cartData)) {
+                $cart->cart_status = Sender_Helper::CONVERTED_CART;
+                $cart->save();
+                do_action('sender_get_customer_data', $cartData['email'], true);
+            }
+        }
+    }
+
+    public function updateUserEmailMarketingConsent($email, $userId)
+    {
+        $subscriber = $this->sender->senderApi->getSubscriber($email);
+        if ($subscriber) {
+            if (isset($subscriber->data->status->email)) {
+                $emailStatusFromSender = strtoupper($subscriber->data->status->email);
+                switch ($emailStatusFromSender) {
+                    case Sender_Helper::UPDATE_STATUS_ACTIVE:
+                        $status = Sender_Helper::SUBSCRIBED;
+                        break;
+                    case Sender_Helper::UPDATE_STATUS_UNSUBSCRIBED:
+                        $status = Sender_Helper::UNSUBSCRIBED;
+                        break;
+                }
+
+                if (isset($status)) {
+                    update_user_meta(
+                        $userId,
+                        Sender_Helper::EMAIL_MARKETING_META_KEY,
+                        Sender_Helper::generateEmailMarketingConsent($status)
+                    );
+                }
+            }
+        }
+    }
+
 }
