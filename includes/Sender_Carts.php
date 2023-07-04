@@ -333,7 +333,7 @@ class Sender_Carts
             if (empty($items)){
                 return;
             }
-            
+
             //Making the woocommerce cookie active when adding from general view
             WC()->session->set_customer_session_cookie(true);
         }
@@ -437,8 +437,9 @@ class Sender_Carts
                     }
                 }
             } else {
-                add_action('wp_head', [&$this, 'addTrackCartScript']);
-                do_action('wp_head', json_encode($cartData));
+                add_action('wp_head', function() use ($cartData) {
+                    $this->addTrackCartScript(json_encode($cartData));
+                });
             }
         }
     }

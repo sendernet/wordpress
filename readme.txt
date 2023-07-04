@@ -4,7 +4,7 @@ Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email autom
 Requires at least: 4.2
 Tested up to: 6.2.2
 Requires PHP: 7.1
-Stable tag: 2.5.2
+Stable tag: 2.5.3
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -235,6 +235,8 @@ Our customer support team is always ready to help you with your day-to-day tasks
 * Updating phone and email statuses gathering
 * Payments pending for confirmation wont trigger product purchased, manually changing status to completed would trigger product
 purchased
+= 2.5.3 - 2023-07-04 =
+* Fix issue on add to cart with no ajax
 
 
 
