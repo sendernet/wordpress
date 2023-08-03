@@ -399,7 +399,12 @@ class Sender_WooCommerce
             $jsonData["discount"] = "-" . $pDiscount . "%";
         }
 
-        echo '<script type="application/sender+json">' . json_encode($jsonData) . '</script>';
+        ob_start();
+        ?>
+        <script type="application/sender+json"><?php echo json_encode($jsonData); ?></script>
+        <?php
+        $script_code = ob_get_clean();
+        echo $script_code;
     }
 
     private function getWooClientsOrderCompleted($chunkSize, $offset = 0)
