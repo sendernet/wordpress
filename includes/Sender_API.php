@@ -106,6 +106,8 @@ class Sender_API
                 }
             }
 
+            $data['ip_address'] = $this->getClientIp();
+
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($data)]);
             $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
@@ -117,6 +119,7 @@ class Sender_API
     {
         if (isset($userData['email']) && isset($userData['visitor_id'])) {
             $userData['store_id'] = get_option('sender_store_register') ?: '';
+            $userData['ip_address'] = $this->getClientIp();
             $params = array_merge($this->senderBaseRequestArguments(), ['body' => json_encode($userData)]);
             $response = wp_remote_post($this->senderStatsBaseUrl . 'attach_visitor', $params);
 
@@ -271,5 +274,24 @@ class Sender_API
 
         $response = wp_remote_request($this->senderBaseUrl . 'subscribers/' . $email, $this->senderBaseRequestArguments());
         return $this->senderBuildResponse($response);
+    }
+
+    public function getClientIp()
+    {
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ip = $_SERVER['HTTP_FORWARDED'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return $ip;
     }
 }
