@@ -1,4 +1,4 @@
-name: Deploy to WordPress SVN
+name: Deploy to WordPress SVN new plugin version
 
 on:
   push:
