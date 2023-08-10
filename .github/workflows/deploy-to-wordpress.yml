@@ -24,7 +24,7 @@ jobs:
 
       - name: Move to SVN
         run: |
-          rsync -a --exclude .git --exclude .idea --exclude 'sender-net-automated-emails' . sender-net-automated-emails/trunk/
+          rsync -a --exclude .git --exclude .idea --exclude .github --exclude 'sender-net-automated-emails' . sender-net-automated-emails/trunk/
 
       - name: Deploy
         run: |
