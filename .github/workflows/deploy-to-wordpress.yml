@@ -15,7 +15,7 @@ jobs:
       SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
 
     steps:
-      - name: Checkout Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
       - name: Pull WordPress SVN
