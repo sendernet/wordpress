@@ -111,12 +111,12 @@
                                 </div>
 
                                 <div class="sender-option sender-mb-20">
-                                    <div class="sender-dropdown-wrap">
+                                    <div class="">
                                         <label class="sender-label sender-select-label sender-form-label"
                                                for="sender_customers_list">Save "Customers who made a purchase"
                                             to:</label>
                                         <div class="sender-select-wrap sender-p-relative">
-                                            <select form="sender-form-settings" class="sender-woo-lists sender-br-5"
+                                            <select form="sender-form-settings" class="sender-woo-lists sender-br-5 select2-custom"
                                                     name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
                                                 echo 'disabled';
                                             } ?> id="sender_customers_list"
@@ -132,13 +132,13 @@
                                 </div>
 
                                 <div class="sender-option sender-mb-20">
-                                    <div class="sender-dropdown-wrap">
+                                    <div>
                                         <label class="sender-label sender-select-label sender-form-label"
                                                for="sender_registration_list">Save "New registrations" to:</label>
                                         <div class="sender-select-wrap sender-p-relative">
                                             <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
                                                 echo 'disabled';
-                                            } ?> name="sender_registration_list" class="sender-woo-lists sender-br-5"
+                                            } ?> name="sender_registration_list" class="sender-woo-lists sender-br-5 select2-custom"
                                                     id="sender_registration_list"
                                                     value="<?= get_option('sender_registration_list') ?>">
                                                 <option value="0">Select a list</option>
@@ -240,6 +240,59 @@
     </div>
 </div>
 
+<!--Select2 sender styling-->
+<style>
+    .select2 {
+        font-size: 13px !important;
+    }
+
+    .select2-selection, .select2-selection__clear, .select2-selection__arrow {
+        height: 40px !important;
+    }
+
+    .select2-selection__rendered {
+        line-height: 40px !important;
+        color: #000000 !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable, .select2-results__option:hover, .select2-results__option:active, .select2-results__option:focus {
+        background-color: #ff8d00 !important;
+    }
+
+    .select2-results__option {
+        color: #0a0c0d;
+    }
+
+    .select2-search__field {
+        border-color: transparent !important;
+        box-shadow: 0 0 0 1px #8a8787 !important;
+    }
+
+    .select2-selection__arrow, .select2-selection__clear {
+        font-size: 18px !important;
+    }
+
+    .select2-selection__arrow b {
+        border-color: #000 transparent transparent transparent !important;
+    }
+
+    .select2-selection__clear {
+        margin-right: 35px !important;
+    }
+
+    .select2-selection__arrow {
+        margin-right: 5px !important;
+    }
+
+    .select2-selection__rendered {
+        margin-left: 5px !important;
+    }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <script>
     var checkboxEl = jQuery('#sender_allow_tracking');
     var checkboxLabel = jQuery('#sender_subscribe_label');
@@ -331,4 +384,15 @@
             });
         });
     }
+
+    jQuery(document).ready(function() {
+        if (jQuery.fn.select2) {
+            jQuery('.select2-custom').select2({
+                placeholder: 'Select a list',
+                allowClear: true,
+                width: '100%',
+            });
+        }
+    });
+
 </script>
