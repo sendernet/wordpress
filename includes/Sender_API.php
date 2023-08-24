@@ -45,8 +45,23 @@ class Sender_API
 
     public function senderGetGroups()
     {
-        $data = wp_remote_request($this->senderBaseUrl . 'tags?limit=100', $this->senderBaseRequestArguments());
-        return $this->senderBuildResponse($data);
+        $page = 1;
+        $allGroups = [];
+
+        do {
+            $data = wp_remote_request($this->senderBaseUrl . 'tags?limit=1000&page=' . $page, $this->senderBaseRequestArguments());
+            $response = $this->senderBuildResponse($data);
+            if (!isset($response->data)){
+                return false;
+            }
+            if (isset($response->data)) {
+                $allGroups = array_merge($allGroups, $response->data);
+            }
+
+            $page++;
+        } while ($page <= $response->meta->last_page);
+
+        return $allGroups;
     }
 
     public function senderGetCart($cartHash)

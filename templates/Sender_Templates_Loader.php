@@ -49,12 +49,11 @@ class Sender_Templates_Loader
 
         if ($apiKey && !get_option('sender_account_disconnected')) {
             $groups = $this->sender->senderApi->senderGetGroups();
-            if (isset($groups->data)) {
-                $groupsDataSenderOption = [];
-                foreach ($groups->data as $group) {
-                    $groupsDataSenderOption[$group->id] = $group->title;
+            if ($groups) {
+                $groupsDataSenderOption = $this->extractGroupsData($groups);
+                if (!empty($groupsDataSenderOption)) {
+                    update_option('sender_groups_data', $groupsDataSenderOption);
                 }
-                update_option('sender_groups_data', $groupsDataSenderOption);
             }
 
             if (!get_option('sender_store_register')) {
@@ -65,6 +64,17 @@ class Sender_Templates_Loader
         $isCronJobRunning = $this->sender_is_cron_job_running();
 
         require_once('settings.php');
+    }
+
+    private function extractGroupsData($groups)
+    {
+        $groupsDataSenderOption = [];
+
+        foreach ($groups as $group) {
+            $groupsDataSenderOption[$group->id] = $group->title;
+        }
+
+        return $groupsDataSenderOption;
     }
 
     public function sender_is_cron_job_running()
