@@ -2,9 +2,9 @@
 Contributors: sendernet
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.2.2
+Tested up to: 6.3.1
 Requires PHP: 7.1
-Stable tag: 2.5.4
+Stable tag: 2.5.7
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -237,12 +237,19 @@ Our customer support team is always ready to help you with your day-to-day tasks
 purchased
 = 2.5.3 - 2023-07-04 =
 * Fix issue on add to cart with no ajax
-= 2.5.4 - 2023-08-09 =
+= 2.5.4 - 2023-08-30 =
 * Product block fixes
 * Adding location to subscriber in sender app
-
-
-
-
+* Select2 implementation for larger amount of groups
+= 2.5.5 - 2023-09-28 =
+* Load forms performance on widgets tab
+* Add/Remove store on woocomerce activation/deactivation
+* Fix on synced orders for correct segment display
+* Forms activated on no woocommerce menu
+= 2.5.6 - 2023-10-04 =
+* Fix on incorrect type checks for new installations
+= 2.5.7 - 2023-11-14 =
+* Use cron always when syncing
+* Fix on font loading script, avoid head hook
 
 

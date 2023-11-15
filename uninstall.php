@@ -25,7 +25,8 @@ $availableSettings = [
     'sender_wocommerce_sync',
     'sender_synced_data_date',
     'sender_subscribe_to_newsletter_string',
-    'sender_subscribe_label'
+    'sender_subscribe_label',
+    'sender_forms_data_last_update',
 ];
 
 global $wpdb;
