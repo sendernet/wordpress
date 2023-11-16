@@ -107,7 +107,7 @@ class Sender_WooCommerce
             <table class="form-table">
                 <tbody>
                 <tr class="show-admin-bar user-admin-bar-front-wrap">
-                    <th scope="row">Subscribed to newsletter</th>
+                    <th scope="row"><?php _e('Subscribed to newsletter', 'sender-net-automated-emails')?></th>
                     <td>
                         <label for="sender_newsletter">
                             <input name="sender_newsletter" type="checkbox"
@@ -115,7 +115,7 @@ class Sender_WooCommerce
                         </label>
                         <br>
                         <br>
-                        <span>You should ask your customers for permission before you subscribe them to your marketing emails.</span>
+                        <span><?php _e('You should ask your customers for permission before you subscribe them to your marketing emails.','sender-net-automated-emails')?></span>
                     </td>
                 </tr>
                 </tbody>

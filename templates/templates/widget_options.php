@@ -1,9 +1,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
-<label for="<?php echo esc_attr($this->get_field_id('form')); ?>">Select form</label>
+<label for="<?php echo esc_attr($this->get_field_id('form')); ?>"><?php _e('Select form', 'sender-net-automated-emails')?></label>
 <select class="sender-d-none sender-invisible-form-select" id="<?php echo esc_attr($this->get_field_id('form')); ?>"
         name="<?php echo esc_attr($this->get_field_name('form')); ?>" class="widefat" style="width:100%;">
-    <option disabled selected>Select your form</option>
+    <option disabled selected><?php _e('Select your form', 'sender-net-automated-emails')?></option>
     <?php
     foreach (get_option('sender_forms_data') as $form) {
         $selected = false;

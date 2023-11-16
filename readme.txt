@@ -2,9 +2,9 @@
 Contributors: sendernet
 Tags: Sender, Sender.net, email marketing, signup forms, newsletter, email automation, popup
 Requires at least: 4.2
-Tested up to: 6.3.1
+Tested up to: 6.4.1
 Requires PHP: 7.1
-Stable tag: 2.5.7
+Stable tag: 2.5.8
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -251,5 +251,8 @@ purchased
 = 2.5.7 - 2023-11-14 =
 * Use cron always when syncing
 * Fix on font loading script, avoid head hook
+= 2.5.8 - 2023-11-16 =
+* Adding support for translations
+* Added Spanish language
 
 

@@ -8,7 +8,9 @@
         // Check if the sync has finished
         $syncFinished = get_transient('sender_sync_finished');
         if ($syncFinished) {
-            echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible"><p>Synced data completed.</p></div>';
+            echo '<div id="sender-data-sync-notice" class="notice notice-success is-dismissible"><p>';
+            _e('Synced data completed.', 'sender-net-automated-emails');
+            echo '</p></div>';
             echo '<br>';
             delete_transient('sender_sync_finished');
         }
@@ -30,18 +32,23 @@
                         </div>
                     <?php } ?>
                     <div class="sender-d-flex">
-                        <label for="sender_api_key" class="sender-label sender-form-label">Enter your API key</label>
+                        <label for="sender_api_key" class="sender-label sender-form-label">
+                            <?php _e('Enter your API key', 'sender-net-automated-emails'); ?>
+                        </label>
                     </div>
-                    <input name="sender_api_key" type="text" id="sender_api_key" placeholder="Paste your API key here"
+                    <input name="sender_api_key" type="text" id="sender_api_key" placeholder="<?php esc_attr_e('Paste your API key here', 'sender-net-automated-emails'); ?>"
                            class="sender-input sender-text-input sender-mb-20 sender-br-5">
                     <input type="submit" name="submit" id="submit"
                            class="sender-cta-button sender-large sender-mb-20 sender-br-5"
-                           value="Begin">
+                           value="<?php _e('Begin', 'sender-net-automated-emails'); ?>">
 
                     <div class="sender-api-text">
-                        <a href="https://app.sender.net/settings/tokens" target="_blank" class="sender-link">Click
-                            here</a> if you are not sure where to find it
+                        <?php _e('Click here', 'sender-net-automated-emails'); ?>
+                        <a href="https://app.sender.net/settings/tokens" target="_blank" class="sender-link">
+                            <?php _e('if you are not sure where to find it', 'sender-net-automated-emails'); ?>
+                        </a>
                     </div>
+
                 </div>
             </form>
 
@@ -56,188 +63,189 @@
 
                     </div>
 
-                    <div class="sender-logout sender-d-flex sender-justified-between">
-                        <div class="sender-status-display sender-d-flex sender-mb-20 sender-p-relative">
-                            <div class="sender-green-checkbox">
-                                <span class="sender-checkbox-tick"></span>
-                            </div>
-                            <div class="sender-status-text sender-p-relative sender-default-text">
-                                Connected to Sender account <br>
-                                <strong><?php echo get_option('sender_account_title'); ?></strong>
-                            </div>
+                <div class="sender-logout sender-d-flex sender-justified-between">
+                    <div class="sender-status-display sender-d-flex sender-mb-20 sender-p-relative">
+                        <div class="sender-green-checkbox">
+                            <span class="sender-checkbox-tick"></span>
                         </div>
-                        <div class="sender-btn-wrap sender-d-flex">
-                            <form method="post" action='' class="sender-mb-20">
-                                <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected"
-                                       value="true"
-                                       class="sender-input sender-text-input sender-br-5">
-                                <input type="submit" name="submit" id="sender-confirmation"
-                                       class="sender-cta-button sender-medium sender-br-5"
-                                       value="Change account">
-                            </form>
+                        <div class="sender-status-text sender-p-relative sender-default-text">
+                            <?php
+                            _e('Connected to Sender account', 'sender-net-automated-emails');
+                            echo '<br><strong>' . esc_html(get_option('sender_account_title')) . '</strong>';
+                            ?>
                         </div>
                     </div>
-                </div>
-                <?php if ($wooEnabled) { ?>
-                    <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative">
-                        <div class="sender-header sender-mb-20">WooCommerce settings</div>
-                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
-                              id="sender-form-settings">
-                            <div class="sender-options sender-d-flex sender-flex-dir-column">
-                                <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
-                                    <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
-                                    <label for="sender_allow_tracking"
-                                           class="sender-label sender-checkbox-label sender-p-relative">
-                                        <input class="sender-checkbox" type="checkbox" id="sender_allow_tracking"
-                                               value="sender_allow_tracking"
-                                               name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
-                                            echo 'checked';
-                                        } ?> >
-                                        <span class="sender-visible-checkbox"
-                                              style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
-                                        <span>Enable tracking</span>
-                                    </label>
-                                </div>
 
-                                <div class="sender-option sender-mb-20">
-                                    <div class="">
-                                        <label class="sender-label sender-select-label sender-form-label"
-                                               for="sender_customers_list">Save "Customers who made a purchase"
-                                            to:</label>
-                                        <div class="sender-select-wrap sender-p-relative">
-                                            <select form="sender-form-settings"
-                                                    class="sender-woo-lists sender-br-5 select2-custom"
-                                                    name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
-                                                echo 'disabled';
-                                            } ?> id="sender_customers_list"
-                                                    value="<?= get_option('sender_customers_list') ?>">
-                                                <option value="0">Select a list</option>
-                                                <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
-                                                    <option <?= get_option('sender_customers_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="sender-option sender-mb-20">
-                                    <div>
-                                        <label class="sender-label sender-select-label sender-form-label"
-                                               for="sender_registration_list">Save "New registrations" to:</label>
-                                        <div class="sender-select-wrap sender-p-relative">
-                                            <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
-                                                echo 'disabled';
-                                            } ?> name="sender_registration_list"
-                                                    class="sender-woo-lists sender-br-5 select2-custom"
-                                                    id="sender_registration_list"
-                                                    value="<?= get_option('sender_registration_list') ?>">
-                                                <option value="0">Select a list</option>
-                                                <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
-                                                    <option <?= get_option('sender_registration_list') == $groupId ? 'selected' : '' ?>
-                                                            value="<?= $groupId ?>"><?= $groupTitle ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="sender-logout sender-d-flex sender-justified-between">
-                                <div class="sender-default-text sender-mb-20">
-                                    <a href="https://help.sender.net/knowledgebase/the-documentation-for-woocommerce-plugin/"
-                                       target="_blank" class="sender-link">Click here</a> for documentation of
-                                    WooCommerce plugin
-                                </div>
-                                <div class="sender-btn-wrap sender-d-flex">
-                                    <input type="submit" name="submit" id="submit"
-                                           class="sender-cta-button sender-medium sender-mb-20 sender-br-5"
-                                           value="Save">
-                                </div>
-                            </div>
-                        </form>
-
-                    </div>
-                    <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20">
-                        <div class="sender-header sender-mb-20">Subscribe to newsletter label</div>
-                        <p>Change the default text showing in cart checkouts and user account profile to your custom
-                            text.</p>
-                        <p><strong>Enable tracking must be active</strong></p>
-                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
-                              id="sender-form-settings">
-                            <div class="sender-options sender-d-flex sender-flex-dir-column">
-                                <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
-                                    <input type="hidden" value="0" name="sender_subscribe_label_hidden_checkbox">
-                                    <label for="sender_subscribe_label"
-                                           class="sender-label sender-checkbox-label sender-p-relative">
-                                        <input class="sender-checkbox sender-label-subscribe" type="checkbox"
-                                               id="sender_subscribe_label"
-                                               value="sender_subscribe_label"
-                                               name="sender_subscribe_label" <?php if (get_option('sender_subscribe_label')) {
-                                            echo 'checked';
-                                        } ?> >
-                                        <span class="sender-visible-checkbox"
-                                              style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
-                                        <span>Enable</span>
-                                    </label>
-                                </div>
-                                <div class="sender-option sender-mb-20">
-                                    <div class="sender-subscriber-label-input">
-                                        <label>
-                                            <input maxlength="255" name="sender_subscribe_to_newsletter_string"
-                                                   type="text"
-                                                   class="sender-input sender-text-input sender-mb-20 sender-br-5 sender-label-subscribe"
-                                                   id="sender_subscribe_to_newsletter_string"
-                                                   value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
-                                            <input type="submit" name="submit" id="submit-label-newsletter"
-                                                   class="sender-cta-button sender-large sender-mb-20 sender-br-5 sender-submit-label-subscribe"
-                                                   value="Save">
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-
-                    </div>
-
-                    <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between sender-mt-20">
-                        <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
-                              id="sender-export-data">
-                            <div class="sender-mb-20">
-                                <?php
-                                // Check if there is a running or scheduled cron job
-                                if ((isset($isCronJobRunning) && $isCronJobRunning) && (isset($syncFinished) && !$syncFinished)) {
-                                    $disableSubmit = 'disabled';
-                                    $noticeMessage = 'A job is running to sync data with Sender application.';
-                                } else {
-                                    $disableSubmit = '';
-                                    $noticeMessage = 'Import all subscribers, orders, and products from your WooCommerce store into your Sender account.';
-                                }
-                                ?>
-                                <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync" value="0"
-                                       class="sender-input sender-text-input sender-br-5">
-                                <div class="sender-btn-wrap sender-d-flex">
-                                    <input type="submit" name="submit" id="sender-submit-sync"
-                                           class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
-                                           value="Sync with Sender" <?php echo $disableSubmit; ?>>
-                                    <div class="sender-default-text" id="sender-import-text">
-                                        <?php echo $noticeMessage; ?>
-                                        <a target="_blank" class="sender-link"
-                                           href="https://app.sender.net/settings/connected-stores">See your store
-                                            information</a>
-                                        <span style="display: block">Last time synchronized: <strong
-                                                    style="display: block"><?php echo get_option('sender_synced_data_date'); ?></strong></span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="sender-btn-wrap sender-d-flex">
+                        <form method="post" action='' class="sender-mb-20">
+                            <input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected"
+                                   value="true"
+                                   class="sender-input sender-text-input sender-br-5">
+                            <input type="submit" name="submit" id="sender-confirmation"
+                                   class="sender-cta-button sender-medium sender-br-5"
+                                   value="<?php esc_attr_e('Change user', 'sender-net-automated-emails'); ?>">
                         </form>
                     </div>
-                <?php } else { ?>
-                <div class="sender-box sender-br-5 sender-p-relative" style="padding-top:0px!important">
-                    <p>You can now find your <a target="_blank" class="sender-link" href="https://app.sender.net/forms">Sender.net
-                            forms</a> in WordPress widgets or in the page builder.</p>
                 </div>
             </div>
+            <?php if ($wooEnabled) { ?>
+                <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative">
+                    <div class="sender-header sender-mb-20"><?php _e('WooCommerce settings', 'sender-net-automated-emails'); ?></div>
+                    <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
+                          id="sender-form-settings">
+                        <div class="sender-options sender-d-flex sender-flex-dir-column">
+                            <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                <input type="hidden" value="0" name="sender_allow_tracking_hidden_checkbox">
+                                <label for="sender_allow_tracking"
+                                       class="sender-label sender-checkbox-label sender-p-relative">
+                                    <input class="sender-checkbox" type="checkbox" id="sender_allow_tracking"
+                                           value="sender_allow_tracking"
+                                           name="sender_allow_tracking" <?php if (get_option('sender_allow_tracking')) {
+                                        echo 'checked';
+                                    } ?> >
+                                    <span class="sender-visible-checkbox"
+                                          style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
+                                    <span><?php _e('Enable tracking', 'sender-net-automated-emails'); ?></span>
+                                </label>
+                            </div>
+
+                            <div class="sender-option sender-mb-20">
+                                <div class="">
+                                    <label class="sender-label sender-select-label sender-form-label"
+                                           for="sender_customers_list"><?php _e("Save Customers who made a purchase to:", 'sender-net-automated-emails')?>
+                                    </label>
+                                    <div class="sender-select-wrap sender-p-relative">
+                                        <select form="sender-form-settings"
+                                                class="sender-woo-lists sender-br-5 select2-custom"
+                                                name="sender_customers_list" <?php if (!get_option('sender_allow_tracking')) {
+                                            echo 'disabled';
+                                        } ?> id="sender_customers_list"
+                                                value="<?= get_option('sender_customers_list') ?>">
+                                            <option value="0"><?php _e("Select a list", 'sender-net-automated-emails')?></option>
+                                            <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
+                                                <option <?= get_option('sender_customers_list') == $groupId ? 'selected' : '' ?>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sender-option sender-mb-20">
+                                <div>
+                                    <label class="sender-label sender-select-label sender-form-label"
+                                           for="sender_registration_list"><?php _e("Save New registrations to:", 'sender-net-automated-emails')?></label>
+                                    <div class="sender-select-wrap sender-p-relative">
+                                        <select form="sender-form-settings" <?php if (!get_option('sender_allow_tracking')) {
+                                            echo 'disabled';
+                                        } ?> name="sender_registration_list"
+                                                class="sender-woo-lists sender-br-5 select2-custom"
+                                                id="sender_registration_list"
+                                                value="<?= get_option('sender_registration_list') ?>">
+                                            <option value="0"><?php _e("Select a list", 'sender-net-automated-emails')?></option>
+                                            <?php foreach (get_option('sender_groups_data') as $groupId => $groupTitle): ?>
+                                                <option <?= get_option('sender_registration_list') == $groupId ? 'selected' : '' ?>
+                                                        value="<?= $groupId ?>"><?= $groupTitle ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="sender-logout sender-d-flex sender-justified-between">
+                            <div class="sender-default-text sender-mb-20">
+                                <a href="https://help.sender.net/knowledgebase/the-documentation-for-woocommerce-plugin/"
+                                   target="_blank" class="sender-link"><?php _e('Click here', 'sender-net-automated-emails')?></a> <?php _e('for documentation of WooCommerce plugin','sender-net-automated-emails')?>
+                            </div>
+                            <div class="sender-btn-wrap sender-d-flex">
+                                <input type="submit" name="submit" id="submit"
+                                       class="sender-cta-button sender-medium sender-mb-20 sender-br-5"
+                                       value="<?php _e('Save', 'sender-net-automated-emails')?>">
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="sender-plugin-settings sender-box sender-br-5 sender-p-relative sender-mb-20">
+                    <div class="sender-header sender-mb-20"><?php _e('Subscribe to newsletter label', 'sender-net-automated-emails')?></div>
+                    <p><?php _e('Change the default text showing in cart checkouts and user account profile to your custom text.', 'sender-net-automated-emails')?></p>
+                    <p><strong><?php _e('Enable tracking must be active', 'sender-net-automated-emails')?></strong></p>
+                    <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
+                          id="sender-form-settings">
+                        <div class="sender-options sender-d-flex sender-flex-dir-column">
+                            <div class="sender-option sender-d-flex sender-p-relative sender-mb-20">
+                                <input type="hidden" value="0" name="sender_subscribe_label_hidden_checkbox">
+                                <label for="sender_subscribe_label"
+                                       class="sender-label sender-checkbox-label sender-p-relative">
+                                    <input class="sender-checkbox sender-label-subscribe" type="checkbox"
+                                           id="sender_subscribe_label"
+                                           value="sender_subscribe_label"
+                                           name="sender_subscribe_label" <?php if (get_option('sender_subscribe_label')) {
+                                        echo 'checked';
+                                    } ?> >
+                                    <span class="sender-visible-checkbox"
+                                          style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>
+                                    <span><?php _e('Enable', 'sender-net-automated-emails')?></span>
+                                </label>
+                            </div>
+                            <div class="sender-option sender-mb-20">
+                                <div class="sender-subscriber-label-input">
+                                    <label>
+                                        <input maxlength="255" name="sender_subscribe_to_newsletter_string"
+                                               type="text"
+                                               class="sender-input sender-text-input sender-mb-20 sender-br-5 sender-label-subscribe"
+                                               id="sender_subscribe_to_newsletter_string"
+                                               value="<?php echo get_option('sender_subscribe_to_newsletter_string') ?>">
+                                        <input type="submit" name="submit" id="submit-label-newsletter"
+                                               class="sender-cta-button sender-large sender-mb-20 sender-br-5 sender-submit-label-subscribe"
+                                               value="<?php _e('Save', 'sender-net-automated-emails')?>">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+
+                <div class="sender-flex-dir-column sender-box sender-br-5 sender-d-flex sender-justified-between sender-mt-20">
+                    <form method="post" class="sender-flex-dir-column sender-d-flex sender-h-100" action=''
+                          id="sender-export-data">
+                        <div class="sender-mb-20">
+                            <?php
+                            // Check if there is a running or scheduled cron job
+                            if ((isset($isCronJobRunning) && $isCronJobRunning) && (isset($syncFinished) && !$syncFinished)) {
+                                $disableSubmit = 'disabled';
+                                $noticeMessage = esc_html__('A job is running to sync data with Sender application.', 'sender-net-automated-emails');
+                            } else {
+                                $disableSubmit = '';
+                                $noticeMessage = esc_html__('Import all subscribers, orders, and products from your WooCommerce store into your Sender account.', 'sender-net-automated-emails');
+                            }
+                            ?>
+                            <input name="sender_wocommerce_sync" type="hidden" id="sender_wocommerce_sync" value="0"
+                                   class="sender-input sender-text-input sender-br-5">
+                            <div class="sender-btn-wrap sender-d-flex">
+                                <input type="submit" name="submit" id="sender-submit-sync"
+                                       class="sender-cta-button sender-medium sender-br-5 sender-height-fit"
+                                       value="<?php _e('Sync with Sender', 'sender-net-automated-emails')?>" <?php echo $disableSubmit; ?>>
+                                <div class="sender-default-text" id="sender-import-text">
+                                    <?php echo $noticeMessage; ?>
+                                    <a target="_blank" class="sender-link"
+                                       href="https://app.sender.net/settings/connected-stores"><?php _e('See your store information', 'sender-net-automated-emails')?></a>
+                                    <span style="display: block"><?php _e('Last time synchronized:', 'sender-net-automated-emails')?> <strong
+                                                style="display: block"><?php echo get_option('sender_synced_data_date'); ?></strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            <?php } else { ?>
+            <div class="sender-box sender-br-5 sender-p-relative" style="padding-top:0px!important">
+                <?php
+                echo '<p>' . esc_html__('You can now find your', 'sender-net-automated-emails') . ' <a target="_blank" class="sender-link" href="https://app.sender.net/forms">' . esc_html__('Sender.net forms', 'sender-net-automated-emails') . '</a> ' . esc_html__('in WordPress widgets or in the page builder.', 'sender-net-automated-emails') . '</p>';
+                ?>
+            </div>
+        </div>
     <?php } ?>
     </div>
     <?php } ?>
@@ -338,17 +346,27 @@
         jQuery('.sender-subscriber-label-input').prop('disabled', !jQuery(ev.currentTarget).is(':checked'));
     });
 
-    jQuery('#sender-confirmation').click(function (e) {
-        e.preventDefault();
-        toggleModal('This will disconnect the store from your Sender account.');
+    jQuery(document).ready(function ($) {
+        $('#sender-confirmation').click(function (e) {
+            e.preventDefault();
+
+            var disconnectMessage = '<?php _e("This will disconnect the store from your Sender account.", "sender-net-automated-emails"); ?>';
+
+            toggleModal(disconnectMessage);
+        });
     });
 
 
     function toggleModal(text) {
         $wrapper = jQuery('<div class="sender-container" id="sender-modal-wrapper"></div>').appendTo('body');
+        var deleteMessage = '<?php _e("Delete subscribers associated with this store", "sender-net-automated-emails"); ?>';
+        var yes = '<?php _e("Yes", "sender-net-automated-emails"); ?>';
+        var no = '<?php _e("No", "sender-net-automated-emails"); ?>';
+        var confirmDelete = '<?php _e("Confirm Delete", "sender-net-automated-emails"); ?>';
+
         $modal = jQuery('<div id="sender-modal-confirmation">' +
             '<div id="sender-modal-header">' +
-            '<h3 class="sender-header">Confirm Delete</h3>' +
+            '<h3 class="sender-header">' + confirmDelete +'</h3>' +
             '<span class="sender-modal-action" id="sender-modal-close">' +
             'x</span>' +
             '</div>' +
@@ -359,13 +377,13 @@
             '<label class="sender-label" for="delete-subscribers-checkbox">' +
             '<input class="sender-checkbox" type="checkbox" id="delete-subscribers-checkbox" name="delete-subscribers">' +
             '<span class="sender-visible-checkbox sender-visible-checkbox-modal" style="background-image: url(<?php echo plugin_dir_url(dirname(__FILE__)) . 'assets/images/white_check.png'; ?>)"></span>' +
-            '<span> Delete subscribers associated with this store </span>' +
+            '<span>' + deleteMessage + '</span>' +
             '</label>' +
             '</div>' +
             '<div id="sender-modal-buttons">' +
-            '<button id="no-disconnected" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn sender-modal-action">No</button>' +
+            '<button id="no-disconnected" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn sender-modal-action">'+ no +'</button>' +
             '<input name="sender_account_disconnected" type="hidden" id="sender_account_disconnected" value="true">' +
-            '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="Yes"></input>' +
+            '<input type="submit" name="submit" class="sender-cta-button sender-medium sender-br-5 sender-modal-action-btn" value="'+ yes +'"></input>' +
             '</div>' +
             '</form>' +
             '</div>' +
